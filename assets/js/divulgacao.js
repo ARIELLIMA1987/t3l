@@ -17,14 +17,13 @@
       
       "ARIEL (64) 99227-7537",
       "MARCOS (64) 99928-0210"
-    ],
-  
-   
+
+      {
     ANAPOLIS: [
+      
       "ARIEL (64) 99227-7537",
+      "MARCOS (64) 99928-0210"
     ],
- 
-    ]
   };
 
   const DEFAULT_BG = PRODUCT_BG_MAP.SOJA;
