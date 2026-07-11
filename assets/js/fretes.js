@@ -1466,7 +1466,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
 <body>
 <div class="page">
   <div class="head">
-    <img src="../assets/img/logo-novafrota.png" alt="NOVA FROTA" />
+    <img src="../assets/img/logot3l.png" alt="T3L / ROCA" />
   </div>
   <div class="bar"></div>
   <table>
