@@ -41,129 +41,18 @@
       "EDSON CROCHIQUIA", "COPAIBA", "ATVOS", "JRCA"
     ],
     contatosPorFilial: {
-      MINEIROS: [{ nome: "KIEWERSON", fone: "5564999794586" }],
-      ARAGUARI: [{ nome: "GUILHERME", fone: "5564992177636" }],
-      ANAPOLIS: [{ nome: "WILHANS", fone: "5566996733683" }],
-      "BOM JESUS": [{ nome: "MATEUS", fone: "5564993070738" }],
-      MONTIVIDIU: [{ nome: "MARCELO", fone: "5564996532847" }],
-      "RIO VERDE": [{ nome: "ARIEL", fone: "5564992277537" }],
-      INDIARA: [{ nome: "RAFAEL", fone: "5564999108790" }],
-      ITUMBIARA: [{ nome: "JHONATAN", fone: "5564992251214" }],
-      JATAI: [{ nome: "RONE", fone: "5564996264511" }],
-      "CHAP CEU": [{ nome: "RICARDO", fone: "5564999913512" }],
-      CRISTALINA: [{ nome: "EVERALDO", fone: "5561996924906" }],
-      "RIO VERDE FERT": [{ nome: "NARCISO", fone: "5564999365343" }],
-      VIANOPOLIS: [{ nome: "FHELLIPE", fone: "5562999307778" }],
-      FORMOSA: [{ nome: "FABIOLA", fone: "5562996017658" }],
-      CATAlÃO: [{ nome: "EVERALDO JR", fone: "556492373735" }],
-      "CATALÃO": [{ nome: "EVERALDO JR", fone: "556492373735" }],
-      "URUAÇU": [{ nome: "GUILHERME", fone: "5562996978707" }],
-      SOROCABA: [{ nome: "DIOGO", fone: "5515992784842" }],
+    "RIO VERDE": [{ nome: "ARIEL", fone: "5564992277537" }],
     },
   };
 
   const FILIAIS_CONTATOS_ARTE = {
     RIOVERDE: [
       "ARIEL (64) 99227-7537",
-      "GAUXIM (64) 99300-5771",
-      "UANDER (64) 98114-4642",
-      "RODRIGO (64) 99603-1200"
+      "AGENOR (64) 99276-3998",
+      "ROGER (64) 99292-5861",
+      "MARCOS VINICIUS (64) 99928-0210"
     ],
-    FERTILIZANTE: [
-      "NARCISO (64) 99936-5343",
-      "NIVAIR (64) 99284-4955",
-      "",
-      ""
-    ],
-    BOMJESUS: [
-      "MATEUS (64) 99307-0738",
-      "EDUARDO (64) 99208-5655",
-      "",
-      ""
-    ],
-    MONTIVIDIU: [
-      "MARCELO (64) 99653-2847",
-      "",
-      ""
-    ],
-    MINEIROS: [
-      "KIEWERSON (64) 99979-4586",
-      "VINICIUS (64) 99939-9946",
-      "",
-      ""
-    ],
-    INDIARA: [
-      "RAFAEL P (64) 99910-8790",
-      "RAFAEL (64) 99937-0131",
-      "",
-      ""
-    ],
-    FORMOSA: [
-      "FABIOLA (62) 99601-7658",
-      "JOAMAR (61) 99628-1922",
-      "",
-      ""
-    ],
-    CRISTALINA: [
-      "EVERALDO (61) 99692-4906",
-      "RAFAELA (61) 99319-6153",
-      "",
-      ""
-    ],
-    CATALAO: [
-      "EVERALDO JR (64) 99237-3735",
-      "",
-      "",
-      ""
-    ],
-    ANAPOLIS: [
-      "WILHANS (66) 99673-3683",
-      "DANILO (62) 99315-5713",
-      "LUCAS (62) 99318-9816",
-      "EDSON (62) 99340-5792"
-    ],
-    URUACU: [
-      "GUILHERME (62) 99697-8707",
-      "GABRIEL (61) 99846-3585",
-      "",
-      ""
-    ],
-    SAOPAULO: [
-      "DIOGO (15) 99278-4842",
-      "",
-      "",
-      ""
-    ],
-    ITUMBIARA: [
-      "JEFERSON (64) 99263-5363",
-      "NATAL (64) 99322-6440",
-      "GUILHERME (64) 99217-7636",
-      "MAYKON (64) 99254-4094"
-    ],
-    VIANOPOLIS: [
-      "FHELLIPE (62) 99930-7778",
-      "",
-      "",
-      ""
-    ],
-    CHAPEU: [
-      "RICARDO (64) 99991-3512",
-      "JONAS (64) 99607-2391",
-      "",
-      ""
-    ],
-    ARAGUARI: [
-      "GUILHERME (64) 99217-7636",
-      "ADRIELLY (34) 99156-6198",
-      "",
-      ""
-    ],
-    JATAI: [
-      "TRIPA (64) 99982-9980",
-      "HUDSON (64) 99906-2674",
-      "PAULO (64) 99228-4439",
-      "RONE (64) 99626-4511"
-    ]
+   
   };
 
   const CONTACT_PHONE = (() => {
