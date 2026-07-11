@@ -14,16 +14,14 @@
 
   const FILIAIS_CONTATOS = {
     RIOVERDE: [
-      "RODRIGO (64) 99603-1200",
-       "ROGER (64)99292-5861",
-      "AGENOR (64) 99276-3998",
+      
       "ARIEL (64) 99227-7537",
       "MARCOS (64) 99928-0210"
     ],
   
    
     ANAPOLIS: [
-      "X (66) 99673-3683",
+      "ARIEL (64) 99227-7537",
     ],
  
     ]
