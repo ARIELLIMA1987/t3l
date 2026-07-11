@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cálculo Piso Mínimo de Frete - T3L</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="../assets/js/auth.js"></script>
+
+  <style>
+    :root{
+      --bg:#050b18; --panel:#07162b; --panel2:#0a1b33; --panel3:#0d2244;
+      --line:rgba(70,110,190,.42); --line2:rgba(90,130,220,.58);
+      --text:#eef5ff; --muted:rgba(238,245,255,.72); --dim:rgba(238,245,255,.54);
+      --blue:#2563eb; --blue2:#5b7cff; --green:#29d391; --green2:#6eee9b;
+      --red:#ff6464; --redSoft:rgba(255,80,80,.23); --cyan:#17c9c3;
+      --shadow:0 18px 45px rgba(0,0,0,.38);
+    }
+    *{box-sizing:border-box}
+    html,body{max-width:100%;overflow-x:hidden}
+    body{
+      margin:0; min-height:100vh; color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(1100px 680px at 10% 10%, rgba(28,93,205,.25), transparent 58%),
+        radial-gradient(900px 520px at 90% 0%, rgba(41,211,145,.10), transparent 58%),
+        radial-gradient(1200px 720px at 50% 120%, rgba(37,99,235,.14), transparent 62%),
+        var(--bg);
+    }
+    .wrap{width:100%;max-width:1500px;margin:0 auto;padding:14px;overflow-x:hidden}
+    .topbar{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:14px;min-width:0}
+    .title{text-align:center;flex:1;min-width:220px}
+    h1{margin:0;font-size:clamp(22px,2.1vw,30px);letter-spacing:.04em;font-weight:950;text-transform:uppercase;line-height:1.08}
+    .subtitle{margin-top:4px;color:var(--muted);font-size:14px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn,.smallBtn{
+      border:1px solid var(--line2); color:var(--text); cursor:pointer; border-radius:10px;
+      background:linear-gradient(180deg,rgba(20,44,91,.98),rgba(9,24,52,.98));
+      font-weight:850; letter-spacing:.01em; transition:.15s ease; white-space:nowrap;
+    }
+    .smallBtn{padding:9px 12px}.btn{width:100%;padding:13px 16px;font-size:15px}
+    .btn:hover,.smallBtn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+    .green{border-color:rgba(41,211,145,.65);background:linear-gradient(180deg,rgba(16,98,60,.88),rgba(8,54,41,.92))}
+    .cyan{border-color:rgba(23,201,195,.65);background:linear-gradient(180deg,rgba(15,151,143,.88),rgba(7,91,95,.92))}
+    .danger{border-color:rgba(255,100,100,.5);background:linear-gradient(180deg,rgba(83,28,40,.9),rgba(38,20,34,.9))}
+    .panel{
+      border:1px solid var(--line); border-radius:10px; background:linear-gradient(180deg,rgba(8,25,50,.92),rgba(5,17,35,.88));
+      box-shadow:var(--shadow); position:relative; overflow:hidden;
+    }
+    .panel::before{content:"";position:absolute;inset:0;background:radial-gradient(620px 180px at 50% -40px,rgba(80,135,255,.13),transparent 72%);pointer-events:none}
+    .panelInner{position:relative;padding:12px}
+    .layout{display:grid;grid-template-columns:minmax(285px,330px) minmax(0,1fr) minmax(285px,330px);grid-template-areas:"summary main params";gap:12px;align-items:start;width:100%;min-width:0}
+    .leftCol{grid-area:params;min-width:0}.mainCol{grid-area:main;min-width:0}.rightCol{grid-area:summary;min-width:0}
+    @media(max-width:1180px){.layout{grid-template-columns:1fr;grid-template-areas:"summary" "params" "main"}.rightCol,.leftCol{display:block}.rightCol .panel{height:auto}}
+    @media(max-width:760px){.topbar{display:block}.actions{justify-content:center;margin-top:12px}.rightCol{display:block}.panel{margin-bottom:12px}h1{font-size:22px}}
+    .sectionTitle{display:flex;align-items:center;gap:8px;font-weight:950;text-transform:uppercase;letter-spacing:.02em;margin:0 0 14px;font-size:15px}
+    .badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line2);background:rgba(50,82,170,.22);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:850;color:#dfe9ff}
+    label{display:block;font-size:13px;color:#f4f7ff;margin:12px 0 7px}
+    input,select{
+      width:100%;border:1px solid rgba(78,118,210,.58);border-radius:10px;background:rgba(7,15,36,.74);color:var(--text);
+      padding:11px 13px;outline:none;font-size:14px;transition:.15s;font-variant-numeric:tabular-nums;
+    }
+    input:focus,select:focus{border-color:rgba(41,211,145,.75);box-shadow:0 0 0 3px rgba(41,211,145,.14)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    .seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid rgba(78,118,210,.52);border-radius:10px;overflow:hidden;background:rgba(7,15,36,.56)}
+    .seg button{border:0;padding:10px;background:transparent;color:var(--muted);font-weight:850;cursor:pointer}.seg button.active.yes{background:linear-gradient(90deg,#116c39,#0e5136);color:white}.seg button.active.no{background:linear-gradient(90deg,#7c2a33,#4b1a26);color:white}
+    .hint{font-size:12px;color:var(--muted);line-height:1.45}.info{color:#60a5fa;font-weight:900}.miniLine{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px dashed rgba(105,145,215,.22);font-size:13px}.miniLine span:last-child{text-align:right;font-weight:850}.blueTxt{color:#72a2ff}.greenTxt{color:var(--green2)}.redTxt{color:#ff9c9c}
+    .official{margin-bottom:14px}.officialGrid{display:grid;grid-template-columns:minmax(140px,170px) minmax(190px,1fr) repeat(3,minmax(120px,155px));gap:10px;align-items:stretch;border:1px solid rgba(78,118,210,.35);border-radius:10px;padding:12px;background:rgba(3,14,30,.36);min-width:0}.officialGrid>*{min-width:0}
+    .tabCard{border:1px solid rgba(78,118,210,.58);border-radius:8px;background:linear-gradient(180deg,rgba(20,88,205,.92),rgba(13,58,150,.88));padding:14px;text-align:center;font-weight:950}.tabCard small{display:block;font-size:10px;color:#dce7ff;margin-top:4px}
+    .bigResult{text-align:center}.bigResult .label{font-size:14px;color:var(--muted);text-transform:uppercase}.bigResult .value{font-size:clamp(28px,3vw,39px);font-weight:950;color:var(--green2);letter-spacing:.02em}.bigResult .sub{font-size:13px;color:var(--muted)}
+    .calcBox{border:1px solid rgba(78,118,210,.48);border-radius:8px;padding:10px;text-align:center;min-height:86px;background:rgba(5,15,34,.58);overflow:hidden}.calcBox .k{font-size:12px;color:#fff}.calcBox .v{font-size:clamp(16px,1.45vw,22px);font-weight:900;margin-top:4px;white-space:nowrap}.calcBox .f{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.25}
+    @media(max-width:1500px){.officialGrid{grid-template-columns:1fr 1fr}.bigResult{grid-column:span 1}.tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:1100px){.officialGrid{grid-template-columns:1fr 1fr}.bigResult{grid-column:span 1}}
+    .tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:12px}.tabBtn{padding:10px 6px;min-width:0;border:1px solid rgba(78,118,210,.55);border-radius:8px;background:rgba(5,17,38,.76);color:var(--text);font-weight:900;cursor:pointer;overflow:hidden}.tabBtn small{display:block;font-weight:600;color:var(--muted);margin-top:4px;font-size:10px;line-height:1.15}.tabBtn.active{background:linear-gradient(180deg,rgba(37,99,235,.95),rgba(14,65,160,.95));border-color:#3b82f6}
+    @media(max-width:900px){.tabs{grid-template-columns:repeat(2,1fr)}}
+    .commercialHead{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.commercialHead .sectionTitle{margin:0}.tableWrap{overflow:auto;border:1px solid rgba(78,118,210,.36);border-radius:10px;max-height:392px}table{width:100%;border-collapse:collapse;min-width:620px}th,td{border-bottom:1px solid rgba(90,130,220,.20);padding:10px 12px;font-size:13px}th{position:sticky;top:0;background:#07112c;color:#eef5ff;text-transform:uppercase;font-size:12px;z-index:1}td.num,th.num{text-align:right}tr{background:rgba(4,15,33,.38)}tr:nth-child(even){background:rgba(7,22,44,.48)}tr.active{background:linear-gradient(90deg,rgba(28,93,205,.75),rgba(17,47,95,.56))}.vehicleName{white-space:nowrap}.weightInput{max-width:118px;text-align:center;padding:8px;border-radius:8px}.unit{color:var(--muted);font-weight:800}.motor{color:#ff857d;font-weight:950}.empresa{color:#6e93ff;font-weight:950}.trash{color:#ff4d4d;font-size:18px;text-align:center}.addVehicle{max-width:310px;margin:12px auto 0}.summaryCard .sectionTitle{margin-bottom:12px}.summaryCard .badge{margin-bottom:8px}.summaryMeta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.summaryMeta .mini{border:1px solid rgba(78,118,210,.38);border-radius:9px;padding:9px;background:rgba(6,16,36,.5)}.summaryMeta .mini .t{font-size:11px;color:var(--muted)}.summaryMeta .mini .v{font-size:16px;font-weight:950;margin-top:3px;text-align:right}.summaryInputRow{display:grid;grid-template-columns:minmax(0,1fr) 95px;align-items:center;gap:10px;padding:8px 0}.summaryInputRow label{margin:0;color:#fff}.summaryInputRow input{padding:9px 10px;text-align:right}.summaryInputRow .unitText{font-size:13px;color:var(--muted);font-weight:900;margin-left:4px}.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(110,150,220,.35),transparent);margin:10px 0}.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.kpi{border:1px solid rgba(78,118,210,.42);border-radius:9px;padding:11px;background:rgba(6,16,36,.6);text-align:center}.kpi .t{font-size:12px;color:var(--muted)}.kpi .v{font-size:20px;font-weight:950;margin-top:4px}.formula{font-size:11px;color:var(--muted);line-height:1.45;margin-top:12px}.notes{margin-top:14px}.noteGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.noteText{font-size:12px;color:var(--muted);line-height:1.48}.footer{margin-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;border:1px solid rgba(78,118,210,.35);border-radius:8px;padding:10px 14px;background:rgba(8,25,50,.72);color:var(--muted);font-size:13px;text-align:center}
+    @media(max-width:760px){.noteGrid,.footer{grid-template-columns:1fr}.officialGrid{grid-template-columns:1fr}.row,.row3{grid-template-columns:1fr}.tableWrap table{min-width:680px}}
+    .lockedMsg{display:none;margin-top:10px;border:1px solid rgba(255,190,80,.38);background:rgba(255,190,80,.10);color:#ffe0a3;border-radius:8px;padding:10px;font-size:12px;line-height:1.4}.locked .lockedMsg{display:block}.locked .officialGrid,.locked .tableWrap{opacity:.55;filter:saturate(.65)}
+
+
+    /* AJUSTE COMPACTO - sem rolagem horizontal e sem sobreposição */
+    .wrap{max-width:1420px;padding:10px 12px;}
+    .topbar{margin-bottom:10px;gap:8px;}
+    .smallBtn{padding:8px 11px;font-size:13px;}
+    .btn{padding:11px 14px;}
+    .layout{grid-template-columns:minmax(280px,310px) minmax(0,1fr) minmax(280px,310px);gap:10px;align-items:start;}
+    .panel{border-radius:9px;}
+    .panelInner{padding:10px;}
+    .sectionTitle{font-size:14px;margin-bottom:10px;}
+    label{font-size:12px;margin:9px 0 5px;}
+    input,select{padding:9px 11px;font-size:13px;border-radius:9px;}
+    .row{gap:9px;}
+    .seg button{padding:9px 8px;}
+    .hint,.formula,.noteText{font-size:11px;}
+    .miniLine{padding:7px 0;font-size:12px;}
+    .officialGrid{grid-template-columns:128px minmax(150px,1.15fr) repeat(3,minmax(92px,1fr));gap:8px;padding:10px;align-items:stretch;overflow:hidden;}
+    .tabCard{padding:10px 8px;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+    .tabCard small{font-size:9px;line-height:1.15;}
+    .bigResult{display:flex;flex-direction:column;justify-content:center;min-width:0;}
+    .bigResult .label{font-size:12px;}
+    .bigResult .value{font-size:clamp(25px,2.35vw,34px);line-height:1;white-space:nowrap;}
+    .bigResult .sub{font-size:11px;}
+    .calcBox{padding:8px 6px;min-height:74px;display:flex;flex-direction:column;justify-content:center;}
+    .calcBox .k{font-size:10px;line-height:1.15;}
+    .calcBox .v{font-size:clamp(15px,1.25vw,20px);line-height:1.1;}
+    .calcBox .f{font-size:9px;line-height:1.15;}
+    .tabs{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:9px;}
+    .tabBtn{padding:8px 4px;font-size:13px;}
+    .tabBtn small{font-size:9px;}
+    .commercialHead{margin-bottom:7px;}
+    .tableWrap{max-height:calc(100vh - 435px);min-height:230px;}
+    table{min-width:590px;}
+    th,td{padding:8px 9px;font-size:12px;}
+    th{font-size:11px;}
+    .weightInput{max-width:104px;padding:7px;}
+    .addVehicle{margin-top:9px;}
+    .summaryCard .sectionTitle{font-size:14px;}
+    .kpis{gap:8px;margin-top:10px;}
+    .kpi{padding:9px 7px;}
+    .kpi .t{font-size:11px;}
+    .kpi .v{font-size:18px;}
+    .summaryMeta{gap:8px;}
+    .summaryMeta .mini{padding:8px;}
+    .summaryMeta .mini .v{font-size:15px;}
+    .quickBtn{border-color:rgba(41,211,145,.65);background:linear-gradient(180deg,rgba(20,44,91,.98),rgba(9,24,52,.98));display:inline-flex;align-items:center;gap:9px;}
+    .miniSwitch{width:34px;height:18px;border-radius:999px;border:1px solid rgba(41,211,145,.7);background:rgba(10,18,38,.9);position:relative;display:inline-block;vertical-align:middle;}
+    .miniSwitch::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#dbeafe;transition:.15s;}
+    body.quoteMode .miniSwitch{background:rgba(41,211,145,.35);}
+    body.quoteMode .miniSwitch::after{left:18px;background:#29d391;}
+    body.quoteMode .layout{grid-template-columns:minmax(290px,340px) minmax(0,1fr);grid-template-areas:"summary main";}
+    body.quoteMode .leftCol, body.quoteMode .official, body.quoteMode .notes, body.quoteMode .footer{display:none!important;}
+    body.quoteMode .tableWrap{max-height:calc(100vh - 250px);min-height:430px;}
+    body.quoteMode .commercialHead .sectionTitle::after{content:"  • MODO COTAÇÃO RÁPIDA";color:var(--green2);}
+    @media(max-width:1320px){
+      .layout{grid-template-columns:minmax(260px,300px) minmax(0,1fr) minmax(260px,300px);gap:8px;}
+      .officialGrid{grid-template-columns:120px minmax(135px,1fr) repeat(3,minmax(82px,1fr));gap:7px;padding:8px;}
+      .bigResult .value{font-size:28px;}
+      .calcBox .v{font-size:16px;}
+      .smallBtn{font-size:12px;padding:7px 9px;}
+      .subtitle{font-size:12px;}
+    }
+    @media(max-width:1180px){
+      .layout{grid-template-columns:1fr;grid-template-areas:"summary" "params" "main";}
+      body.quoteMode .layout{grid-template-columns:1fr;grid-template-areas:"summary" "main";}
+      .tableWrap{max-height:520px;}
+      .officialGrid{grid-template-columns:1fr 1fr;}
+    }
+    @media(max-height:820px) and (min-width:1181px){
+      .notes,.footer{display:none;}
+      .tableWrap{max-height:calc(100vh - 405px);}
+      .sectionTitle{margin-bottom:8px;}
+      label{margin-top:7px;}
+      .panelInner{padding:9px;}
+    }
+
+  
+
+    /* ==========================================================
+       AJUSTE FINAL DO BLOCO ANTT OFICIAL
+       - Evita sobreposição entre valor principal e cards
+       - Reduz altura/largura dos cards oficiais
+       - Dá mais espaço para a tabela comercial
+    ========================================================== */
+    .layout{
+      grid-template-columns:minmax(260px,280px) minmax(0,1fr) minmax(260px,280px);
+      gap:10px;
+    }
+    .officialGrid{
+      grid-template-columns:110px minmax(120px,.9fr) repeat(3,minmax(96px,1fr));
+      gap:7px;
+      padding:8px;
+      align-items:stretch;
+    }
+    .tabCard{
+      padding:8px 6px;
+      font-size:12px;
+      min-height:60px;
+    }
+    .tabCard small{
+      font-size:8.5px;
+      line-height:1.1;
+    }
+    .bigResult{
+      min-width:0;
+      overflow:hidden;
+    }
+    .bigResult .label{
+      font-size:11px;
+      white-space:nowrap;
+    }
+    .bigResult .value{
+      font-size:clamp(23px,2vw,28px);
+      line-height:1;
+      white-space:nowrap;
+      letter-spacing:0;
+    }
+    .bigResult .sub{
+      font-size:10px;
+      line-height:1.15;
+    }
+    .calcBox{
+      min-height:60px;
+      padding:6px;
+    }
+    .calcBox .k{
+      font-size:9.5px;
+      line-height:1.1;
+      white-space:nowrap;
+    }
+    .calcBox .v{
+      font-size:clamp(14px,1.1vw,18px);
+      line-height:1.05;
+      margin-top:3px;
+    }
+    .calcBox .f{
+      font-size:8.5px;
+      line-height:1.1;
+      margin-top:3px;
+    }
+    .tabs{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+    .tableWrap{
+      max-height:calc(100vh - 360px);
+      min-height:270px;
+    }
+    @media(max-width:1380px){
+      .layout{
+        grid-template-columns:minmax(250px,270px) minmax(0,1fr) minmax(250px,270px);
+        gap:8px;
+      }
+      .officialGrid{
+        grid-template-columns:95px minmax(112px,.8fr) repeat(3,minmax(82px,1fr));
+        gap:6px;
+      }
+      .bigResult .value{font-size:24px;}
+      .calcBox .v{font-size:15px;}
+      .calcBox .f{font-size:8px;}
+      .tabCard small{font-size:8px;}
+    }
+    @media(max-width:1180px){
+      .layout{grid-template-columns:1fr;grid-template-areas:"summary" "params" "main";}
+      .officialGrid{grid-template-columns:1fr 1fr;}
+      .bigResult .value{font-size:30px;}
+      .tableWrap{max-height:520px;}
+    }
+
+
+    /* ==========================================================
+       CORREÇÃO DO VALOR ANTT PRINCIPAL
+       - Aumenta a coluna do valor verde
+       - Diminui cards laterais
+       - Remove corte de texto no resultado oficial
+    ========================================================== */
+    .officialGrid{
+      grid-template-columns:110px minmax(220px,1.25fr) repeat(3,minmax(118px,.85fr)) !important;
+      gap:8px !important;
+      overflow:visible !important;
+    }
+    .bigResult{
+      overflow:visible !important;
+      padding:0 4px !important;
+      min-width:220px !important;
+    }
+    .bigResult .label{
+      font-size:10.5px !important;
+      white-space:nowrap !important;
+    }
+    .bigResult .value{
+      font-size:clamp(24px,1.9vw,30px) !important;
+      line-height:.98 !important;
+      white-space:nowrap !important;
+      letter-spacing:-.03em !important;
+      transform:none !important;
+    }
+    .bigResult .sub{
+      font-size:10px !important;
+      line-height:1.15 !important;
+      max-width:220px;
+      margin:0 auto;
+    }
+    .calcBox{
+      min-width:0 !important;
+      min-height:58px !important;
+      padding:6px 5px !important;
+    }
+    .calcBox .v{
+      font-size:clamp(14px,1.15vw,18px) !important;
+      white-space:nowrap !important;
+    }
+    .calcBox .k{font-size:9.5px !important;}
+    .calcBox .f{font-size:8.8px !important;}
+    @media(max-width:1320px){
+      .officialGrid{
+        grid-template-columns:100px minmax(190px,1.1fr) repeat(3,minmax(102px,.8fr)) !important;
+      }
+      .bigResult{min-width:190px !important;}
+      .bigResult .value{font-size:clamp(22px,1.75vw,26px) !important;}
+      .bigResult .sub{max-width:190px;}
+    }
+    @media(max-width:1180px){
+      .officialGrid{grid-template-columns:1fr 1fr !important;overflow:hidden !important;}
+      .bigResult{min-width:0 !important;}
+    }
+
+
+    /* AJUSTE FINO - peso editável com recalculo automático */
+    tr.pesoAtualizado{animation:destaquePeso 1s ease;}
+    @keyframes destaquePeso{
+      0%{background:rgba(41,211,145,.42);box-shadow:inset 0 0 0 1px rgba(41,211,145,.75)}
+      100%{background:transparent;box-shadow:none}
+    }
+    .weightInput.pesoAlterado{border-color:rgba(41,211,145,.8);box-shadow:0 0 0 3px rgba(41,211,145,.13)}
+
+
+    /* SINCRONIZAÇÃO TIPO ⇄ EIXOS */
+    .typeSyncHint{
+      margin-top:6px;color:var(--green2);font-weight:950;font-size:12px;display:flex;align-items:center;gap:6px;
+    }
+    .typeSyncHint::before{content:"↔";font-size:16px;color:#55d16f}
+    .selectedVehicleCard{
+      margin:10px 0 10px;border:1px solid rgba(78,118,210,.48);border-radius:10px;
+      background:linear-gradient(180deg,rgba(8,25,50,.72),rgba(4,14,32,.70));padding:10px;text-align:center;
+      box-shadow:inset 0 0 0 1px rgba(41,211,145,.06);
+    }
+    .selectedVehicleCard .syncLabel{font-size:11px;color:var(--muted);text-align:left;margin-bottom:4px}
+    .selectedVehicleCard .syncVehicleName{font-size:18px;font-weight:950;color:var(--green2);line-height:1.1}
+    .selectedVehicleCard .syncVehicleMeta{display:flex;justify-content:center;gap:16px;color:var(--muted);font-size:12px;font-weight:850;margin-top:7px;flex-wrap:wrap}
+    .syncFooter{
+      margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
+    }
+    .syncFooter .syncBox{
+      border:1px solid rgba(78,118,210,.35);border-radius:9px;background:rgba(8,25,50,.62);padding:10px;
+      color:var(--muted);font-size:12px;line-height:1.35;
+    }
+    .syncFooter .syncBox b{display:block;color:var(--green2);font-size:13px;margin-bottom:3px;text-transform:uppercase}
+    .syncFooter .syncBox:nth-child(2) b{color:#72a2ff}
+    .syncFooter .syncBox:nth-child(3) b{color:#ffd84d}
+    @media(max-width:760px){.syncFooter{grid-template-columns:1fr}}
+
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app">
+    <div class="topbar">
+      <button class="smallBtn" id="btnHome">← Página Inicial</button>
+      <div class="title">
+        <h1>Calcular Piso Mínimo de Frete</h1>
+        <div class="subtitle">Conforme Resolução ANTT nº 5.867/2020 • Atualizada em 20/03/2026 pela Portaria SUROC nº 04/2026</div>
+      </div>
+      <div class="actions">
+        <button class="smallBtn quickBtn" id="btnQuickQuote" type="button">⚡ Cotação Rápida <span class="miniSwitch"></span></button>
+        <button class="smallBtn green" id="btnCompare">⚖️ Comparar Tabelas</button>
+        <button class="smallBtn" id="btnExportPDF">▣ Exportar PDF</button>
+        <button class="smallBtn danger" id="btnClear">🗑 Limpar</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <aside class="leftCol">
+        <section class="panel">
+          <div class="panelInner">
+            <div class="sectionTitle">🚚 2. Parâmetros da Operação</div>
+
+            <label for="cargoType">Tipo de Carga</label>
+            <select id="cargoType">
+              <option>Granel sólido</option><option>Granel líquido</option><option>Carga geral</option><option>Carga frigorificada</option><option>Neogranel</option><option>Perigosa</option>
+            </select>
+
+            <div class="row">
+              <div><label for="eixosInput">Número de Eixos *</label><select id="eixosInput"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option selected>7</option><option>8</option><option>9</option></select></div>
+              <div><label for="kmLeft">Distância (km) *</label><input id="kmLeft" type="number" step="0.1" value="500"></div>
+            </div>
+
+            <div class="selectedVehicleCard">
+              <div class="syncLabel">Veículo selecionado</div>
+              <div class="syncVehicleName" id="syncVehicleName">7 Bitrem</div>
+              <div class="syncVehicleMeta">
+                <span id="syncVehicleEixos">7 eixos</span>
+                <span id="syncVehiclePeso">37,000 ton</span>
+              </div>
+            </div>
+
+            <label>Composição Veicular? <span class="info">ⓘ</span></label>
+            <div class="hint">(Veículo automotor + implemento)</div>
+            <div class="seg" data-toggle="composicao"><button class="active yes" data-val="sim">Sim</button><button data-val="nao">Não</button></div>
+
+            <label>É Alto Desempenho? <span class="info">ⓘ</span></label>
+            <div class="seg" data-toggle="alto"><button class="active no" data-val="nao">Não</button><button data-val="sim">Sim</button></div>
+
+            <label>Retorno Vazio? <span class="info">ⓘ</span></label>
+            <div class="seg" data-toggle="retorno"><button class="active no" data-val="nao">Não</button><button data-val="sim">Sim</button></div>
+
+            <button class="btn cyan" id="btnCalc">▦ Calcular Piso Mínimo</button>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:12px">
+          <div class="panelInner">
+            <div class="sectionTitle">▤ Informações da Operação</div>
+            <div class="miniLine"><span>Tabela Selecionada:</span><span class="blueTxt" id="infoTabela">Tabela A - Transporte Rodoviário de Carga e Lotação</span></div>
+            <div class="miniLine"><span>Distância Informada:</span><span id="infoKm">500 km</span></div>
+            <div class="miniLine"><span>CCD (Coef. Custo Deslocamento):</span><span id="infoCCD">8,0855</span></div>
+            <div class="miniLine"><span>CC (Coef. Carga e Descarga):</span><span id="infoCC">792,30</span></div>
+            <div class="miniLine"><span>Fórmula Ida:</span><span>(Distância x CCD) + CC</span></div>
+            <div class="miniLine"><span>Fórmula Retorno Vazio:</span><span>0,92 x Distância x CCD</span></div>
+            <div class="miniLine"><span>Observação:</span><span>Valores conforme parâmetros informados.</span></div>
+          </div>
+        </section>
+      </aside>
+
+      <main class="mainCol">
+        <section class="panel official" id="officialPanel">
+          <div class="panelInner">
+            <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+              <div class="sectionTitle" style="margin:0">🛡 1. Piso Mínimo de Frete (Valores Oficiais ANTT) - Sem Pedágio <span class="info">ⓘ</span></div>
+              <span class="badge greenTxt">⚖️ Valores oficiais ANTT</span>
+            </div>
+
+            <div class="officialGrid" style="margin-top:14px">
+              <div class="tabCard"><div id="selectedTableBig">Tabela A</div><small id="selectedTableDesc">Transporte Rodoviário de Carga e Lotação</small></div>
+              <div class="bigResult"><div class="label">Piso Mínimo (IDA)</div><div class="value" id="officialMain">R$ 0,00</div><div class="sub">Valor tabela ANTT oficial (sem pedágio)</div></div>
+              <div class="calcBox"><div class="k">Valor Ida (R$)</div><div class="v" id="officialIda">0,00</div><div class="f">(Distância x CCD) + CC</div></div>
+              <div class="calcBox"><div class="k">Retorno Vazio (R$)</div><div class="v" id="officialRetorno">0,00</div><div class="f">0,92 x Distância x CCD</div></div>
+              <div class="calcBox"><div class="k">Valor Total (R$)</div><div class="v" id="officialTotal">0,00</div><div class="f">Ida + Retorno Vazio</div></div>
+            </div>
+
+            <div style="margin-top:12px;font-weight:950;text-transform:uppercase">Selecione a tabela de piso <span class="info">ⓘ</span></div>
+            <div class="tabs" id="tabs"></div>
+            <div class="hint" style="margin-top:9px">ⓘ O piso mínimo oficial não soma pedágio. O pedágio entra apenas na cotação comercial por tipo de veículo.</div>
+            <div class="lockedMsg" id="lockedMsg">⚠️ Esta tabela ainda não possui coeficientes cadastrados neste arquivo. Para evitar cálculo errado, o sistema bloqueia o resultado até você informar os coeficientes oficiais.</div>
+          </div>
+        </section>
+
+        <section class="panel" id="commercialPanel">
+          <div class="panelInner">
+            <div class="commercialHead">
+              <div class="sectionTitle">🚲 3. Cotação Comercial (Base por Tipo de Veículo) - <span class="greenTxt">Inclui Pedágio</span></div>
+              <div class="hint">Edite o peso médio para recalcular os valores ⓘ</div>
+            </div>
+            <div class="tableWrap">
+              <table>
+                <thead><tr><th>Tipo de Veículo</th><th class="num">Eixos</th><th class="num">Peso Médio<br>(editável)</th><th>Un.</th><th class="num">Frete Motorista<br>(R$ / ton)</th><th class="num">Frete Empresa<br>(R$ / ton)</th><th class="num">Ação</th></tr></thead>
+                <tbody id="vehicleRows"></tbody>
+              </table>
+            </div>
+            <button class="smallBtn addVehicle" id="btnAddVehicle">Resetar Pesos</button>
+          </div>
+        </section>
+      </main>
+
+      <aside class="rightCol">
+        <section class="panel summaryCard">
+          <div class="panelInner">
+            <span class="badge">Entrada</span>
+            <div class="sectionTitle" style="margin-top:8px">▤ Resumo da Cotação</div>
+
+            <label for="tipoSummary">Tipo</label>
+            <select id="tipoSummary"></select>
+            <div class="typeSyncHint" id="summaryTipoHint">7 eixos</div>
+
+            <div class="row">
+              <div><label for="kmSummary">KM total</label><input id="kmSummary" type="number" step="0.1" value="500"></div>
+              <div><label for="pedagioSummary">Pedágio por eixo (R$)</label><input id="pedagioSummary" type="number" step="0.01" value="216"></div>
+            </div>
+
+            <div class="row">
+              <div><label for="margemSummary">Margem (%)</label><input id="margemSummary" type="number" step="0.01" value="10"></div>
+              <div><label for="icmsSummary">ICMS (%) (opcional)</label><input id="icmsSummary" type="number" step="0.01" value="0"></div>
+            </div>
+
+            <button class="btn" id="btnCalcSummary">Calcular</button>
+
+            <div class="kpis">
+              <div class="kpi"><div class="t">Frete Motorista (R$/ton)</div><div class="v motor" id="sumMotorista">R$ 0,00</div></div>
+              <div class="kpi"><div class="t">Frete Empresa (R$/ton)</div><div class="v empresa" id="sumEmpresa">R$ 0,00</div></div>
+            </div>
+
+            <div class="summaryMeta">
+              <div class="mini"><div class="t">Número de Eixos</div><div class="v" id="sumEixos">7</div></div>
+              <div class="mini"><div class="t">Pedágio Total (R$)</div><div class="v" id="sumPedTotal">0,00</div></div>
+            </div>
+
+            <div class="formula">
+              <b>Motorista:</b> ARREDONDAR.PARA.CIMA(((R$/KM × KM) + Custo CC + (Pedágio/Eixo × Eixos)) / Peso; 0)<br>
+              <b>Empresa:</b> Motorista / (1 - Margem) / (1 - ICMS)<br>
+              <span class="greenTxt">Base principal:</span> KM, Pedágio, Margem e ICMS.
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <div class="syncFooter">
+      <div class="syncBox"><b>Sincronização automática</b>Ao alterar o Tipo no Resumo da Cotação, o Número de Eixos é atualizado automaticamente.</div>
+      <div class="syncBox"><b>Sincronização automática</b>Ao alterar o Número de Eixos nos Parâmetros, o Tipo de Veículo compatível é selecionado automaticamente.</div>
+      <div class="syncBox"><b>Resultado</b>Tipo, eixos, peso e pedágio total ficam consistentes em todo o sistema.</div>
+    </div>
+
+    <div class="footer">
+      <div>🛡 Cálculo baseado nas regras oficiais da ANTT.</div>
+      <div>⚙ Sempre confira os dados informados antes de finalizar o cálculo.</div>
+      <div>🗓 Portaria SUROC nº 04/2026 • Vigência: 20/03/2026</div>
+    </div>
+  </div>
+
+<script>
+/* =======================
+   AUTENTICAÇÃO OPCIONAL
+======================= */
+function portalUser(){ try{ if(typeof getUser === "function") return String(getUser()||"").trim().toUpperCase(); }catch(e){} return String(localStorage.getItem("nf_auth_user")||"").trim().toUpperCase(); }
+function goHome(){ window.location.href = "./home.html"; }
+
+/* =======================
+   DADOS DO PISO
+   Tabela A populada conforme base atual do portal.
+   Tabelas B/C/D/E ficam bloqueadas até cadastrar coeficientes oficiais.
+======================= */
+const TABLES = {
+  A:{name:"Tabela A", desc:"Transporte Rodoviário de Carga e Lotação", enabled:true, coeffs:{
+    2:{ccd:4.1462,cc:393.62},3:{ccd:4.8568,cc:505.94},4:{ccd:6.7381,cc:642.10},5:{ccd:6.7381,cc:642.10},6:{ccd:7.4408,cc:656.76},7:{ccd:8.0855,cc:792.30},8:{ccd:8.0855,cc:792.30},9:{ccd:9.2662,cc:877.83}
+  }},
+  B:{name:"Tabela B", desc:"Exclusivo de Carga", enabled:false, coeffs:{}},
+  C:{name:"Tabela C", desc:"Carga Fracionada", enabled:false, coeffs:{}},
+  D:{name:"Tabela D", desc:"Carga Conteinerizada", enabled:false, coeffs:{}},
+  E:{name:"Tabela E", desc:"Transporte Internacional", enabled:false, coeffs:{}}
+};
+
+let activeTable = localStorage.getItem("nf_piso_active_table") || "A";
+let flags = {composicao:"sim", alto:"nao", retorno:"nao"};
+
+const VEHICLES_DEFAULT = [
+  {tipo:"9 Rodotrem", eixos:9, rkm:9.2662, custoCC:877.83, peso:49},
+  {tipo:"9 Rodocaçamba", eixos:9, rkm:9.2662, custoCC:877.83, peso:47},
+  {tipo:"8 eixos Graneleiro", eixos:8, rkm:8.0855, custoCC:792.30, peso:45},
+  {tipo:"8 eixos Caçamba", eixos:8, rkm:8.0855, custoCC:792.30, peso:43},
+  {tipo:"4 eixo Graneleiro", eixos:7, rkm:8.0855, custoCC:792.30, peso:39},
+  {tipo:"4 eixo Caçamba", eixos:7, rkm:8.0855, custoCC:792.30, peso:37},
+  {tipo:"7 Bitrem", eixos:7, rkm:8.0855, custoCC:792.30, peso:36},
+  {tipo:"7 Biçamba", eixos:7, rkm:8.0855, custoCC:792.30, peso:35},
+  {tipo:"6 LS Graneleiro", eixos:6, rkm:7.4408, custoCC:656.76, peso:31},
+  {tipo:"6 LS Caçamba", eixos:6, rkm:7.4408, custoCC:656.76, peso:29},
+  {tipo:"5 LS Graneleiro", eixos:5, rkm:6.7381, custoCC:642.10, peso:26},
+  {tipo:"5 LS TOCO Caçamba", eixos:5, rkm:6.7381, custoCC:642.10, peso:25},
+  {tipo:"3 Truck Graneleiro", eixos:3, rkm:5.1660, custoCC:533.36, peso:14}
+];
+
+let selectedVehicle = Number(localStorage.getItem("nf_piso_selected_vehicle") || 0);
+let vehicles = loadVehicles();
+
+const $ = id => document.getElementById(id);
+const brMoney = n => Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const brNum = (n,d=2) => Number(n||0).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const val = id => Number($(id)?.value || 0);
+function loadVehicles(){ try{ const raw=localStorage.getItem("nf_piso_vehicles_v2"); return raw?JSON.parse(raw):structuredClone(VEHICLES_DEFAULT); }catch(e){ return structuredClone(VEHICLES_DEFAULT); } }
+function saveVehicles(){ localStorage.setItem("nf_piso_vehicles_v2", JSON.stringify(vehicles)); }
+
+function syncKm(source){ const other = source === "left" ? $("kmSummary") : $("kmLeft"); if(other) other.value = source === "left" ? $("kmLeft").value : $("kmSummary").value; }
+function getInputs(){ return { km:val("kmSummary"), pedagio:val("pedagioSummary"), margem:val("margemSummary")/100, icms:val("icmsSummary")/100, eixos:Number($("eixosInput").value||7) }; }
+function selectedRow(){ return vehicles[selectedVehicle] || vehicles[0]; }
+function setEixosFromSelectedVehicle(){
+  const row = selectedRow();
+  if(row && $("eixosInput")) $("eixosInput").value = String(row.eixos);
+}
+function setVehicleFromEixos(){
+  const eixos = Number($("eixosInput")?.value || 0);
+  const idx = vehicles.findIndex(v => Number(v.eixos) === eixos);
+  if(idx >= 0){
+    selectedVehicle = idx;
+    localStorage.setItem("nf_piso_selected_vehicle", String(idx));
+  }
+}
+function renderSyncVehicleCard(){
+  const row = selectedRow();
+  if(!row) return;
+  const name = $("syncVehicleName"), ex = $("syncVehicleEixos"), peso = $("syncVehiclePeso"), hint = $("summaryTipoHint");
+  if(name) name.textContent = row.tipo;
+  if(ex) ex.textContent = `${row.eixos} eixos`;
+  if(peso) peso.textContent = `${brNum(row.peso,3)} ton`;
+  if(hint) hint.textContent = `${row.eixos} eixos`;
+}
+function calcOfficial(){
+  const t = TABLES[activeTable]; const {km,eixos}=getInputs(); const c = t.coeffs[eixos];
+  if(!t.enabled || !c) return {enabled:false, ccd:0, cc:0, ida:0, retorno:0, total:0};
+  const ida = (km * c.ccd) + c.cc;
+  const retorno = flags.retorno === "sim" ? (0.92 * km * c.ccd) : 0;
+  return {enabled:true, ccd:c.ccd, cc:c.cc, ida, retorno, total:ida+retorno};
+}
+function calcCommercial(row){
+  const {km,pedagio,margem,icms}=getInputs();
+  const base = (row.rkm * km) + row.custoCC;
+  const pedagioTotal = pedagio * row.eixos;
+  const porTon = (base + pedagioTotal) / row.peso;
+  const motorista = Math.ceil(porTon);
+  const empresa = (1-margem)<=0 || (1-icms)<=0 ? NaN : motorista / (1-margem) / (1-icms);
+  return {base,pedagioTotal,motorista,empresa};
+}
+function renderTabs(){
+  const el=$("tabs"); el.innerHTML="";
+  Object.entries(TABLES).forEach(([key,t])=>{
+    const b=document.createElement("button"); b.className="tabBtn"+(key===activeTable?" active":"");
+    b.innerHTML=`${t.name}<small>${t.desc.split(" ").slice(0,3).join(" ")}</small>`;
+    b.onclick=()=>{ activeTable=key; localStorage.setItem("nf_piso_active_table",key); renderAll(); };
+    el.appendChild(b);
+  });
+  const ret=document.createElement("button"); ret.className="tabBtn"+(flags.retorno==="sim"?" active":""); ret.innerHTML=`Retorno Vazio<small>Cálculo</small>`; ret.onclick=()=>{ flags.retorno=flags.retorno==="sim"?"nao":"sim"; applyToggles(); renderAll(); }; el.appendChild(ret);
+}
+function renderOfficial(){
+  const t=TABLES[activeTable], r=calcOfficial();
+  $("selectedTableBig").textContent=t.name; $("selectedTableDesc").textContent=t.desc;
+  $("infoTabela").textContent=`${t.name} - ${t.desc}`; $("infoKm").textContent=`${brNum(getInputs().km,0)} km`;
+  $("infoCCD").textContent=r.enabled?brNum(r.ccd,4):"Não cadastrado"; $("infoCC").textContent=r.enabled?brNum(r.cc,2):"Não cadastrado";
+  $("officialPanel").classList.toggle("locked",!r.enabled);
+  $("officialMain").textContent=brMoney(r.ida); $("officialIda").textContent=brNum(r.ida,2); $("officialRetorno").textContent=brNum(r.retorno,2); $("officialTotal").textContent=brNum(r.total,2);
+}
+function renderTipoSummary(){
+  const sel=$("tipoSummary"); if(!sel) return;
+  const current=String(selectedVehicle);
+  sel.innerHTML="";
+  vehicles.forEach((v,i)=>{ const op=document.createElement("option"); op.value=String(i); op.textContent=v.tipo; sel.appendChild(op); });
+  sel.value = vehicles[selectedVehicle] ? current : "0";
+}
+function parsePesoInput(value){
+  let s = String(value ?? "").trim().replace(/\s+/g, "");
+  if(!s) return NaN;
+  s = s.replace(/[^\d.,-]/g, "");
+  if(s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+function pulsePesoRow(tr, input){
+  if(!tr) return;
+  tr.classList.remove("pesoAtualizado");
+  void tr.offsetWidth;
+  tr.classList.add("pesoAtualizado");
+  if(input){
+    input.classList.add("pesoAlterado");
+    setTimeout(()=>input.classList.remove("pesoAlterado"), 650);
+  }
+}
+function updateVehicleRowValues(tr, row){
+  if(!tr || !row) return;
+  const c = calcCommercial(row);
+  const motorCell = tr.querySelector(".motor");
+  const empresaCell = tr.querySelector(".empresa");
+  if(motorCell) motorCell.textContent = brMoney(c.motorista);
+  if(empresaCell) empresaCell.textContent = Number.isFinite(c.empresa) ? brMoney(c.empresa) : "Erro";
+}
+function applyPesoChange(input, i, shouldFormat=false){
+  const n = parsePesoInput(input.value);
+  if(Number.isFinite(n) && n > 0){
+    vehicles[i].peso = n;
+    saveVehicles();
+    const tr = input.closest("tr");
+    updateVehicleRowValues(tr, vehicles[i]);
+    renderSummary();
+    renderSyncVehicleCard();
+    pulsePesoRow(tr, input);
+    if(shouldFormat) input.value = brNum(n,3);
+  }else if(shouldFormat){
+    input.value = brNum(vehicles[i].peso,3);
+  }
+}
+function renderVehicles(){
+  const tbody=$("vehicleRows"); tbody.innerHTML="";
+  vehicles.forEach((v,i)=>{
+    const c=calcCommercial(v); const tr=document.createElement("tr"); tr.className=i===selectedVehicle?"active":"";
+    tr.innerHTML=`<td class="vehicleName">${v.tipo}</td><td class="num">${v.eixos}</td><td class="num"><input class="weightInput" data-i="${i}" value="${brNum(v.peso,3)}" inputmode="decimal" autocomplete="off"></td><td class="unit">ton</td><td class="num motor">${brMoney(c.motorista)}</td><td class="num empresa">${Number.isFinite(c.empresa)?brMoney(c.empresa):"Erro"}</td><td class="num trash">🗑</td>`;
+    tr.addEventListener("click",e=>{ if(e.target.classList.contains("weightInput")) return; selectedVehicle=i; localStorage.setItem("nf_piso_selected_vehicle",String(i)); setEixosFromSelectedVehicle(); renderAll(); });
+    const input = tr.querySelector(".weightInput");
+    input.addEventListener("focus", e => e.target.select());
+    input.addEventListener("input", e => applyPesoChange(e.target, i, false));
+    input.addEventListener("blur", e => applyPesoChange(e.target, i, true));
+    input.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === "Tab"){
+        applyPesoChange(e.target, i, true);
+      }
+      if(e.key === "Enter"){
+        e.preventDefault();
+        e.target.blur();
+      }
+    });
+    tbody.appendChild(tr);
+  });
+}
+function renderSummary(){
+  const row=selectedRow(); const c=calcCommercial(row); const {pedagio}=getInputs();
+  $("sumEixos").textContent=row.eixos; $("sumPedTotal").textContent=brNum(pedagio*row.eixos,2);
+  $("sumMotorista").textContent=brMoney(c.motorista); $("sumEmpresa").textContent=Number.isFinite(c.empresa)?brMoney(c.empresa):"Erro";
+  renderSyncVehicleCard();
+}
+function renderAll(){ renderTipoSummary(); renderTabs(); renderOfficial(); renderVehicles(); renderSummary(); }
+function applyToggles(){
+  document.querySelectorAll(".seg").forEach(seg=>{ const key=seg.dataset.toggle; seg.querySelectorAll("button").forEach(b=>{ b.classList.toggle("active", flags[key]===b.dataset.val); b.classList.toggle("yes", b.dataset.val==="sim"); b.classList.toggle("no", b.dataset.val==="nao"); }); });
+}
+
+function quoteModeKey(){ return "nf_piso_quote_mode_v3"; }
+function isQuoteMode(){ return localStorage.getItem(quoteModeKey()) === "1"; }
+function applyQuoteMode(){ document.body.classList.toggle("quoteMode", isQuoteMode()); }
+function toggleQuoteMode(){ localStorage.setItem(quoteModeKey(), isQuoteMode() ? "0" : "1"); applyQuoteMode(); renderAll(); }
+
+function bind(){
+  $("btnQuickQuote")?.addEventListener("click", toggleQuoteMode);
+  $("btnHome").onclick=goHome; $("btnCalc").onclick=renderAll; $("btnCalcSummary")?.addEventListener("click", renderAll);
+  $("btnClear").onclick=()=>{ if(confirm("Limpar ajustes e voltar ao padrão?")){ localStorage.removeItem("nf_piso_vehicles_v2"); vehicles=structuredClone(VEHICLES_DEFAULT); selectedVehicle=0; $("kmSummary").value=500; $("kmLeft").value=500; $("pedagioSummary").value=216; $("margemSummary").value=10; $("icmsSummary").value=0; renderAll(); } };
+  $("btnAddVehicle").onclick=()=>{ vehicles.push({tipo:"Novo veículo",eixos:Number($("eixosInput").value||7),rkm:8.0855,custoCC:792.30,peso:35}); saveVehicles(); selectedVehicle=vehicles.length-1; setEixosFromSelectedVehicle(); renderAll(); };
+  $("btnCompare").onclick=()=>alert("Comparação ativa: selecione Tabela A/B/C/D/E. Tabelas sem coeficientes ficam bloqueadas para evitar cálculo errado.");
+  $("btnExportPDF").onclick=()=>window.print();
+  $("kmLeft").addEventListener("input",()=>{ syncKm("left"); renderAll(); });
+  $("kmSummary").addEventListener("input",()=>{ syncKm("summary"); renderAll(); });
+  ["pedagioSummary","margemSummary","icmsSummary","cargoType"].forEach(id=>$(id).addEventListener("input",renderAll));
+  $("eixosInput")?.addEventListener("change",()=>{ setVehicleFromEixos(); renderAll(); });
+  $("eixosInput")?.addEventListener("input",()=>{ setVehicleFromEixos(); renderAll(); });
+  $("tipoSummary")?.addEventListener("change",()=>{
+    selectedVehicle=Number($("tipoSummary").value||0);
+    localStorage.setItem("nf_piso_selected_vehicle",String(selectedVehicle));
+    setEixosFromSelectedVehicle();
+    renderAll();
+  });
+  document.querySelectorAll(".seg").forEach(seg=>seg.addEventListener("click",e=>{ if(e.target.tagName!=="BUTTON") return; flags[seg.dataset.toggle]=e.target.dataset.val; applyToggles(); renderAll(); }));
+}
+document.addEventListener("DOMContentLoaded",()=>{ bind(); applyToggles(); applyQuoteMode(); setEixosFromSelectedVehicle(); renderAll(); });
+</script>
+</body>
+</html>
