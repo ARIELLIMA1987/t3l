@@ -6,15 +6,11 @@
     "https://script.google.com/macros/s/AKfycbwE32nx3-o45wVegsZh86a5zi98F1TqN1BtFsRAqGJmNcov8HE_HjF4P0FPnKco9xhr/exec";
 
   const DIRECTORY = {
-    regionais: ["GOIAS", "MINAS", "SAO PAULO"],
+    regionais: ["GOIAS"],
     filiaisPorRegional: {
       GOIAS: [
-        "ITUMBIARA", "RIO VERDE", "RIO VERDE FERT", "MONTIVIDIU", "ANAPOLIS",
-        "MINEIROS", "JATAI", "CHAP CEU", "VIANOPOLIS", "URUAÇU", "INDIARA",
-        "BOM JESUS", "CRISTALINA", "FORMOSA", "CATALÃO"
+        "RIO VERDE ", "ANAPOLIS"
       ],
-      MINAS: ["UBERLANDIA", "ARAGUARI"],
-      "SAO PAULO": ["SOROCABA"],
     },
     clientes: [
       "CARGILL", "TERRA ROXA", "COMIGO", "CONCREBEL", "VITERRA", "GD AGRONEGOCIOS", "COFCO", "NOVA AGRI",
