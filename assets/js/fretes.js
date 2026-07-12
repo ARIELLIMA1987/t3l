@@ -1510,7 +1510,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     if (MODAL.km()) MODAL.km().value = safeText(row.km);
     if (MODAL.ped()) MODAL.ped().value = safeText(row.pedagioEixo);
     if (MODAL.volume()) MODAL.volume().value = safeText(row.volume);
-    if (MODAL.icms()) MODAL.icms().value = normalizePercentage(row.icms);
+    if (MODAL.icms()) MODAL.icms().value = safetext(row.icms);
     if (MODAL.empresa()) MODAL.empresa().value = normalizeMoneyInput(row.valorEmpresa);
     if (MODAL.motorista()) MODAL.motorista().value = normalizeMoneyInput(row.valorMotorista);
     if (MODAL.sat()) MODAL.sat().value = safeText(row.pedidoSat);
