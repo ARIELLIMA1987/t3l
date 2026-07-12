@@ -18,8 +18,7 @@
     ],
     contatosPorFilial: {
     "RIO VERDE": [{ nome: "ARIEL", fone: "5564992277537" }],
-    "ANAPOLIS": [{ nome: "ARIEL", fone: "5564992277537" }],
-    },
+    "ANAPOLIS": [{ nome: "ARIEL", fone: "5564992277537" }]
   };
 
   const FILIAIS_CONTATOS_ARTE = {
