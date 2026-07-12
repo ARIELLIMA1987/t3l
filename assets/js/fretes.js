@@ -381,14 +381,15 @@
     return res;
   }
 
-  function getPersonaFromUI(id, fallback) {
+  // Corrigida a função para bater com a chamada abaixo dela (getPesoFromUI)
+  function getPesoFromUI(id, fallback) {
     const el = document.getElementById(id);
     const v = parsePtNumber(el?.value);
     return Number.isFinite(v) && v > 0 ? v : fallback;
   }
 
   function calcMinRPorTon(param, km, pedagioPorEixo) {
-    const peso = getPersonaFromUI(param.weightInputId, param.defaultPeso);
+    const peso = getPesoFromUI(param.weightInputId, param.defaultPeso);
     const numerador = param.rkm * km + param.custoCC + pedagioPorEixo * param.eixos;
     return ceil0(numerador / peso);
   }
@@ -1003,7 +1004,7 @@
     if (!rows.length) return "";
 
     return [
-      "🇸🇱🇸🇱🇸🇱 ROCA LOG 🇸🇱🇸🇱🇸🇱", // Nome alterado aqui
+      "🇸🇱🇸🇱🇸🇱 ROCA LOG 🇸🇱🇸🇱🇸🇱", // Nome alterado para ROCA LOG
       "✅ FRETES LIBERADOS",
       "",
       rows.map(buildFreteBloco).join("\n🟰🟰🟰🟰🟰🟰🟰🟰🟰\n")
@@ -1142,7 +1143,7 @@
 
     try {
       await navigator.clipboard.writeText(msg);
-      setStatus("✅ Mensagem copiada");
+      setStatus("✅ Message copiada");
     } catch {
       prompt("Copie a mensagem:", msg);
     }
@@ -1555,7 +1556,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
 
       await saveFrete(payload);
 
-      showModalLoading("Frete salvo com sucesso ✓", "Atualizando a lista de fretes.");
+      showModalLoading("Frete saved com sucesso ✓", "Atualizando a lista de fretes.");
       await atualizar();
 
       modalShow(false);
@@ -1845,7 +1846,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     document.getElementById("btnEnviarWhatsAppPacote")?.addEventListener("click", enviarWhatsAppPacote);
     document.getElementById("nfBaixarJPG")?.addEventListener("click", () => downloadDivulgacaoJPG(STATE.previewRow || getFilteredRows()[0]));
     document.getElementById("nfCopiarImagem")?.addEventListener("click", () => copyPreviewImage(STATE.previewRow || getFilteredRows()[0]));
-    document.getElementById("nfEnviarWhatsapp")?.addEventListener("click", () => {
+    document.getElementById("nfEnviarWhatsApp")?.addEventListener("click", () => {
       const row = STATE.previewRow || getFilteredRows()[0];
       if (row) enviarWhatsAppRow(row);
     });
