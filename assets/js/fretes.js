@@ -1,4 +1,4 @@
-/* fretes.js | NOVA FROTA - MODO RAIO DIVULGAÇÃO */
+/* fretes.js | ROCA LOG - MODO RAIO DIVULGAÇÃO */
 (function () {
   "use strict";
 
@@ -17,8 +17,9 @@
       "OURO VERDE",
     ],
     contatosPorFilial: {
-    "RIO VERDE": [{ nome: "ARIEL", fone: "5564992277537" }],
-    "ANAPOLIS": [{ nome: "ARIEL", fone: "5564992277537" }]
+      "RIO VERDE": [{ nome: "ARIEL", fone: "5564992277537" }],
+      "ANAPOLIS": [{ nome: "ARIEL", fone: "5564992277537" }]
+    }
   };
 
   const FILIAIS_CONTATOS_ARTE = {
@@ -26,7 +27,7 @@
       "ARIEL (64) 99227-7537",
       "MARCOS VINICIUS (64) 99928-0210",
     ],
-    };
+  };
 
   const CONTACT_PHONE = (() => {
     const map = {};
@@ -171,7 +172,7 @@
     MILHO: "../assets/img/MILHOTESTE.png",
     ACUCAR: "../assets/img/ACUCARTESTE.png",
     CALCARIO: "../assets/img/CALCARIOTESTE.png",
-    FARELODESOJA: "../assets/img/FARELODESOJA.png",
+    FARELO_DE_SOJA: "../assets/img/FARELODESOJA.png",
     SORGO: "../assets/img/SORGOTESTE.png",
     FERTILIZANTE: "../assets/img/FERTILIZANTE.png",
   };
@@ -241,22 +242,17 @@
       maximumFractionDigits: 2,
     });
   }
-  
-function formatDateTimeBR(value) {
+
+  function formatDateTimeBR(value) {
     const raw = safeText(value);
     if (!raw) return "";
 
-    // A partir de agora, o Apps Script deve gravar a coluna ultimaAlteracao
-    // já formatada como dd/MM/yyyy HH:mm. Então, quando vier nesse padrão,
-    // apenas mostramos o texto como está.
     if (/^\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/.test(raw)) return raw;
     if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) return raw;
     if (/^\d{2}\/\d{2}\/\d{2}/.test(raw)) return raw;
 
-    // Evita mostrar timestamps antigos do updatedAt/Date.now como números soltos.
     if (/^\d{12,}$/.test(raw)) return "";
 
-    // Compatibilidade: se algum retorno vier como ISO, exibe em pt-BR.
     const d = new Date(raw);
     if (Number.isNaN(d.getTime())) return raw;
 
@@ -273,19 +269,9 @@ function formatDateTimeBR(value) {
     if (!row) return "";
 
     const possibleKeys = [
-      "ultimaAlteracao",
-      "ultima_alteracao",
-      "UltimaAlteracao",
-      "Ultima Alteracao",
-      "Última Alteração",
-      "dataAlteracao",
-      "data_alteracao",
-      "Data Alteracao",
-      "Data Alteração",
-      "dataAtualizacao",
-      "data_atualizacao",
-      "Data Atualizacao",
-      "Data Atualização"
+      "ultimaAlteracao", "ultima_alteracao", "UltimaAlteracao", "Ultima Alteracao", "Última Alteração",
+      "dataAlteracao", "data_alteracao", "Data Alteracao", "Data Alteração",
+      "dataAtualizacao", "data_atualizacao", "Data Atualizacao", "Data Atualização"
     ];
 
     for (const key of possibleKeys) {
@@ -293,7 +279,6 @@ function formatDateTimeBR(value) {
         return formatDateTimeBR(row[key]);
       }
     }
-
     return "";
   }
 
@@ -303,7 +288,6 @@ function formatDateTimeBR(value) {
     td.textContent = getUltimaAlteracao(row) || "-";
     return td;
   }
-
 
   function nowUltimaAlteracaoBR() {
     const d = new Date();
@@ -332,6 +316,12 @@ function formatDateTimeBR(value) {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+  }
+
+  function normalizePercentage(value) {
+    let clean = safeText(value).replace("%", "").trim();
+    if (!clean) return "";
+    return `${clean}%`;
   }
 
   function escapeHtml(str) {
@@ -391,14 +381,14 @@ function formatDateTimeBR(value) {
     return res;
   }
 
-  function getPesoFromUI(id, fallback) {
+  function getPersonaFromUI(id, fallback) {
     const el = document.getElementById(id);
     const v = parsePtNumber(el?.value);
     return Number.isFinite(v) && v > 0 ? v : fallback;
   }
 
   function calcMinRPorTon(param, km, pedagioPorEixo) {
-    const peso = getPesoFromUI(param.weightInputId, param.defaultPeso);
+    const peso = getPersonaFromUI(param.weightInputId, param.defaultPeso);
     const numerador = param.rkm * km + param.custoCC + pedagioPorEixo * param.eixos;
     return ceil0(numerador / peso);
   }
@@ -758,7 +748,6 @@ function formatDateTimeBR(value) {
           return;
         }
 
-        
         if (["e5", "e6", "e7", "e4", "e9"].includes(col.key)) {
           tr.appendChild(buildPillSNCell(row[col.key]));
           return;
@@ -776,7 +765,7 @@ function formatDateTimeBR(value) {
 
         const td = document.createElement("td");
 
-        if (["volume", "valorEmpresa", "valorMotorista", "km", "pedagioEixo", "pedidoSat", "porta", "transito"].includes(col.key)) {
+        if (["volume", "valorEmpresa", "valorMotorista", "km", "pedagioEixo", "pedidoSat", "porta", "transito", "icms"].includes(col.key)) {
           td.className = "num";
         }
 
@@ -784,6 +773,8 @@ function formatDateTimeBR(value) {
           td.appendChild(createColorTag(row[col.key], col.isColorTag));
         } else if (col.isMoney) {
           td.textContent = safeText(row[col.key]) ? formatMoneyBR(row[col.key]) : "";
+        } else if (col.key === "icms") {
+          td.textContent = safeText(row[col.key]) ? normalizePercentage(row[col.key]) : "";
         } else {
           td.textContent = safeText(row[col.key]);
         }
@@ -861,7 +852,7 @@ function formatDateTimeBR(value) {
   function productFamilyNF(produto) {
     const n = normalizeKeyNF(produto);
 
-    if (n.includes("FARELO") && n.includes("SOJA")) return "FARELODESOJA";
+    if (n.includes("FARELO") && n.includes("SOJA")) return "FARELO_DE_SOJA";
     if (n.includes("SOJA")) return "SOJA";
     if (n.includes("MILHO")) return "MILHO";
     if (n.includes("ACUCAR")) return "ACUCAR";
@@ -907,9 +898,7 @@ function formatDateTimeBR(value) {
 
     return [
       contato ? `${contato} ${formatPhoneNF(phone)}` : "",
-      "",
-      "",
-      ""
+      "", "", ""
     ];
   }
 
@@ -924,47 +913,34 @@ function formatDateTimeBR(value) {
   }
 
   function divulgacaoDataFromRow(row) {
-  const produto = upper(row.produto || "SOJA");
-  const family = productFamilyNF(produto);
-  const contatos = contactsFromFilial(row);
+    const produto = upper(row.produto || "SOJA");
+    const family = productFamilyNF(produto);
+    const contatos = contactsFromFilial(row);
 
-  const valor = safeText(row.valorMotorista)
-    ? formatMoneyBR(row.valorMotorista)
-    : "A COMBINAR";
+    const valor = safeText(row.valorMotorista)
+      ? formatMoneyBR(row.valorMotorista)
+      : "A COMBINAR";
 
-  return {
-    // COLETA = SOMENTE ORIGEM
-    coletaCidade: upper(row.origem || ""),
-
-    coletaLocal: upper(row.coleta || ""),
-
-    // DESCARGA = DESTINO + UF
-    descargaCidade: cityUf(row, "destino", "uf"),
-
-    descargaLocal: upper(row.descarga || ""),
-
-    produto,
-    productFamily: family,
-
-    bg: PRODUCT_BG_MAP_NF[family] || PRODUCT_BG_MAP_NF.SOJA,
-
-    valor,
-
-    obs: upper(row.obs || ""),
-
-    contatos,
-
-    contatoPrincipal: upper(row.contato || ""),
-
-    phone: extractPhoneBR(row.contato),
-
-    filename:
-      `${family}_` +
-      `${normalizeKeyNF(row.origem)}_` +
-      `${normalizeKeyNF(row.destino)}_` +
-      `${normalizeKeyNF(valor)}.jpg`
-  };
-}
+    return {
+      coletaCidade: upper(row.origem || ""),
+      coletaLocal: upper(row.coleta || ""),
+      descargaCidade: cityUf(row, "destino", "uf"),
+      descargaLocal: upper(row.descarga || ""),
+      produto,
+      productFamily: family,
+      bg: PRODUCT_BG_MAP_NF[family] || PRODUCT_BG_MAP_NF.SOJA,
+      valor,
+      obs: upper(row.obs || ""),
+      contatos,
+      contatoPrincipal: upper(row.contato || ""),
+      phone: extractPhoneBR(row.contato),
+      filename:
+        `${family}_` +
+        `${normalizeKeyNF(row.origem)}_` +
+        `${normalizeKeyNF(row.destino)}_` +
+        `${normalizeKeyNF(valor)}.jpg`
+    };
+  }
 
   function setText(id, txt) {
     const el = document.getElementById(id);
@@ -1002,45 +978,37 @@ function formatDateTimeBR(value) {
   }
 
   function buildFreteBloco(row) {
-  const origem = upper(row.origem || "");
-  const coleta = upper(row.coleta || "");
-  const destino = cityUf(row, "destino", "uf");
-  const descarga = upper(row.descarga || "");
-  const produto = upper(row.produto || "");
+    const origem = upper(row.origem || "");
+    const coleta = upper(row.coleta || "");
+    const destino = cityUf(row, "destino", "uf");
+    const descarga = upper(row.descarga || "");
+    const produto = upper(row.produto || "");
 
-  const valor = safeText(row.valorMotorista)
-    ? formatMoneyBR(row.valorMotorista)
-    : "A COMBINAR";
+    const valor = safeText(row.valorMotorista)
+      ? formatMoneyBR(row.valorMotorista)
+      : "A COMBINAR";
 
-  return [
-    `🏷️ ${origem}${coleta ? ` (${coleta})` : ""}`,
-    `🏁 ${destino}${descarga ? ` (${descarga})` : ""}`,
-    `💢 ${produto}`,
-    `💰${valor}`
-  ].join("\n");
-}
+    return [
+      `🏷️ ${origem}${coleta ? ` (${coleta})` : ""}`,
+      `🏁 ${destino}${descarga ? ` (${descarga})` : ""}`,
+      `CN 💢 ${produto}`,
+      `💰 ${valor}`
+    ].join("\n");
+  }
 
-function buildMessage(row) {
-  const selected = getSelectedRows();
+  function buildMessage(row) {
+    const selected = getSelectedRows();
+    const rows = selected.length ? selected : (row ? [row] : (STATE.previewRow ? [STATE.previewRow] : []));
 
-  const rows = selected.length
-    ? selected
-    : row
-      ? [row]
-      : STATE.previewRow
-        ? [STATE.previewRow]
-        : [];
+    if (!rows.length) return "";
 
-  if (!rows.length) return "";
-
-  return [
-    "🇸🇱🇸🇱🇸🇱 NOVA FROTA 🇸🇱🇸🇱🇸🇱",
-    "✅ FRETES LIBERADOS",
-    "",
-    rows.map(buildFreteBloco).join("\n🟰🟰🟰🟰🟰🟰🟰🟰🟰\n")
-  ].join("\n");
-}
-
+    return [
+      "🇸🇱🇸🇱🇸🇱 ROCA LOG 🇸🇱🇸🇱🇸🇱", // Nome alterado aqui
+      "✅ FRETES LIBERADOS",
+      "",
+      rows.map(buildFreteBloco).join("\n🟰🟰🟰🟰🟰🟰🟰🟰🟰\n")
+    ].join("\n");
+  }
 
   function loadHtml2CanvasNF() {
     return new Promise((resolve, reject) => {
@@ -1197,34 +1165,35 @@ function buildMessage(row) {
   }
 
   function updateBulkUI() {
-  const selected = getSelectedRows();
-  const n = selected.length;
+    const selected = getSelectedRows();
+    const n = selected.length;
 
-  const a = document.getElementById("nfSelecionadosTxt");
-  const b = document.getElementById("nfArtesTxt");
-  const c = document.getElementById("nfMsgsTxt");
+    const a = document.getElementById("nfSelecionadosTxt");
+    const b = document.getElementById("nfArtesTxt");
+    const c = document.getElementById("nfMsgsTxt");
 
-  if (a) a.textContent = `${n} selecionado${n === 1 ? "" : "s"}`;
-  if (b) b.textContent = `${n} arte${n === 1 ? "" : "s"}`;
-  if (c) c.textContent = `${n} mensagem${n === 1 ? "" : "s"}`;
+    if (a) a.textContent = `${n} selecionado${n === 1 ? "" : "s"}`;
+    if (b) b.textContent = `${n} arte${n === 1 ? "" : "s"}`;
+    if (c) c.textContent = `${n} mensagem${n === 1 ? "" : "s"}`;
 
-  const selectAll = document.getElementById("nfSelectAll");
-  if (selectAll) {
-    const visible = getFilteredRows().filter((r) => safeText(r.id));
-    selectAll.checked = visible.length > 0 && visible.every((r) => STATE.selectedIds.has(safeText(r.id)));
-    selectAll.indeterminate =
-      visible.some((r) => STATE.selectedIds.has(safeText(r.id))) && !selectAll.checked;
+    const selectAll = document.getElementById("nfSelectAll");
+    if (selectAll) {
+      const visible = getFilteredRows().filter((r) => safeText(r.id));
+      selectAll.checked = visible.length > 0 && visible.every((r) => STATE.selectedIds.has(safeText(r.id)));
+      selectAll.indeterminate =
+        visible.some((r) => STATE.selectedIds.has(safeText(r.id))) && !selectAll.checked;
+    }
+
+    const msg = document.getElementById("nfMensagemPronta");
+    if (msg) {
+      msg.value = selected.length
+        ? buildMessage()
+        : STATE.previewRow
+          ? buildMessage(STATE.previewRow)
+          : "";
+    }
   }
 
-  const msg = document.getElementById("nfMensagemPronta");
-  if (msg) {
-    msg.value = selected.length
-      ? buildMessage()
-      : STATE.previewRow
-        ? buildMessage(STATE.previewRow)
-        : "";
-  }
-}
   function renderStats(rows) {
     rows = rows || [];
 
@@ -1265,21 +1234,21 @@ function buildMessage(row) {
   }
 
   async function enviarWhatsAppPacote() {
-  const rows = getSelectedRows();
+    const rows = getSelectedRows();
 
-  if (!rows.length) {
-    alert("Selecione uma ou mais linhas.");
-    return;
+    if (!rows.length) {
+      alert("Selecione uma ou mais linhas.");
+      return;
+    }
+
+    const msg = buildMessage();
+
+    try {
+      await navigator.clipboard.writeText(msg);
+    } catch {}
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
   }
-
-  const msg = buildMessage();
-
-  try {
-    await navigator.clipboard.writeText(msg);
-  } catch {}
-
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-}
 
   function buildDivulgacaoHtml(rows) {
     const linhas = rows.map((row) => `
@@ -1395,7 +1364,6 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     el.setAttribute("aria-hidden", show ? "false" : "true");
   }
 
-
   function getModalLoadingElements() {
     return {
       overlay: document.getElementById("nfModalLoading"),
@@ -1510,7 +1478,9 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     if (MODAL.km()) MODAL.km().value = safeText(row.km);
     if (MODAL.ped()) MODAL.ped().value = safeText(row.pedagioEixo);
     if (MODAL.volume()) MODAL.volume().value = safeText(row.volume);
-    if (MODAL.icms()) MODAL.icms().value = safetext(row.icms);
+    
+    if (MODAL.icms()) MODAL.icms().value = normalizePercentage(row.icms);
+    
     if (MODAL.empresa()) MODAL.empresa().value = normalizeMoneyInput(row.valorEmpresa);
     if (MODAL.motorista()) MODAL.motorista().value = normalizeMoneyInput(row.valorMotorista);
     if (MODAL.sat()) MODAL.sat().value = safeText(row.pedidoSat);
@@ -1563,7 +1533,6 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
       alert("Preencha: " + missing.join(", "));
       return false;
     }
-
     return true;
   }
 
@@ -1571,7 +1540,6 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     if (STATE.editingId) {
       return await apiGet({ action: "fretes_update", id: STATE.editingId, ...payload });
     }
-
     return await apiGet({ action: "fretes_add", ...payload });
   }
 
@@ -1579,7 +1547,6 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     if (STATE.modalBusy) return;
 
     const payload = collectModalPayload();
-
     if (!validateModalPayload(payload)) return;
 
     try {
@@ -1672,20 +1639,9 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
         overflow-y:hidden;
         backdrop-filter:blur(6px);
       }
-
-      body.preview-hidden #nfFloatingHBar{
-        right:12px;
-      }
-
-      #nfFloatingHBarInner{
-        height:1px;
-      }
-
-      @media(max-width:1250px){
-        #nfFloatingHBar{
-          right:12px;
-        }
-      }
+      body.preview-hidden #nfFloatingHBar{ right:12px; }
+      #nfFloatingHBarInner{ height:1px; }
+      @media(max-width:1250px){ #nfFloatingHBar{ right:12px; } }
     `;
     document.head.appendChild(style);
 
@@ -1729,7 +1685,6 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
 
     wrap.addEventListener("scroll", () => {
       if (STATE.floatingSyncing) return;
-
       STATE.floatingSyncing = true;
       bar.scrollLeft = wrap.scrollLeft;
       STATE.floatingSyncing = false;
@@ -1737,7 +1692,6 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
 
     bar.addEventListener("scroll", () => {
       if (STATE.floatingSyncing) return;
-
       STATE.floatingSyncing = true;
       wrap.scrollLeft = bar.scrollLeft;
       STATE.floatingSyncing = false;
@@ -1756,7 +1710,6 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
 
   function bindMoneyMask(inputEl) {
     if (!inputEl) return;
-
     inputEl.addEventListener("blur", () => {
       inputEl.value = normalizeMoneyInput(inputEl.value);
     });
@@ -1785,10 +1738,13 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
   function initMasks() {
     bindMoneyMask(MODAL.empresa());
     bindMoneyMask(MODAL.motorista());
+    
+    MODAL.icms()?.addEventListener("blur", () => {
+      MODAL.icms().value = normalizePercentage(MODAL.icms().value);
+    });
   }
 
   function bindButtons() {
-    // Amarração direta dos botões principais
     $("#btnReloadFromSheets")?.addEventListener("click", atualizar);
     $("#btnNew")?.addEventListener("click", openNewModal);
     $("#btnCloseModal")?.addEventListener("click", closeModal);
@@ -1796,8 +1752,6 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     $("#btnSave")?.addEventListener("click", handleSave);
     $("#btnDivulgacaoFrete")?.addEventListener("click", openDivulgacaoFrete);
 
-    // Segurança extra: captura por delegação.
-    // Isso resolve casos de botão recriado, botão duplicado ou listener perdido.
     if (!document.body.dataset.nfFretesDelegatedClicks) {
       document.body.dataset.nfFretesDelegatedClicks = "1";
 
@@ -1808,36 +1762,23 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
         const id = btn.id || "";
 
         if (id === "btnSave") {
-          e.preventDefault();
-          e.stopPropagation();
-          handleSave();
-          return;
+          e.preventDefault(); e.stopPropagation();
+          handleSave(); return;
         }
-
         if (id === "btnCancel" || id === "btnCloseModal") {
-          e.preventDefault();
-          e.stopPropagation();
-          closeModal();
-          return;
+          e.preventDefault(); e.stopPropagation();
+          closeModal(); return;
         }
-
         if (id === "btnNew") {
-          e.preventDefault();
-          e.stopPropagation();
-          openNewModal();
-          return;
+          e.preventDefault(); e.stopPropagation();
+          openNewModal(); return;
         }
-
         if (id === "btnReloadFromSheets") {
-          e.preventDefault();
-          e.stopPropagation();
-          atualizar();
-          return;
+          e.preventDefault(); e.stopPropagation();
+          atualizar(); return;
         }
-
         if (id === "btnDivulgacaoFrete") {
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault(); e.stopPropagation();
           openDivulgacaoFrete();
         }
       });
@@ -1850,10 +1791,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        if (STATE.modalBusy) {
-          e.preventDefault();
-          return;
-        }
+        if (STATE.modalBusy) { e.preventDefault(); return; }
         closeModal();
       }
     });
@@ -1887,8 +1825,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
         else STATE.selectedIds.add(safeText(r.id));
       });
 
-      applyFilters();
-      updateBulkUI();
+      applyFilters(); updateBulkUI();
     });
 
     document.getElementById("nfSelectAll")?.addEventListener("change", (e) => {
@@ -1897,13 +1834,11 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
       getFilteredRows().forEach((r) => {
         const id = safeText(r.id);
         if (!id) return;
-
         if (checked) STATE.selectedIds.add(id);
         else STATE.selectedIds.delete(id);
       });
 
-      applyFilters();
-      updateBulkUI();
+      applyFilters(); updateBulkUI();
     });
 
     document.getElementById("btnGerarPacoteJPG")?.addEventListener("click", gerarPacoteJPG);
@@ -1920,11 +1855,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
       if (!workspace) return;
 
       workspace.classList.toggle("preview-hidden");
-
-      document.body.classList.toggle(
-        "preview-hidden",
-        workspace.classList.contains("preview-hidden")
-      );
+      document.body.classList.toggle("preview-hidden", workspace.classList.contains("preview-hidden"));
 
       setTimeout(syncFloatingHorizontalBar, 80);
       setTimeout(syncFloatingHorizontalBar, 240);
