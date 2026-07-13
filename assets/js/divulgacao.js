@@ -1,4 +1,4 @@
-/* divulgacao.js | NOVA FROTA */
+/* divulgacao.js | ROCA LOG */
 (function () {
   "use strict";
 
