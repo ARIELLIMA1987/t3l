@@ -10,6 +10,14 @@
     FARELODESOJA: "../assets/img/FARELODESOJA.png",
     SORGO: "../assets/img/SORGOTESTE.png",
     FERTILIZANTE: "../assets/img/FERTILIZANTE.png"
+    FUBA: "../assets/img/FUBA.png"
+    BLOCO DE CONCRETO: "../assets/img/CONCREOT.png"
+    EMBALAGENS: "../assets/img/EMBALAGEM.png"
+    DERIVADO DE MILHO : "../assets/img/DERIVADOMILHO.png"
+    GERMEN DE MILHO: "../assets/img/GERME.png"
+    ALIMENTICIO: "../assets/img/ALIMENTICIO.png"
+    PIPOCA: "../assets/img/PIPOCA.png"
+    POSTE DE CONCRETO: "../assets/img/POSTE.png"
   };
 
   const FILIAIS_CONTATOS = {
