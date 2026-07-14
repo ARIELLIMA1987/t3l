@@ -1,4 +1,4 @@
-/* fretes.js | ROCA LOG - MODO RAIO DIVULGAÇÃO */
+/* fretes.js | ROCA LOG - MODO RAIO DIVULGAÇÃO | MARGEM CORRIGIDA */
 (function () {
   "use strict";
 
@@ -328,7 +328,13 @@
     const empresa = parsePtNumber(valorEmpresa);
     const motorista = parsePtNumber(valorMotorista);
 
-    if (!Number.isFinite(empresa) || empresa <= 0 || !Number.isFinite(motorista)) return "";
+    if (
+      !Number.isFinite(empresa) ||
+      empresa <= 0 ||
+      !Number.isFinite(motorista)
+    ) {
+      return "";
+    }
 
     const margem = ((empresa - motorista) / empresa) * 100;
 
@@ -798,8 +804,12 @@
           td.appendChild(createColorTag(row[col.key], col.isColorTag));
         } else if (col.isMoney) {
           td.textContent = safeText(row[col.key]) ? formatMoneyBR(row[col.key]) : "";
-        } else if (col.key === "icms" || col.key === "margem") {
+        } else if (col.key === "icms") {
           td.textContent = safeText(row[col.key]) ? normalizePercentage(row[col.key]) : "";
+        } else if (col.key === "margem") {
+          td.textContent =
+            calcularMargem(row.valorEmpresa, row.valorMotorista) ||
+            (safeText(row.margem) ? normalizePercentage(row.margem) : "");
         } else {
           td.textContent = safeText(row[col.key]);
         }
@@ -1509,9 +1519,10 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     if (MODAL.empresa()) MODAL.empresa().value = normalizeMoneyInput(row.valorEmpresa);
     if (MODAL.motorista()) MODAL.motorista().value = normalizeMoneyInput(row.valorMotorista);
     if (MODAL.margem()) {
-      MODAL.margem().value =
-        calcularMargem(row.valorEmpresa, row.valorMotorista) ||
-        normalizePercentage(row.margem);
+      MODAL.margem().value = calcularMargem(
+        row.valorEmpresa,
+        row.valorMotorista
+      );
     }
     if (MODAL.porta()) MODAL.porta().value = safeText(row.porta);
     if (MODAL.transito()) MODAL.transito().value = safeText(row.transito);
@@ -1626,7 +1637,13 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
       const res = await apiGet({ action: "fretes_list" });
 
       STATE.rows = Array.isArray(res.data)
-        ? res.data.map((row) => ({ ...row, status: normalizeFreteStatus(row.status) }))
+        ? res.data.map((row) => ({
+            ...row,
+            status: normalizeFreteStatus(row.status),
+            margem:
+              calcularMargem(row.valorEmpresa, row.valorMotorista) ||
+              normalizePercentage(row.margem)
+          }))
         : [];
 
       fillTopFilters(STATE.rows);
@@ -1767,7 +1784,23 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
   function initMasks() {
     bindMoneyMask(MODAL.empresa());
     bindMoneyMask(MODAL.motorista());
-    
+
+    const empresaEl = MODAL.empresa();
+    const motoristaEl = MODAL.motorista();
+    const margemEl = MODAL.margem();
+
+    [empresaEl, motoristaEl].forEach((el) => {
+      if (!el) return;
+      el.addEventListener("input", atualizarMargemModal);
+      el.addEventListener("blur", () => setTimeout(atualizarMargemModal, 0));
+    });
+
+    if (margemEl) {
+      margemEl.readOnly = true;
+      margemEl.setAttribute("tabindex", "-1");
+      margemEl.title = "Calculada automaticamente: (Frete Empresa - Frete Motorista) / Frete Empresa × 100";
+    }
+
     MODAL.icms()?.addEventListener("blur", () => {
       MODAL.icms().value = normalizePercentage(MODAL.icms().value);
     });
