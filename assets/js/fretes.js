@@ -77,7 +77,7 @@
     { key: "e9", label: "9E" },
     { key: "produto", label: "Produto", isColorTag: "produto" },
     { key: "icms", label: "ICMS" },
-    { key: "margem", label: "Margem" },
+    { key: "margem", label: "margem" },
     { key: "porta", label: "Porta", isInlineEditable: true },
     { key: "transito", label: "Trânsito", isInlineEditable: true },
     { key: "status", label: "Status" },
