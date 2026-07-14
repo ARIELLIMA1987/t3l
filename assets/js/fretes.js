@@ -77,7 +77,7 @@
     { key: "e9", label: "9E" },
     { key: "produto", label: "Produto", isColorTag: "produto" },
     { key: "icms", label: "ICMS" },
-    { key: "pedidoSat", label: "Pedido SAT" },
+    { key: "margem", label: "Margem" },
     { key: "porta", label: "Porta", isInlineEditable: true },
     { key: "transito", label: "Trânsito", isInlineEditable: true },
     { key: "status", label: "Status" },
@@ -105,7 +105,7 @@
     icms: () => document.getElementById("mICMS"),
     empresa: () => document.getElementById("mEmpresa"),
     motorista: () => document.getElementById("mMotorista"),
-    sat: () => document.getElementById("mSat"),
+    margem: () => document.getElementById("mMargem") || document.getElementById("mSat"),
     porta: () => document.getElementById("mPorta"),
     transito: () => document.getElementById("mTransito"),
     status: () => document.getElementById("mStatus"),
@@ -262,7 +262,7 @@
     const hora = String(d.getHours()).padStart(2, "0");
     const minuto = String(d.getMinutes()).padStart(2, "0");
 
-    return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
+    return ${dia}/${mes}/${ano} ${hora}:${minuto};
   }
 
   function getUltimaAlteracao(row) {
@@ -321,7 +321,31 @@
   function normalizePercentage(value) {
     let clean = safeText(value).replace("%", "").trim();
     if (!clean) return "";
-    return `${clean}%`;
+    return ${clean}%;
+  }
+
+  function calcularMargem(valorEmpresa, valorMotorista) {
+    const empresa = parsePtNumber(valorEmpresa);
+    const motorista = parsePtNumber(valorMotorista);
+
+    if (!Number.isFinite(empresa) || empresa <= 0 || !Number.isFinite(motorista)) return "";
+
+    const margem = ((empresa - motorista) / empresa) * 100;
+
+    return margem.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }) + "%";
+  }
+
+  function atualizarMargemModal() {
+    const campoMargem = MODAL.margem();
+    if (!campoMargem) return;
+
+    campoMargem.value = calcularMargem(
+      MODAL.empresa()?.value,
+      MODAL.motorista()?.value
+    );
   }
 
   function escapeHtml(str) {
@@ -445,7 +469,7 @@
     span.style.lineHeight = "1.2";
     span.style.background = c.bg;
     span.style.color = c.fg;
-    span.style.border = `1px solid ${c.fg}22`;
+    span.style.border = 1px solid ${c.fg}22;
     span.style.whiteSpace = "nowrap";
 
     return span;
@@ -570,7 +594,7 @@
       input.disabled = true;
 
       try {
-        setStatus(`💾 Salvando ${key}...`);
+        setStatus(💾 Salvando ${key}...);
 
         const ultimaAlteracao = nowUltimaAlteracaoBR();
         const res = await apiGet({
@@ -595,7 +619,7 @@
       } catch (e) {
         input.value = originalValue;
         setStatus("❌ Erro ao atualizar");
-        alert(e.message || `Falha ao salvar ${key}.`);
+        alert(e.message || Falha ao salvar ${key}.);
       } finally {
         isSaving = false;
         input.disabled = false;
@@ -671,7 +695,7 @@
       if (!confirm("Excluir este frete?")) return;
 
       try {
-        setStatus("🗑 Excluindo...");
+        setStatus("🗑️ Excluindo...");
         await apiGet({ action: "fretes_delete", id: row.id });
         await atualizar();
         setStatus("✅ Excluído");
@@ -766,7 +790,7 @@
 
         const td = document.createElement("td");
 
-        if (["volume", "valorEmpresa", "valorMotorista", "km", "pedagioEixo", "pedidoSat", "porta", "transito", "icms"].includes(col.key)) {
+        if (["volume", "valorEmpresa", "valorMotorista", "km", "pedagioEixo", "margem", "porta", "transito", "icms"].includes(col.key)) {
           td.className = "num";
         }
 
@@ -774,7 +798,7 @@
           td.appendChild(createColorTag(row[col.key], col.isColorTag));
         } else if (col.isMoney) {
           td.textContent = safeText(row[col.key]) ? formatMoneyBR(row[col.key]) : "";
-        } else if (col.key === "icms") {
+        } else if (col.key === "icms" || col.key === "margem") {
           td.textContent = safeText(row[col.key]) ? normalizePercentage(row[col.key]) : "";
         } else {
           td.textContent = safeText(row[col.key]);
@@ -882,8 +906,8 @@
     const d = String(phone || "").replace(/\D/g, "");
     const p = d.startsWith("55") ? d.slice(2) : d;
 
-    if (p.length === 11) return `(${p.slice(0, 2)}) ${p.slice(2, 7)}-${p.slice(7)}`;
-    if (p.length === 10) return `(${p.slice(0, 2)}) ${p.slice(2, 6)}-${p.slice(6)}`;
+    if (p.length === 11) return (${p.slice(0, 2)}) ${p.slice(2, 7)}-${p.slice(7)};
+    if (p.length === 10) return (${p.slice(0, 2)}) ${p.slice(2, 6)}-${p.slice(6)};
 
     return phone || "";
   }
@@ -898,7 +922,7 @@
     const phone = CONTACT_PHONE[upper(contato)] || "";
 
     return [
-      contato ? `${contato} ${formatPhoneNF(phone)}` : "",
+      contato ? ${contato} ${formatPhoneNF(phone)} : "",
       "", "", ""
     ];
   }
@@ -910,7 +934,7 @@
     if (!city) return "";
     if (city.includes("-")) return upper(city);
 
-    return uf ? `${upper(city)}-${upper(uf)}` : upper(city);
+    return uf ? ${upper(city)}-${upper(uf)} : upper(city);
   }
 
   function divulgacaoDataFromRow(row) {
@@ -936,10 +960,10 @@
       contatoPrincipal: upper(row.contato || ""),
       phone: extractPhoneBR(row.contato),
       filename:
-        `${family}_` +
-        `${normalizeKeyNF(row.origem)}_` +
-        `${normalizeKeyNF(row.destino)}_` +
-        `${normalizeKeyNF(valor)}.jpg`
+        ${family}_ +
+        ${normalizeKeyNF(row.origem)}_ +
+        ${normalizeKeyNF(row.destino)}_ +
+        ${normalizeKeyNF(valor)}.jpg
     };
   }
 
@@ -990,10 +1014,10 @@
       : "A COMBINAR";
 
     return [
-      `🏷️ ${origem}${coleta ? ` (${coleta})` : ""}`,
-      `🏁 ${destino}${descarga ? ` (${descarga})` : ""}`,
-      `CN 💢 ${produto}`,
-      `💰 ${valor}`
+      🏷️ ${origem}${coleta ? ` (${coleta}) : ""}`,
+      🏁 ${destino}${descarga ? ` (${descarga}) : ""}`,
+      CN 💢 ${produto},
+      💰 ${valor}
     ].join("\n");
   }
 
@@ -1155,8 +1179,8 @@
     const phone = extractPhoneBR(row.contato);
     const msg = buildMessage(row);
     const url = phone
-      ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
-      : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+      ? https://wa.me/${phone}?text=${encodeURIComponent(msg)}
+      : https://wa.me/?text=${encodeURIComponent(msg)};
 
     window.open(url, "_blank");
   }
@@ -1173,9 +1197,9 @@
     const b = document.getElementById("nfArtesTxt");
     const c = document.getElementById("nfMsgsTxt");
 
-    if (a) a.textContent = `${n} selecionado${n === 1 ? "" : "s"}`;
-    if (b) b.textContent = `${n} arte${n === 1 ? "" : "s"}`;
-    if (c) c.textContent = `${n} mensagem${n === 1 ? "" : "s"}`;
+    if (a) a.textContent = ${n} selecionado${n === 1 ? "" : "s"};
+    if (b) b.textContent = ${n} arte${n === 1 ? "" : "s"};
+    if (c) c.textContent = ${n} mensagem${n === 1 ? "" : "s"};
 
     const selectAll = document.getElementById("nfSelectAll");
     if (selectAll) {
@@ -1209,10 +1233,10 @@
       if (el) el.textContent = txt;
     };
 
-    set("nfStatVolume", `${sum("volume").toLocaleString("pt-BR", { maximumFractionDigits: 0 })} t`);
-    set("nfStatEmpresa", `${formatMoneyBR(avg("valorEmpresa"))} / t`);
-    set("nfStatMotorista", `${formatMoneyBR(avg("valorMotorista"))} / t`);
-    set("nfStatKm", `${sum("km").toLocaleString("pt-BR", { maximumFractionDigits: 0 })} km`);
+    set("nfStatVolume", ${sum("volume").toLocaleString("pt-BR", { maximumFractionDigits: 0 })} t);
+    set("nfStatEmpresa", ${formatMoneyBR(avg("valorEmpresa"))} / t);
+    set("nfStatMotorista", ${formatMoneyBR(avg("valorMotorista"))} / t);
+    set("nfStatKm", ${sum("km").toLocaleString("pt-BR", { maximumFractionDigits: 0 })} km);
     set("nfStatPedagio", formatMoneyBR(sum("pedagioEixo")));
   }
 
@@ -1224,7 +1248,7 @@
       return;
     }
 
-    setStatus(`⚡ Gerando ${rows.length} artes...`);
+    setStatus(⚡ Gerando ${rows.length} artes...);
 
     for (let i = 0; i < rows.length; i++) {
       await downloadDivulgacaoJPG(rows[i]);
@@ -1248,7 +1272,7 @@
       await navigator.clipboard.writeText(msg);
     } catch {}
 
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+    window.open(https://wa.me/?text=${encodeURIComponent(msg)}, "_blank");
   }
 
   function buildDivulgacaoHtml(rows) {
@@ -1313,7 +1337,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
       </tr>
     </thead>
     <tbody>
-      ${linhas || `<tr><td colspan="10" style="text-align:center;padding:18px;font-weight:700;">NENHUM FRETE LIBERADO ENCONTRADO</td></tr>`}
+      ${linhas || <tr><td colspan="10" style="text-align:center;padding:18px;font-weight:700;">NENHUM FRETE LIBERADO ENCONTRADO</td></tr>}
     </tbody>
   </table>
   <div class="foot">
@@ -1418,7 +1442,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     [
       MODAL.origem(), MODAL.coleta(), MODAL.destino(), MODAL.uf(), MODAL.descarga(),
       MODAL.produto(), MODAL.km(), MODAL.ped(), MODAL.volume(), MODAL.icms(),
-      MODAL.empresa(), MODAL.motorista(), MODAL.sat(), MODAL.porta(),
+      MODAL.empresa(), MODAL.motorista(), MODAL.margem(), MODAL.porta(),
       MODAL.transito(), MODAL.obs()
     ].forEach((el) => {
       if (el) el.value = "";
@@ -1484,7 +1508,11 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     
     if (MODAL.empresa()) MODAL.empresa().value = normalizeMoneyInput(row.valorEmpresa);
     if (MODAL.motorista()) MODAL.motorista().value = normalizeMoneyInput(row.valorMotorista);
-    if (MODAL.sat()) MODAL.sat().value = safeText(row.pedidoSat);
+    if (MODAL.margem()) {
+      MODAL.margem().value =
+        calcularMargem(row.valorEmpresa, row.valorMotorista) ||
+        normalizePercentage(row.margem);
+    }
     if (MODAL.porta()) MODAL.porta().value = safeText(row.porta);
     if (MODAL.transito()) MODAL.transito().value = safeText(row.transito);
     if (MODAL.status()) MODAL.status().value = normalizeFreteStatus(row.status) || "LIBERADO";
@@ -1509,7 +1537,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
       pedagioEixo: safeText(MODAL.ped()?.value),
       produto: upper(MODAL.produto()?.value),
       icms: safeText(MODAL.icms()?.value),
-      pedidoSat: upper(MODAL.sat()?.value),
+      margem: calcularMargem(MODAL.empresa()?.value, MODAL.motorista()?.value),
       porta: safeText(MODAL.porta()?.value),
       transito: safeText(MODAL.transito()?.value),
       status: normalizeFreteStatus(MODAL.status()?.value),
@@ -1648,7 +1676,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
 
     const bar = document.createElement("div");
     bar.id = "nfFloatingHBar";
-    bar.innerHTML = `<div id="nfFloatingHBarInner"></div>`;
+    bar.innerHTML = <div id="nfFloatingHBarInner"></div>;
     document.body.appendChild(bar);
 
     STATE.floatingBarReady = true;
@@ -1719,7 +1747,7 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
   function initUppercaseFields() {
     [
       MODAL.origem(), MODAL.coleta(), MODAL.destino(), MODAL.uf(),
-      MODAL.descarga(), MODAL.produto(), MODAL.sat(), MODAL.obs()
+      MODAL.descarga(), MODAL.produto(), MODAL.obs()
     ].forEach((el) => {
       if (!el) return;
 
