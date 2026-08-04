@@ -2,23 +2,8 @@
 (function () {
   "use strict";
 
-  const PRODUCT_BG_MAP = {
-    SOJA: "../assets/img/postt3l.png",
-    MILHO: "../assets/img/postt3l.png",
-    ACUCAR: "../assets/img/postt3l.png",
-    CALCARIO: "../assets/img/postt3l.png",
-    FARELODESOJA: "../assets/img/postt3l.png",
-    SORGO: "../assets/img/postt3l.png",
-    FERTILIZANTE: "../assets/img/postt3l.png",
-    FUBA: "../assets/img/postt3l.png",
-    BLOCO DE CONCRETO: "../assets/img/postt3l.png",
-    EMBALAGENS: "../assets/img/postt3l.png",
-    DERIVADO DE MILHO : "../assets/img/postt3l.png",
-    GERMEN DE MILHO: "../assets/img/postt3l.png",
-    ALIMENTICIO: "../assets/img/postt3l.png",
-    PIPOCA: "../assets/img/postt3l.png",
-    POSTE DE CONCRETO: "../assets/img/postt3l.png",
-  };
+  const PRODUCT_BG_MAP = {"../assets/img/postt3l.png",
+   };
 
   const FILIAIS_CONTATOS = {
     RIOVERDE: [
