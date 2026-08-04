@@ -3,21 +3,21 @@
   "use strict";
 
   const PRODUCT_BG_MAP = {
-    SOJA: "../assets/img/SOJATESTE.png",
-    MILHO: "../assets/img/MILHOTESTE.png",
-    ACUCAR: "../assets/img/ACUCARTESTE.png",
-    CALCARIO: "../assets/img/CALCARIOTESTE.png",
-    FARELODESOJA: "../assets/img/FARELODESOJA.png",
-    SORGO: "../assets/img/SORGOTESTE.png",
-    FERTILIZANTE: "../assets/img/FERTILIZANTE.png"
-    FUBA: "../assets/img/FUBA.png"
-    BLOCO DE CONCRETO: "../assets/img/CONCREOT.png"
-    EMBALAGENS: "../assets/img/EMBALAGEM.png"
-    DERIVADO DE MILHO : "../assets/img/DERIVADOMILHO.png"
-    GERMEN DE MILHO: "../assets/img/GERME.png"
-    ALIMENTICIO: "../assets/img/ALIMENTICIO.png"
-    PIPOCA: "../assets/img/PIPOCA.png"
-    POSTE DE CONCRETO: "../assets/img/POSTE.png"
+    SOJA: "../assets/img/postt3l.png",
+    MILHO: "../assets/img/postt3l.png",
+    ACUCAR: "../assets/img/postt3l.png",
+    CALCARIO: "../assets/img/postt3l.png",
+    FARELODESOJA: "../assets/img/postt3l.png",
+    SORGO: "../assets/img/postt3l.png",
+    FERTILIZANTE: "../assets/img/postt3l.png",
+    FUBA: "../assets/img/postt3l.png",
+    BLOCO DE CONCRETO: "../assets/img/postt3l.png",
+    EMBALAGENS: "../assets/img/postt3l.png",
+    DERIVADO DE MILHO : "../assets/img/postt3l.png",
+    GERMEN DE MILHO: "../assets/img/postt3l.png",
+    ALIMENTICIO: "../assets/img/postt3l.png",
+    PIPOCA: "../assets/img/postt3l.png",
+    POSTE DE CONCRETO: "../assets/img/postt3l.png",
   };
 
   const FILIAIS_CONTATOS = {
