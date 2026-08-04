@@ -14,7 +14,7 @@
     },
     clientes: [
       "JAEPEL", "OURO SAFRA", "COMIGO", "MMJV", "COMERX", "CANAA", "SANTA CLARA", "CICOPAL",
-      "OURO VERDE",
+      "OURO VERDE","CORRETOR DE ACUCAR","BELMA",
     ],
     contatosPorFilial: {
       "RIO VERDE": [{ nome: "ARIEL", fone: "5564992277537" }],
