@@ -1,1943 +1,1380 @@
-/* fretes.js | ROCA LOG - MODO RAIO DIVULGAÇÃO | MARGEM CORRIGIDA */
-(function () {
-  "use strict";
-
-  const API_URL =
-    "https://script.google.com/macros/s/AKfycbyEmbKPOu9AU5twvIoQQTmceNlrV7-UEnwAHcDYUagqSc48CfXzJ9gmkyTgVDFCe0g9/exec";
-
-  const DIRECTORY = {
-    regionais: ["GOIAS"],
-    filiaisPorRegional: {
-      GOIAS: [
-        "RIO VERDE ", "ANAPOLIS"
-      ],
-    },
-    clientes: [
-      "JAEPEL", "OURO SAFRA", "COMIGO", "MMJV", "COMERX", "CANAA", "SANTA CLARA", "CICOPAL",
-      "OURO VERDE", "CORRETOR DE ACUCAR", "BELMA",
-    ],
-    contatosPorFilial: {
-      "RIO VERDE": [{ nome: "ARIEL", fone: "5564992277537" }],
-      "ANAPOLIS": [{ nome: "ARIEL", fone: "5564992277537" }]
-    }
-  };
-
-  const FILIAIS_CONTATOS_ARTE = {
-    RIOVERDE: [
-      "ARIEL (64) 99227-7537",
-      "MARCOS VINICIUS (64) 99928-0210",
-    ],
-  };
-
-  const CONTACT_PHONE = (() => {
-    const map = {};
-    Object.values(DIRECTORY.contatosPorFilial || {}).forEach((arr) => {
-      (arr || []).forEach((c) => {
-        if (c?.nome && c?.fone) {
-          map[String(c.nome).toUpperCase().trim()] = String(c.fone).trim();
-        }
-      });
-    });
-    return map;
-  })();
-
-  const STATE = {
-    rows: [],
-    editingId: "",
-    inlineSaving: new Set(),
-    floatingBarReady: false,
-    floatingSyncing: false,
-    selectedIds: new Set(),
-    previewRow: null,
-    modalBusy: false,
-  };
-
-  const $ = (sel) => document.querySelector(sel);
-
-  const COLS = [
-    { key: "__select", label: "", isSelect: true },
-    { key: "regional", label: "Regional" },
-    { key: "filial", label: "Filial" },
-    { key: "cliente", label: "Cliente", isColorTag: "cliente" },
-    { key: "origem", label: "Origem" },
-    { key: "coleta", label: "Coleta" },
-    { key: "contato", label: "Contato", isContato: true, isColorTag: "contato" },
-    { key: "destino", label: "Destino" },
-    { key: "uf", label: "UF" },
-    { key: "descarga", label: "Descarga" },
-    { key: "volume", label: "Volume" },
-    { key: "valorEmpresa", label: "Vlr Empresa", isMoney: true },
-    { key: "valorMotorista", label: "Vlr Motorista", isMoney: true },
-    { key: "km", label: "KM" },
-    { key: "pedagioEixo", label: "Pedágio/Eixo" },
-    { key: "e5", label: "5E" },
-    { key: "e6", label: "6E" },
-    { key: "e7", label: "7E" },
-    { key: "e4", label: "4E" },
-    { key: "e9", label: "9E" },
-    { key: "produto", label: "Produto", isColorTag: "produto" },
-    { key: "icms", label: "ICMS" },
-    { key: "margem", label: "Margem" },
-    { key: "porta", label: "Porta", isInlineEditable: true },
-    { key: "transito", label: "Trânsito", isInlineEditable: true },
-    { key: "status", label: "Status" },
-    { key: "obs", label: "Observações" },
-    { key: "__ultimaAlteracao", label: "Última Alteração", isUltimaAlteracao: true },
-    { key: "__acoes", label: "Ações", isAcoes: true },
-  ];
-
-  const MODAL = {
-    wrap: () => document.getElementById("modal"),
-    title: () => document.getElementById("modalTitle"),
-    regional: () => document.getElementById("mRegional"),
-    filial: () => document.getElementById("mFilial"),
-    cliente: () => document.getElementById("mCliente"),
-    contato: () => document.getElementById("mContato"),
-    origem: () => document.getElementById("mOrigem"),
-    coleta: () => document.getElementById("mColeta"),
-    destino: () => document.getElementById("mDestino"),
-    uf: () => document.getElementById("mUF"),
-    descarga: () => document.getElementById("mDescarga"),
-    produto: () => document.getElementById("mProduto"),
-    km: () => document.getElementById("mKM"),
-    ped: () => document.getElementById("mPed"),
-    volume: () => document.getElementById("mVolume"),
-    icms: () => document.getElementById("mICMS"),
-    empresa: () => document.getElementById("mEmpresa"),
-    motorista: () => document.getElementById("mMotorista"),
-    margem: () => document.getElementById("mMargem") || document.getElementById("mSat"),
-    porta: () => document.getElementById("mPorta"),
-    transito: () => document.getElementById("mTransito"),
-    status: () => document.getElementById("mStatus"),
-    obs: () => document.getElementById("mObs"),
-    btnSave: () => document.getElementById("btnSave"),
-  };
-
-  const FIXED_CLIENT_COLORS = {
-    LDC: { bg: "#DBEAFE", fg: "#1D4ED8" },
-    "OURO SAFRA": { bg: "#FEF3C7", fg: "#B45309" },
-    CARAMURU: { bg: "#DCFCE7", fg: "#15803D" },
-    CARGILL: { bg: "#FDE68A", fg: "#92400E" },
-    COFCO: { bg: "#EDE9FE", fg: "#6D28D9" },
-    MOSAIC: { bg: "#E0F2FE", fg: "#0369A1" },
-    AMAGGI: { bg: "#FFE4E6", fg: "#BE123C" },
-    CHS: { bg: "#ECFCCB", fg: "#4D7C0F" },
-    BRF: { bg: "#F3E8FF", fg: "#7E22CE" },
-    "JBS SEARA": { bg: "#FCE7F3", fg: "#BE185D" },
-    "NOVA AGRI": { bg: "#D1FAE5", fg: "#047857" },
-    CONCREBEL: { bg: "#E2E8F0", fg: "#334155" },
-  };
-
-  const FIXED_CONTACT_COLORS = {
-    ARIEL: { bg: "#DBEAFE", fg: "#1D4ED8" },
-    ROBSON: { bg: "#DCFCE7", fg: "#15803D" },
-    SERGIO: { bg: "#FEF3C7", fg: "#B45309" },
-    EVERALDO: { bg: "#EDE9FE", fg: "#6D28D9" },
-    FABIOLA: { bg: "#FCE7F3", fg: "#BE185D" },
-    RAFAEL: { bg: "#E0F2FE", fg: "#0369A1" },
-    JHONATAN: { bg: "#FFE4E6", fg: "#BE123C" },
-    KIEWERSON: { bg: "#ECFCCB", fg: "#4D7C0F" },
-    RONE: { bg: "#F3E8FF", fg: "#7E22CE" },
-    RICARDO: { bg: "#FDE68A", fg: "#92400E" },
-    GUILHERME: { bg: "#D1FAE5", fg: "#047857" },
-    NARCISO: { bg: "#E2E8F0", fg: "#334155" },
-    ALFREDO: { bg: "#FEE2E2", fg: "#B91C1C" },
-    MATEUS: { bg: "#CCFBF1", fg: "#0F766E" },
-    FHELLIPE: { bg: "#F5D0FE", fg: "#A21CAF" },
-    "EVERALDO JR": { bg: "#CFFAFE", fg: "#0E7490" },
-    DIOGO: { bg: "#DCFCE7", fg: "#15803D" },
-  };
-
-  const FIXED_PRODUCT_COLORS = {
-    SOJA: { bg: "#FEF3C7", fg: "#B45309" },
-    MILHO: { bg: "#DBEAFE", fg: "#1D4ED8" },
-    FERTILIZANTE: { bg: "#DCFCE7", fg: "#15803D" },
-    ADUBO: { bg: "#FCE7F3", fg: "#BE185D" },
-    AÇUCAR: { bg: "#EDE9FE", fg: "#6D28D9" },
-    ACUCAR: { bg: "#EDE9FE", fg: "#6D28D9" },
-    SORGO: { bg: "#FFE4E6", fg: "#BE123C" },
-    FARELO: { bg: "#E0F2FE", fg: "#0369A1" },
-    DDG: { bg: "#ECFCCB", fg: "#4D7C0F" },
-    ETANOL: { bg: "#FDE68A", fg: "#92400E" },
-    SEMENTE: { bg: "#D1FAE5", fg: "#047857" },
-    SEMENTES: { bg: "#D1FAE5", fg: "#047857" },
-    CALCÁRIO: { bg: "#E2E8F0", fg: "#334155" },
-    CALCARIO: { bg: "#E2E8F0", fg: "#334155" },
-    GESSO: { bg: "#F5D0FE", fg: "#A21CAF" },
-    SAL: { bg: "#CFFAFE", fg: "#0E7490" },
-  };
-
-  const PRODUCT_BG_MAP_NF = {
-    SOJA: "../assets/img/SOJATESTE.png",
-    MILHO: "../assets/img/MILHOTESTE.png",
-    ACUCAR: "../assets/img/ACUCARTESTE.png",
-    CALCARIO: "../assets/img/CALCARIOTESTE.png",
-    FARELO_DE_SOJA: "../assets/img/FARELODESOJA.png",
-    SORGO: "../assets/img/SORGOTESTE.png",
-    FERTILIZANTE: "../assets/img/FERTILIZANTE.png",
-  };
-
-  const PISO_PARAMS = {
-    e9: { eixos: 9, rkm: 9.2662, custoCC: 877.83, weightInputId: "w9", defaultPeso: 47 },
-    e4: { eixos: 4, rkm: 8.0855, custoCC: 792.3, weightInputId: "w4", defaultPeso: 39 },
-    e7: { eixos: 7, rkm: 8.0855, custoCC: 792.3, weightInputId: "w7", defaultPeso: 36 },
-    e6: { eixos: 6, rkm: 7.4408, custoCC: 656.76, weightInputId: "w6", defaultPeso: 31 },
-    e5: { eixos: 5, rkm: 6.7381, custoCC: 642.1, weightInputId: "w5", defaultPeso: 26 },
-  };
-
-  function safeText(v) {
-    return String(v ?? "").trim();
-  }
-
-  function upper(v) {
-    return safeText(v).toUpperCase();
-  }
-
-  function upperKeepSpaces(v) {
-    return String(v ?? "").toUpperCase();
-  }
-
-  function normalizeKeyNF(v) {
-    return String(v || "")
-      .trim()
-      .toUpperCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^A-Z0-9]/g, "");
-  }
-
-  function setStatus(text) {
-    const el = document.querySelector("[data-sync-status]") || document.querySelector("#syncStatus");
-    if (el) el.textContent = text;
-  }
-
-  function normalizeFreteStatus(value) {
-    const s = upper(value);
-    if (s === "EM ANALISE") return "FINALIZANDO";
-    if (s === "BLOQUEADO") return "SUSPENSO";
-    return s;
-  }
-
-  function parsePtNumber(value) {
-    if (value === null || value === undefined) return NaN;
-    if (typeof value === "number") return Number.isFinite(value) ? value : NaN;
-
-    let s = String(value).trim();
-    if (!s) return NaN;
-
-    s = s.replace(/\s+/g, "").replace(/[^\d.,-]/g, "");
-    if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
-
-    const n = Number(s);
-    return Number.isFinite(n) ? n : NaN;
-  }
-
-  function formatMoneyBR(value) {
-    const n = parsePtNumber(value);
-    if (!Number.isFinite(n)) return safeText(value);
-    return n.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }
-
-  function formatDateTimeBR(value) {
-    const raw = safeText(value);
-    if (!raw) return "";
-
-    if (/^\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/.test(raw)) return raw;
-    if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) return raw;
-    if (/^\d{2}\/\d{2}\/\d{2}/.test(raw)) return raw;
-
-    if (/^\d{12,}$/.test(raw)) return "";
-
-    const d = new Date(raw);
-    if (Number.isNaN(d.getTime())) return raw;
-
-    const dia = String(d.getDate()).padStart(2, "0");
-    const mes = String(d.getMonth() + 1).padStart(2, "0");
-    const ano = String(d.getFullYear());
-    const hora = String(d.getHours()).padStart(2, "0");
-    const minuto = String(d.getMinutes()).padStart(2, "0");
-
-    return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
-  }
-
-  function getUltimaAlteracao(row) {
-    if (!row) return "";
-
-    const possibleKeys = [
-      "ultimaAlteracao", "ultima_alteracao", "UltimaAlteracao", "Ultima Alteracao", "Última Alteração",
-      "dataAlteracao", "data_alteracao", "Data Alteracao", "Data Alteração",
-      "dataAtualizacao", "data_atualizacao", "Data Atualizacao", "Data Atualização"
-    ];
-
-    for (const key of possibleKeys) {
-      if (row[key] !== undefined && row[key] !== null && safeText(row[key])) {
-        return formatDateTimeBR(row[key]);
-      }
-    }
-    return "";
-  }
-
-  function buildUltimaAlteracaoCell(row) {
-    const td = document.createElement("td");
-    td.className = "num";
-    td.textContent = getUltimaAlteracao(row) || "-";
-    return td;
-  }
-
-  function nowUltimaAlteracaoBR() {
-    const d = new Date();
-    const pad = (n) => String(n).padStart(2, "0");
-
-    return [
-      pad(d.getDate()),
-      pad(d.getMonth() + 1),
-      d.getFullYear()
-    ].join("/") + " " + [
-      pad(d.getHours()),
-      pad(d.getMinutes())
-    ].join(":");
-  }
-
-  function normalizeMoneyInput(value) {
-    const text = String(value ?? "").trim();
-    if (!text) return "";
-
-    const numeric = parsePtNumber(text);
-    if (!Number.isFinite(numeric)) return text.toUpperCase();
-
-    return numeric.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }
-
-  function normalizePercentage(value) {
-    let clean = safeText(value).replace("%", "").trim();
-    if (!clean) return "";
-    return `${clean}%`;
-  }
-
-  function calcularMargem(valorEmpresa, valorMotorista) {
-    const empresa = parsePtNumber(valorEmpresa);
-    const motorista = parsePtNumber(valorMotorista);
-
-    if (
-      !Number.isFinite(empresa) ||
-      empresa <= 0 ||
-      !Number.isFinite(motorista)
-    ) {
-      return "";
-    }
-
-    const margem = ((empresa - motorista) / empresa) * 100;
-
-    return margem.toLocaleString("pt-BR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }) + "%";
-  }
-
-  function atualizarMargemModal() {
-    const campoMargem = MODAL.margem();
-    if (!campoMargem) return;
-
-    campoMargem.value = calcularMargem(
-      MODAL.empresa()?.value,
-      MODAL.motorista()?.value
-    );
-  }
-
-  function escapeHtml(str) {
-    return String(str ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function ceil0(n) {
-    return Math.ceil(n);
-  }
-
-  function jsonp(url, timeoutMs = 30000) {
-    return new Promise((resolve, reject) => {
-      const cb = "cb_" + Math.random().toString(36).slice(2);
-      const s = document.createElement("script");
-      const sep = url.includes("?") ? "&" : "?";
-
-      const t = setTimeout(() => {
-        cleanup();
-        reject(new Error("Timeout JSONP"));
-      }, timeoutMs);
-
-      function cleanup() {
-        clearTimeout(t);
-        try { delete window[cb]; } catch {}
-        try { s.remove(); } catch {}
-      }
-
-      window[cb] = (data) => {
-        cleanup();
-        resolve(data);
-      };
-
-      s.src = url + sep + "callback=" + encodeURIComponent(cb) + "&_=" + Date.now();
-      s.onerror = () => {
-        cleanup();
-        reject(new Error("Erro ao carregar JSONP"));
-      };
-
-      document.head.appendChild(s);
-    });
-  }
-
-  function buildUrl(paramsObj) {
-    const url = new URL(API_URL);
-    Object.entries(paramsObj || {}).forEach(([k, v]) => url.searchParams.set(k, v));
-    return url.toString();
-  }
-
-  async function apiGet(paramsObj) {
-    const res = await jsonp(buildUrl(paramsObj), 35000);
-    if (!res || res.ok === false) throw new Error(res?.error || "Falha na API");
-    return res;
-  }
-
-  // Corrigida a função para bater com a chamada abaixo dela (getPesoFromUI)
-  function getPesoFromUI(id, fallback) {
-    const el = document.getElementById(id);
-    const v = parsePtNumber(el?.value);
-    return Number.isFinite(v) && v > 0 ? v : fallback;
-  }
-
-  function calcMinRPorTon(param, km, pedagioPorEixo) {
-    const peso = getPesoFromUI(param.weightInputId, param.defaultPeso);
-    const numerador = param.rkm * km + param.custoCC + pedagioPorEixo * param.eixos;
-    return ceil0(numerador / peso);
-  }
-
-  function sn(valueMotoristaTon, minTon) {
-    if (!Number.isFinite(valueMotoristaTon) || !Number.isFinite(minTon)) return "";
-    return valueMotoristaTon >= minTon ? "S" : "N";
-  }
-
-  function applyPisoSN(rows) {
-    return (rows || []).map((r) => {
-      const km = parsePtNumber(r.km) || 0;
-      const ped = parsePtNumber(r.pedagioEixo) || 0;
-      const vm = parsePtNumber(r.valorMotorista);
-
-      return {
-        ...r,
-        e5: sn(vm, calcMinRPorTon(PISO_PARAMS.e5, km, ped)),
-        e6: sn(vm, calcMinRPorTon(PISO_PARAMS.e6, km, ped)),
-        e7: sn(vm, calcMinRPorTon(PISO_PARAMS.e7, km, ped)),
-        e4: sn(vm, calcMinRPorTon(PISO_PARAMS.e4, km, ped)),
-        e9: sn(vm, calcMinRPorTon(PISO_PARAMS.e9, km, ped)),
-      };
-    });
-  }
-
-  function getFixedColorConfig(value, kind) {
-    const key = upper(value);
-    if (kind === "cliente" && FIXED_CLIENT_COLORS[key]) return FIXED_CLIENT_COLORS[key];
-    if (kind === "contato" && FIXED_CONTACT_COLORS[key]) return FIXED_CONTACT_COLORS[key];
-    if (kind === "produto" && FIXED_PRODUCT_COLORS[key]) return FIXED_PRODUCT_COLORS[key];
-    return { bg: "#F1F5F9", fg: "#334155" };
-  }
-
-  function createColorTag(text, kind) {
-    const span = document.createElement("span");
-    const value = safeText(text);
-
-    if (!value) {
-      span.textContent = "";
-      return span;
-    }
-
-    const c = getFixedColorConfig(value, kind);
-    span.textContent = value;
-    span.style.display = "inline-flex";
-    span.style.alignItems = "center";
-    span.style.maxWidth = "100%";
-    span.style.padding = "2px 8px";
-    span.style.borderRadius = "999px";
-    span.style.fontWeight = "800";
-    span.style.fontSize = "11px";
-    span.style.lineHeight = "1.2";
-    span.style.background = c.bg;
-    span.style.color = c.fg;
-    span.style.border = `1px solid ${c.fg}22`;
-    span.style.whiteSpace = "nowrap";
-
-    return span;
-  }
-
-  function extractPhoneBR(text) {
-    const s = safeText(text);
-    if (!s) return "";
-
-    let digits = s.replace(/\D/g, "");
-    if (digits) {
-      if (digits.startsWith("55")) return digits;
-      if (digits.length === 10 || digits.length === 11) return "55" + digits;
-    }
-
-    const phone = CONTACT_PHONE[upper(s)] || "";
-    if (!phone) return "";
-
-    const p = phone.replace(/\D/g, "");
-    return p.startsWith("55") ? p : "55" + p;
-  }
-
-  function whatsappLinkFromContato(contato) {
-    const phone = extractPhoneBR(contato);
-    return phone ? "https://wa.me/" + phone : "";
-  }
-
-  function buildContatoCell(contatoText) {
-    const td = document.createElement("td");
-    const wrap = document.createElement("div");
-
-    wrap.style.display = "flex";
-    wrap.style.alignItems = "center";
-    wrap.style.justifyContent = "space-between";
-    wrap.style.gap = "6px";
-
-    const labelWrap = document.createElement("div");
-    labelWrap.style.minWidth = "0";
-    labelWrap.appendChild(createColorTag(contatoText || "", "contato"));
-    wrap.appendChild(labelWrap);
-
-    const wpp = whatsappLinkFromContato(contatoText);
-    if (wpp) {
-      const a = document.createElement("a");
-      a.href = wpp;
-      a.target = "_blank";
-      a.rel = "noopener";
-      a.className = "waIcon";
-      a.title = "Chamar no WhatsApp";
-
-      const img = document.createElement("img");
-      img.src = "../assets/img/whatsapp.png";
-      img.alt = "WhatsApp";
-      img.onerror = () => { a.textContent = "📞"; };
-
-      a.appendChild(img);
-      wrap.appendChild(a);
-    }
-
-    td.appendChild(wrap);
-    return td;
-  }
-
-  function buildPillSNCell(val) {
-    const td = document.createElement("td");
-    td.className = "num";
-
-    const v = upper(val);
-    const span = document.createElement("span");
-    span.className = "pillSN " + (v === "S" ? "s" : v === "N" ? "n" : "empty");
-    span.textContent = v || "-";
-
-    td.appendChild(span);
-    return td;
-  }
-
-  function buildStatusCell(value) {
-    const td = document.createElement("td");
-    const status = normalizeFreteStatus(value);
-    const span = document.createElement("span");
-
-    span.textContent = status || "-";
-    span.style.display = "inline-flex";
-    span.style.alignItems = "center";
-    span.style.justifyContent = "center";
-    span.style.minWidth = "96px";
-    span.style.height = "22px";
-    span.style.padding = "0 10px";
-    span.style.borderRadius = "999px";
-    span.style.fontWeight = "900";
-    span.style.fontSize = "10px";
-    span.style.color = "#fff";
-
-    if (status === "LIBERADO") span.style.background = "#15803D";
-    else if (status === "FINALIZANDO") span.style.background = "#1D4ED8";
-    else if (status === "SUSPENSO") span.style.background = "#B91C1C";
-    else span.style.background = "#64748B";
-
-    td.appendChild(span);
-    return td;
-  }
-
-  function buildInlineEditableCell(row, key) {
-    const td = document.createElement("td");
-    td.className = "num";
-
-    const input = document.createElement("input");
-    input.type = "text";
-    input.className = "inlineCellInput";
-    input.value = safeText(row[key] || "");
-    input.setAttribute("inputmode", "numeric");
-    input.setAttribute("autocomplete", "off");
-
-    let originalValue = safeText(row[key] || "");
-    let isSaving = false;
-
-    async function commit() {
-      const newValue = safeText(input.value);
-      if (isSaving || newValue === originalValue || !safeText(row.id)) return;
-
-      isSaving = true;
-      input.disabled = true;
-
-      try {
-        setStatus(`💾 Salvando ${key}...`);
-
-        const ultimaAlteracao = nowUltimaAlteracaoBR();
-        const res = await apiGet({
-          action: "fretes_update",
-          id: safeText(row.id),
-          [key]: newValue
-        });
-
-        const idx = STATE.rows.findIndex((r) => safeText(r.id) === safeText(row.id));
-        if (idx >= 0) {
-          STATE.rows[idx][key] = newValue;
-          STATE.rows[idx].ultimaAlteracao = res?.data?.ultimaAlteracao || ultimaAlteracao;
-          STATE.rows[idx].updatedAt = res?.data?.updatedAt || STATE.rows[idx].updatedAt;
-        }
-
-        row[key] = newValue;
-        row.ultimaAlteracao = res?.data?.ultimaAlteracao || ultimaAlteracao;
-
-        originalValue = newValue;
-        applyFilters();
-        setStatus("✅ Atualizado");
-      } catch (e) {
-        input.value = originalValue;
-        setStatus("❌ Erro ao atualizar");
-        alert(e.message || `Falha ao salvar ${key}.`);
-      } finally {
-        isSaving = false;
-        input.disabled = false;
-      }
-    }
-
-    input.addEventListener("blur", commit);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        input.blur();
-      }
-      if (e.key === "Escape") {
-        input.value = originalValue;
-        input.blur();
-      }
-    });
-
-    td.appendChild(input);
-    return td;
-  }
-
-  function buildSelectCell(row) {
-    const td = document.createElement("td");
-    td.className = "num";
-
-    const cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.className = "nfRowCheck";
-    cb.checked = STATE.selectedIds.has(safeText(row.id));
-    cb.title = "Selecionar para pacote de divulgação";
-
-    cb.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const id = safeText(row.id);
-      if (!id) return;
-
-      if (cb.checked) STATE.selectedIds.add(id);
-      else STATE.selectedIds.delete(id);
-
-      updateBulkUI();
-      renderPreview(row);
-    });
-
-    td.appendChild(cb);
-    return td;
-  }
-
-  function buildAcoesCell(row) {
-    const td = document.createElement("td");
-    td.className = "num";
-
-    const wrap = document.createElement("div");
-    wrap.className = "nfActionGroup";
-
-    const btnEdit = document.createElement("button");
-    btnEdit.type = "button";
-    btnEdit.className = "btnTiny ghost";
-    btnEdit.textContent = "Editar";
-    btnEdit.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openEditModal(row);
-    });
-
-    const btnDel = document.createElement("button");
-    btnDel.type = "button";
-    btnDel.className = "btnTiny";
-    btnDel.textContent = "Excluir";
-    btnDel.addEventListener("click", async (e) => {
-      e.stopPropagation();
-
-      if (!row.id) return;
-      if (!confirm("Excluir este frete?")) return;
-
-      try {
-        setStatus("🗑 Excluindo...");
-        await apiGet({ action: "fretes_delete", id: row.id });
-        await atualizar();
-        setStatus("✅ Excluído");
-      } catch (e) {
-        setStatus("❌ Falha ao excluir");
-        alert(e.message || "Falha ao excluir.");
-      }
-    });
-
-    wrap.appendChild(btnEdit);
-    wrap.appendChild(btnDel);
-
-    td.appendChild(wrap);
-    return td;
-  }
-
-  function render(rowsRaw) {
-    const tbody = $("#tbody");
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    if (!rowsRaw || !rowsRaw.length) {
-      syncFloatingHorizontalBar();
-      return;
-    }
-
-    const rows = applyPisoSN(rowsRaw).slice().sort((a, b) => {
-      const fa = safeText(a.filial).localeCompare(safeText(b.filial));
-      if (fa !== 0) return fa;
-
-      const ca = safeText(a.cliente).localeCompare(safeText(b.cliente));
-      if (ca !== 0) return ca;
-
-      return safeText(a.destino).localeCompare(safeText(b.destino));
-    });
-
-    let filialAtual = "";
-
-    rows.forEach((row) => {
-      if (safeText(row.filial) !== filialAtual) {
-        filialAtual = safeText(row.filial);
-
-        const trGroup = document.createElement("tr");
-        trGroup.className = "groupRow";
-
-        const td = document.createElement("td");
-        td.colSpan = COLS.length;
-        td.textContent = filialAtual || "SEM FILIAL";
-
-        trGroup.appendChild(td);
-        tbody.appendChild(trGroup);
-      }
-
-      const tr = document.createElement("tr");
-
-      COLS.forEach((col) => {
-        if (col.isSelect) {
-          tr.appendChild(buildSelectCell(row));
-          return;
-        }
-
-        if (col.isContato) {
-          tr.appendChild(buildContatoCell(row.contato || ""));
-          return;
-        }
-
-        if (col.isUltimaAlteracao) {
-          tr.appendChild(buildUltimaAlteracaoCell(row));
-          return;
-        }
-
-        if (col.isAcoes) {
-          tr.appendChild(buildAcoesCell(row));
-          return;
-        }
-
-        if (["e5", "e6", "e7", "e4", "e9"].includes(col.key)) {
-          tr.appendChild(buildPillSNCell(row[col.key]));
-          return;
-        }
-
-        if (col.key === "status") {
-          tr.appendChild(buildStatusCell(row[col.key]));
-          return;
-        }
-
-        if (col.isInlineEditable) {
-          tr.appendChild(buildInlineEditableCell(row, col.key));
-          return;
-        }
-
-        const td = document.createElement("td");
-
-        if (["volume", "valorEmpresa", "valorMotorista", "km", "pedagioEixo", "margem", "porta", "transito", "icms"].includes(col.key)) {
-          td.className = "num";
-        }
-
-        if (col.isColorTag) {
-          td.appendChild(createColorTag(row[col.key], col.isColorTag));
-        } else if (col.isMoney) {
-          td.textContent = safeText(row[col.key]) ? formatMoneyBR(row[col.key]) : "";
-        } else if (col.key === "icms") {
-          td.textContent = safeText(row[col.key]) ? normalizePercentage(row[col.key]) : "";
-        } else if (col.key === "margem") {
-          td.textContent =
-            calcularMargem(row.valorEmpresa, row.valorMotorista) ||
-            (safeText(row.margem) ? normalizePercentage(row.margem) : "");
-        } else {
-          td.textContent = safeText(row[col.key]);
-        }
-
-        tr.appendChild(td);
-      });
-
-      tr.addEventListener("click", () => renderPreview(row));
-      tbody.appendChild(tr);
-    });
-
-    syncFloatingHorizontalBar();
-    updateBulkUI();
-    renderStats(getFilteredRows());
-  }
-
-  function getFilteredRows() {
-    const regional = upper($("#fRegional")?.value || "");
-    const filial = upper($("#fFilial")?.value || "");
-    const contato = upper($("#fContato")?.value || "");
-    const busca = upper($("#fBusca")?.value || "");
-
-    return STATE.rows.filter((row) => {
-      if (regional && upper(row.regional) !== regional) return false;
-      if (filial && upper(row.filial) !== filial) return false;
-      if (contato && upper(row.contato) !== contato) return false;
-
-      if (busca) {
-        const blob = upper(JSON.stringify(row));
-        if (!blob.includes(busca)) return false;
-      }
-
-      return true;
-    });
-  }
-
-  function applyFilters() {
-    render(getFilteredRows());
-    renderPreview(getFilteredRows()[0] || STATE.rows[0]);
-  }
-
-  function setSelectOptions(selectEl, options, placeholderText) {
-    if (!selectEl) return;
-
-    const current = selectEl.value;
-    selectEl.innerHTML = "";
-
-    const ph = document.createElement("option");
-    ph.value = "";
-    ph.textContent = placeholderText;
-    selectEl.appendChild(ph);
-
-    options.forEach((opt) => {
-      const o = document.createElement("option");
-      o.value = opt;
-      o.textContent = opt;
-      selectEl.appendChild(o);
-    });
-
-    if ([...selectEl.options].some((o) => o.value === current)) {
-      selectEl.value = current;
-    }
-  }
-
-  function fillTopFilters(rows) {
-    const regionais = [...new Set(rows.map((r) => upper(r.regional)).filter(Boolean))].sort();
-    const filiais = [...new Set(rows.map((r) => upper(r.filial)).filter(Boolean))].sort();
-    const contatos = [...new Set(rows.map((r) => upper(r.contato)).filter(Boolean))].sort();
-
-    setSelectOptions($("#fRegional"), regionais, "Todas as regionais");
-    setSelectOptions($("#fFilial"), filiais, "Todas as filiais");
-    setSelectOptions($("#fContato"), contatos, "Todos os contatos");
-  }
-
-  function productFamilyNF(produto) {
-    const n = normalizeKeyNF(produto);
-
-    if (n.includes("FARELO") && n.includes("SOJA")) return "FARELO_DE_SOJA";
-    if (n.includes("SOJA")) return "SOJA";
-    if (n.includes("MILHO")) return "MILHO";
-    if (n.includes("ACUCAR")) return "ACUCAR";
-    if (n.includes("CALCARIO")) return "CALCARIO";
-    if (n.includes("SORGO")) return "SORGO";
-    if (n.includes("FERT") || n.includes("ADUBO")) return "FERTILIZANTE";
-
-    return "SOJA";
-  }
-
-  function normalizeFilialKeyNF(filial) {
-    const k = normalizeKeyNF(filial);
-
-    if (k === "RIOVERDE") return "RIOVERDE";
-    if (k === "RIOVERDEFERT") return "FERTILIZANTE";
-    if (k === "SAOPAULO" || k === "SOROCABA") return "SAOPAULO";
-    if (k === "CHAPCEU" || k === "CHAPEU") return "CHAPEU";
-    if (k === "CATALAO") return "CATALAO";
-    if (k === "URUAÇU" || k === "URUACU") return "URUACU";
-    if (k === "BOMJESUS") return "BOMJESUS";
-
-    return k;
-  }
-
-  function formatPhoneNF(phone) {
-    const d = String(phone || "").replace(/\D/g, "");
-    const p = d.startsWith("55") ? d.slice(2) : d;
-
-    if (p.length === 11) return `(${p.slice(0, 2)}) ${p.slice(2, 7)}-${p.slice(7)}`;
-    if (p.length === 10) return `(${p.slice(0, 2)}) ${p.slice(2, 6)}-${p.slice(6)}`;
-
-    return phone || "";
-  }
-
-  function contactsFromFilial(row) {
-    const filialKey = normalizeFilialKeyNF(row.filial);
-    const lista = FILIAIS_CONTATOS_ARTE[filialKey];
-
-    if (lista && lista.length) return lista.slice(0, 4);
-
-    const contato = safeText(row.contato);
-    const phone = CONTACT_PHONE[upper(contato)] || "";
-
-    return [
-      contato ? `${contato} ${formatPhoneNF(phone)}` : "",
-      "", "", ""
-    ];
-  }
-
-  function cityUf(row, cityKey, ufKey) {
-    const city = safeText(row[cityKey]);
-    const uf = safeText(row[ufKey]);
-
-    if (!city) return "";
-    if (city.includes("-")) return upper(city);
-
-    return uf ? `${upper(city)}-${upper(uf)}` : upper(city);
-  }
-
-  function divulgacaoDataFromRow(row) {
-    const produto = upper(row.produto || "SOJA");
-    const family = productFamilyNF(produto);
-    const contatos = contactsFromFilial(row);
-
-    const valor = safeText(row.valorMotorista)
-      ? formatMoneyBR(row.valorMotorista)
-      : "A COMBINAR";
-
-    return {
-      coletaCidade: upper(row.origem || ""),
-      coletaLocal: upper(row.coleta || ""),
-      descargaCidade: cityUf(row, "destino", "uf"),
-      descargaLocal: upper(row.descarga || ""),
-      produto,
-      productFamily: family,
-      bg: PRODUCT_BG_MAP_NF[family] || PRODUCT_BG_MAP_NF.SOJA,
-      valor,
-      obs: upper(row.obs || ""),
-      contatos,
-      contatoPrincipal: upper(row.contato || ""),
-      phone: extractPhoneBR(row.contato),
-      filename:
-        `${family}_` +
-        `${normalizeKeyNF(row.origem)}_` +
-        `${normalizeKeyNF(row.destino)}_` +
-        `${normalizeKeyNF(valor)}.jpg`
-    };
-  }
-
-  function setText(id, txt) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = txt || "";
-  }
-
-  function renderPreview(row) {
-    if (!row) row = STATE.previewRow || getFilteredRows()[0] || STATE.rows[0];
-    if (!row) return;
-
-    STATE.previewRow = row;
-    const d = divulgacaoDataFromRow(row);
-
-    const bg = document.getElementById("nfArtBg");
-    if (bg) bg.src = d.bg;
-
-    const badge = document.getElementById("nfPreviewProdutoBadge");
-    if (badge) badge.textContent = d.productFamily;
-
-    setText("nfArtColetaCidade", d.coletaCidade);
-    setText("nfArtColetaLocal", d.coletaLocal);
-    setText("nfArtDescargaCidade", d.descargaCidade);
-    setText("nfArtDescargaLocal", d.descargaLocal);
-    setText("nfArtProduto", d.produto);
-    setText("nfArtValor", d.valor);
-    setText("nfArtObs", d.obs);
-
-    setText("nfArtContato1", d.contatos[0] || "");
-    setText("nfArtContato2", d.contatos[1] || "");
-    setText("nfArtContato3", d.contatos[2] || "");
-    setText("nfArtContato4", d.contatos[3] || "");
-
-    const msg = document.getElementById("nfMensagemPronta");
-    if (msg) msg.value = buildMessage(row);
-  }
-
-  function buildFreteBloco(row) {
-    const origem = upper(row.origem || "");
-    const coleta = upper(row.coleta || "");
-    const destino = cityUf(row, "destino", "uf");
-    const descarga = upper(row.descarga || "");
-    const produto = upper(row.produto || "");
-
-    const valor = safeText(row.valorMotorista)
-      ? formatMoneyBR(row.valorMotorista)
-      : "A COMBINAR";
-
-    return [
-      `🏷️ ${origem}${coleta ? ` (${coleta})` : ""}`,
-      `🏁 ${destino}${descarga ? ` (${descarga})` : ""}`,
-      `💢 ${produto}`,
-      `💰 ${valor}`
-    ].join("\n");
-  }
-
-  function buildMessage(row) {
-    const selected = getSelectedRows();
-    const rows = selected.length ? selected : (row ? [row] : (STATE.previewRow ? [STATE.previewRow] : []));
-
-    if (!rows.length) return "";
-
-    return [
-      "🇸🇱🇸🇱🇸🇱 ROCA LOG 🇸🇱🇸🇱🇸🇱", // Nome alterado para ROCA LOG
-      "✅ FRETES LIBERADOS",
-      "",
-      rows.map(buildFreteBloco).join("\n🟰🟰🟰🟰🟰🟰🟰🟰🟰\n")
-    ].join("\n");
-  }
-
-  function loadHtml2CanvasNF() {
-    return new Promise((resolve, reject) => {
-      if (typeof window.html2canvas === "function") {
-        resolve(window.html2canvas);
-        return;
-      }
-
-      const existing = document.querySelector('script[data-nf-html2canvas="1"]');
-      if (existing) {
-        existing.addEventListener("load", () => resolve(window.html2canvas), { once: true });
-        existing.addEventListener("error", () => reject(new Error("Falha ao carregar html2canvas.")), { once: true });
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
-      script.async = true;
-      script.defer = true;
-      script.dataset.nfHtml2canvas = "1";
-
-      script.onload = () => {
-        if (typeof window.html2canvas === "function") resolve(window.html2canvas);
-        else reject(new Error("html2canvas carregou, mas não ficou disponível."));
-      };
-
-      script.onerror = () => reject(new Error("Não foi possível carregar html2canvas. Verifique internet/CDN."));
-      document.head.appendChild(script);
-    });
-  }
-
-  function waitForImage(img) {
-    if (!img) return Promise.resolve();
-    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-
-    return new Promise((resolve) => {
-      const done = () => resolve();
-      img.addEventListener("load", done, { once: true });
-      img.addEventListener("error", done, { once: true });
-      setTimeout(done, 2500);
-    });
-  }
-
-  async function canvasFromPreview(row) {
-    renderPreview(row);
-
-    const card = document.getElementById("nfArtCard");
-    const img = document.getElementById("nfArtBg");
-
-    if (!card) {
-      alert("Prévia da divulgação não encontrada na página.");
-      return null;
-    }
-
-    try {
-      setStatus("🖼️ Gerando imagem...");
-      const html2canvasLib = await loadHtml2CanvasNF();
-
-      await waitForImage(img);
-      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-
-      return await html2canvasLib(card, {
-        backgroundColor: null,
-        scale: 4,
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
-        imageTimeout: 8000
-      });
-    } catch (e) {
-      console.error("[fretes] erro ao gerar canvas:", e);
-      alert(e.message || "Não foi possível gerar a imagem. Tente baixar novamente.");
-      return null;
-    }
-  }
-
-  async function downloadDivulgacaoJPG(row) {
-    const chosenRow = row || STATE.previewRow || getFilteredRows()[0];
-    if (!chosenRow) {
-      alert("Selecione um frete para baixar a imagem.");
-      return;
-    }
-
-    const d = divulgacaoDataFromRow(chosenRow);
-    const canvas = await canvasFromPreview(chosenRow);
-
-    if (!canvas) return;
-
-    try {
-      const link = document.createElement("a");
-      link.download = d.filename || "divulgacao-frete.jpg";
-      link.href = canvas.toDataURL("image/jpeg", 0.95);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setStatus("✅ JPG baixado");
-    } catch (e) {
-      console.error("[fretes] erro ao baixar JPG:", e);
-      alert("Não foi possível baixar o JPG neste navegador.");
-    }
-  }
-
-  async function copyPreviewImage(row) {
-    const chosenRow = row || STATE.previewRow || getFilteredRows()[0];
-    if (!chosenRow) {
-      alert("Selecione um frete para copiar a imagem.");
-      return;
-    }
-
-    try {
-      const canvas = await canvasFromPreview(chosenRow);
-      if (!canvas) return;
-
-      if (!navigator.clipboard || !window.ClipboardItem) {
-        throw new Error("Clipboard indisponível neste navegador.");
-      }
-
-      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-      if (!blob) throw new Error("Não foi possível gerar o PNG para copiar.");
-
-      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-      setStatus("✅ Imagem copiada");
-    } catch (e) {
-      console.warn("[fretes] copiar imagem falhou:", e);
-      alert("Não consegui copiar a imagem neste navegador. Use Baixar JPG.");
-    }
-  }
-
-  async function copyMessage(row) {
-    const msg = buildMessage(row || STATE.previewRow || getFilteredRows()[0] || {});
-
-    try {
-      await navigator.clipboard.writeText(msg);
-      setStatus("✅ Message copiada");
-    } catch {
-      prompt("Copie a mensagem:", msg);
-    }
-  }
-
-  async function enviarWhatsAppRow(row) {
-    await copyMessage(row);
-
-    const phone = extractPhoneBR(row.contato);
-    const msg = buildMessage(row);
-    const url = phone
-      ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
-      : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-
-    window.open(url, "_blank");
-  }
-
-  function getSelectedRows() {
-    return STATE.rows.filter((r) => STATE.selectedIds.has(safeText(r.id)));
-  }
-
-  function updateBulkUI() {
-    const selected = getSelectedRows();
-    const n = selected.length;
-
-    const a = document.getElementById("nfSelecionadosTxt");
-    const b = document.getElementById("nfArtesTxt");
-    const c = document.getElementById("nfMsgsTxt");
-
-    if (a) a.textContent = `${n} selecionado${n === 1 ? "" : "s"}`;
-    if (b) b.textContent = `${n} arte${n === 1 ? "" : "s"}`;
-    if (c) c.textContent = `${n} mensagem${n === 1 ? "" : "s"}`;
-
-    const selectAll = document.getElementById("nfSelectAll");
-    if (selectAll) {
-      const visible = getFilteredRows().filter((r) => safeText(r.id));
-      selectAll.checked = visible.length > 0 && visible.every((r) => STATE.selectedIds.has(safeText(r.id)));
-      selectAll.indeterminate =
-        visible.some((r) => STATE.selectedIds.has(safeText(r.id))) && !selectAll.checked;
-    }
-
-    const msg = document.getElementById("nfMensagemPronta");
-    if (msg) {
-      msg.value = selected.length
-        ? buildMessage()
-        : STATE.previewRow
-          ? buildMessage(STATE.previewRow)
-          : "";
-    }
-  }
-
-  function renderStats(rows) {
-    rows = rows || [];
-
-    const sum = (key) => rows.reduce((acc, r) => acc + (parsePtNumber(r[key]) || 0), 0);
-    const avg = (key) => {
-      const nums = rows.map((r) => parsePtNumber(r[key])).filter(Number.isFinite);
-      return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
-    };
-
-    const set = (id, txt) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = txt;
-    };
-
-    set("nfStatVolume", `${sum("volume").toLocaleString("pt-BR", { maximumFractionDigits: 0 })} t`);
-    set("nfStatEmpresa", `${formatMoneyBR(avg("valorEmpresa"))} / t`);
-    set("nfStatMotorista", `${formatMoneyBR(avg("valorMotorista"))} / t`);
-    set("nfStatKm", `${sum("km").toLocaleString("pt-BR", { maximumFractionDigits: 0 })} km`);
-    set("nfStatPedagio", formatMoneyBR(sum("pedagioEixo")));
-  }
-
-  async function gerarPacoteJPG() {
-    const rows = getSelectedRows();
-
-    if (!rows.length) {
-      alert("Selecione uma ou mais linhas para gerar o pacote JPG.");
-      return;
-    }
-
-    setStatus(`⚡ Gerando ${rows.length} artes...`);
-
-    for (let i = 0; i < rows.length; i++) {
-      await downloadDivulgacaoJPG(rows[i]);
-      await new Promise((r) => setTimeout(r, 250));
-    }
-
-    setStatus("✅ Pacote JPG gerado");
-  }
-
-  async function enviarWhatsAppPacote() {
-    const rows = getSelectedRows();
-
-    if (!rows.length) {
-      alert("Selecione uma ou mais linhas.");
-      return;
-    }
-
-    const msg = buildMessage();
-
-    try {
-      await navigator.clipboard.writeText(msg);
-    } catch {}
-
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-  }
-
-  function buildDivulgacaoHtml(rows) {
-    const linhas = rows.map((row) => `
-      <tr>
-        <td>${escapeHtml(row.regional)}</td>
-        <td>${escapeHtml(row.filial)}</td>
-        <td>${escapeHtml(row.origem)}</td>
-        <td>${escapeHtml(row.coleta)}</td>
-        <td>${escapeHtml(row.destino)}</td>
-        <td>${escapeHtml(row.uf)}</td>
-        <td>${escapeHtml(row.descarga)}</td>
-        <td>${escapeHtml(row.produto)}</td>
-        <td class="freteCol">${escapeHtml(formatMoneyBR(row.valorMotorista))}</td>
-        <td>${escapeHtml(row.contato)}</td>
-      </tr>
-    `).join("");
-
-    const hoje = new Date().toLocaleDateString("pt-BR");
-
-    return `
+<!-- fretes.html -->
 <!doctype html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<title>Divulgação de Frete</title>
-<style>
-@page { size: A4 landscape; margin: 10mm; }
-body{ margin:0; font-family:Arial,sans-serif; color:#222; background:#fff; }
-.page{ width:100%; padding:8px 10px; }
-.head{ text-align:center; margin-bottom:10px; border:1px solid #cfd8dc; padding:12px 10px; }
-.head img{ max-width:420px; max-height:75px; object-fit:contain; display:block; margin:0 auto 6px; }
-.bar{ height:24px; background:#3B7D23; border:1px solid #2f661b; border-bottom:none; }
-table{ width:100%; border-collapse:collapse; table-layout:fixed; font-size:10px; }
-thead th{ background:#F6D96B; color:#1f2937; border:1px solid #666; padding:4px 3px; text-align:center; font-weight:900; }
-tbody td{ border:1px solid #666; padding:2px 3px; font-size:9px; }
-tbody tr:nth-child(even){ background:#f8f8f8; }
-.freteCol{ color:#c62828; font-weight:900; text-align:right; }
-.foot{ margin-top:8px; font-size:11px; color:#555; display:flex; justify-content:space-between; }
-@media print { .printHint { display:none; } }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fretes | ROCA LOG</title>
+
+  <link rel="stylesheet" href="../assets/css/app.css">
+
+  <style>
+    :root {
+      --bg: #F5F7FA;
+      --panel: #FFFFFF;
+      --line: #E5E7EB;
+      --text: #0F172A;
+      --muted: #64748B;
+      --navy: #0F172A;
+      --blue: #102A6B;
+      --green: #0B3B2E;
+      --gold: #8A6A12;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    input,
+    select,
+    textarea {
+      text-transform: uppercase;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .container.nfWide.pageFretes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: none !important;
+      min-height: calc(100vh - 72px);
+      margin: 0;
+      padding: 10px 12px 14px;
+      background: var(--bg);
+    }
+
+    .fretes-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      width: 100%;
+      margin: 0;
+      padding: 10px 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+    }
+
+    .fretes-top .title {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .fretes-top .title h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      color: var(--text);
+    }
+
+    .fretes-top .title .sub {
+      max-width: 1100px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: rgba(17, 24, 39, .72);
+    }
+
+    .fretes-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      width: 100%;
+      margin: 0;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+    }
+
+    .ft-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .ft-label {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 2px;
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .ft-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .ft-mini input {
+      width: 60px;
+      height: 28px;
+      margin: 0;
+      padding: 3px 6px;
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      background: #FFFFFF;
+      color: #111827;
+      outline: none;
+      font-size: 10px;
+    }
+
+    .ft-mini input:focus,
+    .ft-select:focus,
+    .ft-search:focus,
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus,
+    .inlineCellInput:focus {
+      border-color: #5B7CFA;
+      box-shadow: 0 0 0 3px rgba(91, 124, 250, .18);
+    }
+
+    .ft-select,
+    .ft-search {
+      height: 30px;
+      margin: 0;
+      padding: 4px 9px;
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      background: #FFFFFF;
+      color: #111827;
+      outline: none;
+      font-size: 10px;
+    }
+
+    .ft-select {
+      width: 200px;
+      flex: 0 0 200px;
+    }
+
+    .ft-search,
+    .ft-search-wide {
+      min-width: 240px;
+      flex: 1 1 420px;
+      max-width: none;
+    }
+
+    .ft-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .ft-actions.top-actions {
+      margin-left: auto;
+    }
+
+    .btnTiny {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 28px;
+      margin: 0;
+      padding: 0 10px;
+      border: 1px solid rgba(15, 23, 42, .14);
+      border-radius: 8px;
+      background: var(--navy);
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btnTiny:hover {
+      filter: brightness(1.06);
+    }
+
+    .btnTiny:disabled,
+    .iconClose:disabled {
+      cursor: not-allowed;
+      opacity: .65;
+      filter: grayscale(.1);
+    }
+
+    .btnTiny.ghost {
+      background: #FFFFFF;
+      color: var(--text);
+      border-color: #D1D5DB;
+    }
+
+    .btnTiny.green {
+      background: var(--green);
+      color: #FFFFFF;
+    }
+
+    .btnTiny.blue {
+      background: var(--blue);
+      color: #FFFFFF;
+    }
+
+    .btnTiny.gold {
+      background: var(--gold);
+      color: #FFFFFF;
+    }
+
+    .fretes-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 12px;
+      align-items: start;
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+    }
+
+    .fretes-workspace.preview-hidden {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fretes-workspace.preview-hidden .nfPreviewPanel {
+      display: none;
+    }
+
+    .card.tableFull {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: calc(100vh - 220px);
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+    }
+
+    .tableWrap {
+      flex: 1 1 auto;
+      width: 100%;
+      height: calc(100vh - 235px);
+      min-height: 480px;
+      overflow: auto;
+      border: 0;
+      border-radius: 0;
+      background: #FFFFFF;
+    }
+
+    .tableWrap table {
+      width: 100%;
+      min-width: 1700px;
+      border-collapse: collapse;
+      background: #FFFFFF;
+    }
+
+    .tableWrap th,
+    .tableWrap td {
+      padding: 4px 8px;
+      border-bottom: 1px solid #D1D5DB;
+      color: #111827;
+      font-size: 11px;
+      line-height: 1.15;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .tableWrap thead th {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      padding: 6px 8px;
+      background: var(--navy);
+      color: #FFFFFF;
+      border-bottom: 1px solid #0B1220;
+      font-size: 10px;
+      letter-spacing: .02em;
+    }
+
+    .tableWrap tbody tr:nth-child(even) {
+      background: #F1F4F9;
+    }
+
+    .tableWrap tbody tr:hover {
+      background: #E8EDFF;
+    }
+
+    .num {
+      text-align: right;
+    }
+
+    .groupRow td {
+      position: sticky;
+      top: 29px;
+      z-index: 3;
+      padding: 6px 8px;
+      background: var(--navy) !important;
+      color: #FFFFFF !important;
+      font-weight: 900;
+      letter-spacing: .02em;
+      border-bottom: 1px solid #0B1220;
+    }
+
+    .nfRowCheck {
+      width: 16px;
+      height: 16px;
+      accent-color: #2563EB;
+      cursor: pointer;
+    }
+
+    .tdUltimaAlteracao {
+      min-width: 118px;
+      color: #334155;
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th.thUltimaAlteracao {
+      min-width: 118px;
+    }
+
+    th.thAcoes {
+      min-width: 116px;
+    }
+
+    .nfActionGroup {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .nfIconBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      background: #FFFFFF;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .nfIconBtn.raio {
+      border-color: #F59E0B;
+      color: #B45309;
+      background: #FFFBEB;
+    }
+
+    .nfIconBtn.eye {
+      border-color: #60A5FA;
+      color: #1D4ED8;
+      background: #EFF6FF;
+    }
+
+    .nfIconBtn.wa {
+      border-color: #22C55E;
+      color: #15803D;
+      background: #F0FDF4;
+    }
+
+    .nfIconBtn:hover {
+      filter: brightness(.96);
+      transform: translateY(-1px);
+    }
+
+    .waIcon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid rgba(17, 24, 39, .12);
+      border-radius: 8px;
+      background: #FFFFFF;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+
+    .waIcon img {
+      display: block;
+      width: 15px;
+      height: 15px;
+    }
+
+    .pillSN {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 18px;
+      border: 1px solid rgba(17, 24, 39, .18);
+      border-radius: 999px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: .02em;
+      user-select: none;
+    }
+
+    .pillSN.s {
+      background: #DCFCE7;
+      border-color: #86EFAC;
+      color: #166534;
+    }
+
+    .pillSN.n {
+      background: #FEE2E2;
+      border-color: #FCA5A5;
+      color: #7F1D1D;
+    }
+
+    .pillSN.empty {
+      background: #EEF2F7;
+      border-color: #CBD5E1;
+      color: #475569;
+    }
+
+    .inlineCellWrap {
+      position: relative;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      min-width: 48px;
+    }
+
+    .inlineCellInput {
+      width: 48px;
+      height: 24px;
+      padding: 0 4px;
+      border: 1px solid #D1D5DB;
+      border-radius: 7px;
+      background: #FFFFFF;
+      color: #111827;
+      outline: none;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: none !important;
+    }
+
+    .inlineCellWrap.isSaving::after {
+      content: "...";
+      position: absolute;
+      right: -14px;
+      color: #64748B;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .nfPreviewPanel {
+      position: sticky;
+      top: 10px;
+      width: 300px;
+      margin: 0;
+      padding: 12px;
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+    }
+
+    .nfPreviewHead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .nfPreviewHead h3 {
+      margin: 0;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 950;
+      text-transform: uppercase;
+    }
+
+    .nfClosePreview {
+      border: 0;
+      background: transparent;
+      color: #64748B;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .nfProductBadge {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #16A34A;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 950;
+    }
+
+    .nfArtCard {
+      position: relative;
+      width: 240px;
+      height: 429px;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #1F2937;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .20);
+      color: #FFFFFF;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .nfArtScale {
+      position: absolute;
+      inset: 0;
+      width: 380px;
+      height: 680px;
+      transform: scale(.63158);
+      transform-origin: top left;
+    }
+
+    .nfArtScale .previewBg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 0;
+      outline: 0;
+    }
+
+    .nfArtScale .previewColeta,
+    .nfArtScale .previewDescarga,
+    .nfArtScale .previewProduct,
+    .nfArtScale .previewPrice,
+    .nfArtScale .previewNote,
+    .nfArtScale .previewContacts {
+      z-index: 2;
+    }
+
+    .nfArtScale .previewColeta {
+      position: absolute;
+      top: 185px;
+      left: 32px;
+      width: 215px;
+      text-align: center;
+    }
+
+    .nfArtScale .previewDescarga {
+      position: absolute;
+      top: 265px;
+      left: 32px;
+      width: 215px;
+      text-align: center;
+    }
+
+    .nfArtScale .previewProduct {
+      position: absolute;
+      top: 350px;
+      left: 30px;
+      width: 215px;
+      color: #FFFFFF;
+      text-align: center;
+      font-size: 19px;
+      font-weight: 900;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .nfArtScale .previewPrice {
+      position: absolute;
+      top: 390px;
+      left: 32px;
+      width: 215px;
+      color: #FFFFFF;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .nfArtScale .previewContacts {
+      position: absolute;
+      top: 455px;
+      left: 58px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: 200px;
+    }
+
+    .nfArtScale .previewNote {
+      position: absolute;
+      top: 560px;
+      left: 32px;
+      width: 215px;
+      color: #FFFFFF;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .nfArtScale .previewValue {
+      color: #FFFFFF;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .nfArtScale .previewSmall {
+      margin-top: 4px;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .nfArtScale .previewContactLine {
+      overflow: hidden;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.05;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .nfArtScale .previewValue,
+    .nfArtScale .previewSmall,
+    .nfArtScale .previewProduct,
+    .nfArtScale .previewPrice,
+    .nfArtScale .previewNote,
+    .nfArtScale .previewContactLine {
+      text-shadow:
+        0 2px 4px rgba(0, 0, 0, .85),
+        0 0 6px rgba(0, 0, 0, .50);
+    }
+
+    .nfPreviewButtons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .nfPreviewButtons button {
+      height: 32px;
+      border: 1px solid #D1D5DB;
+      border-radius: 9px;
+      font-size: 10px;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .nfPreviewButtons .green,
+    .nfPreviewButtons .wa {
+      background: #16A34A;
+      border-color: #16A34A;
+      color: #FFFFFF;
+    }
+
+    .nfPreviewButtons .blue {
+      background: #1D4ED8;
+      border-color: #1D4ED8;
+      color: #FFFFFF;
+    }
+
+    .nfPreviewButtons .wa {
+      grid-column: 1 / -1;
+    }
+
+    .nfReadyMsg {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      background: #F8FAFC;
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .nfReadyMsg textarea {
+      width: 100%;
+      min-height: 120px;
+      margin-top: 6px;
+      padding: 8px;
+      border: 1px solid #D1D5DB;
+      border-radius: 9px;
+      background: #FFFFFF;
+      color: var(--text);
+      font-size: 10px;
+      text-transform: none;
+    }
+
+    #modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, .55);
+      backdrop-filter: blur(6px);
+    }
+
+    .modalCard {
+      position: relative;
+      width: min(980px, 100%);
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, .28);
+    }
+
+    .modalHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #F8FAFC;
+    }
+
+    .modalHead h2 {
+      margin: 0;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 950;
+    }
+
+    .iconClose {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #D1D5DB;
+      border-radius: 12px;
+      background: #FFFFFF;
+      color: var(--text);
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .modalBody {
+      max-height: calc(100vh - 220px);
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      margin: 0 0 6px;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      height: 32px;
+      padding: 5px 10px;
+      border: 1px solid #D1D5DB;
+      border-radius: 12px;
+      background: #FFFFFF;
+      color: #111827;
+      outline: none;
+      font-size: 12px;
+    }
+
+    .field textarea {
+      height: auto;
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .modalFoot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      background: #F8FAFC;
+    }
+
+    .nfModalLoading {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(255, 255, 255, .88);
+      backdrop-filter: blur(4px);
+    }
+
+    .nfModalLoading.show {
+      display: flex;
+    }
+
+    .nfModalLoadingBox {
+      min-width: 260px;
+      max-width: 360px;
+      padding: 24px 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #FFFFFF;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, .18);
+      color: var(--text);
+      text-align: center;
+    }
+
+    .nfModalSpinner {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      border: 8px solid #E2E8F0;
+      border-top-color: #1D9BF0;
+      border-right-color: #1D9BF0;
+      border-radius: 50%;
+      animation: nfSpin .85s linear infinite;
+    }
+
+    .nfModalLoadingTitle {
+      color: #1D9BF0;
+      font-size: 17px;
+      font-weight: 950;
+      line-height: 1.2;
+    }
+
+    .nfModalLoadingSub {
+      margin-top: 6px;
+      color: #64748B;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .nfModalProgress {
+      width: 100%;
+      height: 5px;
+      margin-top: 16px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #E5E7EB;
+    }
+
+    .nfModalProgress::before {
+      content: "";
+      display: block;
+      width: 42%;
+      height: 100%;
+      border-radius: 999px;
+      background: #1D9BF0;
+      animation: nfProgress 1.1s ease-in-out infinite;
+    }
+
+    @keyframes nfSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes nfProgress {
+      0% { transform: translateX(-110%); }
+      100% { transform: translateX(250%); }
+    }
+
+    @media (max-width: 1250px) {
+      .fretes-workspace {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .nfPreviewPanel {
+        position: relative;
+        top: auto;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .ft-actions.top-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .container.nfWide.pageFretes {
+        padding: 8px;
+      }
+
+      .ft-select,
+      .ft-search,
+      .ft-search-wide {
+        width: 100%;
+        max-width: none;
+        flex: 1 1 100%;
+      }
+
+      .ft-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+
+      .tableWrap {
+        height: auto;
+        min-height: 420px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="page">
-  <div class="head">
-    <img src="../assets/img/logot3l.png" alt="T3L / ROCA" />
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <a class="burger" href="./home.html" title="Voltar">🏠</a>
+        <img src="../assets/img/logo-novafrota.png" alt="T3L / ROCA">
+      </div>
+
+      <div class="actions">
+        <div class="icon-btn" title="Sair" data-logout>↩️</div>
+      </div>
+    </div>
   </div>
-  <div class="bar"></div>
-  <table>
-    <thead>
-      <tr>
-        <th>REGIONAL</th>
-        <th>FILIAL</th>
-        <th>ORIGEM</th>
-        <th>LOCAL DE CARREGAMENTO</th>
-        <th>DESTINO</th>
-        <th>UF</th>
-        <th>DESCARGA</th>
-        <th>PRODUTO</th>
-        <th>FRETE</th>
-        <th>CONTATO</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${linhas || `<tr><td colspan="10" style="text-align:center;padding:18px;font-weight:700;">NENHUM FRETE LIBERADO ENCONTRADO</td></tr>`}
-    </tbody>
-  </table>
-  <div class="foot">
-    <div><b>Data:</b> ${hoje}</div>
-    <div><b>Total de fretes:</b> ${rows.length}</div>
+
+  <div class="container nfWide pageFretes">
+    <div class="fretes-top">
+      <div class="title">
+        <h1>
+          Fretes (Operacional)
+          <span id="syncStatus" data-sync-status style="font-size:11px;opacity:.7;margin-left:8px;">
+            🔄 Carregando...
+          </span>
+        </h1>
+
+        <div class="sub">
+          Permissão Frete Mínimo: indica quais tipos (eixos) atendem o piso mínimo ANTT por embarque.
+          <b>Dados sincronizados com Google Sheets em tempo real.</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="fretes-toolbar">
+      <div class="ft-row">
+        <span class="ft-label">Pesos:</span>
+
+        <div class="ft-mini">
+          <span>9E</span>
+          <input id="w9" type="number" step="0.01" value="47">
+        </div>
+
+        <div class="ft-mini">
+          <span>4E</span>
+          <input id="w4" type="number" step="0.01" value="39">
+        </div>
+
+        <div class="ft-mini">
+          <span>7E</span>
+          <input id="w7" type="number" step="0.01" value="36">
+        </div>
+
+        <div class="ft-mini">
+          <span>6E</span>
+          <input id="w6" type="number" step="0.01" value="31">
+        </div>
+
+        <div class="ft-mini">
+          <span>5E</span>
+          <input id="w5" type="number" step="0.01" value="26">
+        </div>
+
+        <button class="btnTiny" id="btnSaveWeights" type="button">Salvar</button>
+        <button class="btnTiny ghost" id="btnResetWeights" type="button">Reset</button>
+
+        <div class="ft-actions top-actions">
+          <button class="btnTiny" id="btnReloadFromSheets" data-action="atualizar" type="button">
+            🔄 Atualizar
+          </button>
+
+          <button class="btnTiny gold" id="btnDivulgacaoFrete" type="button">
+            DIVULGAÇÃO FRETE
+          </button>
+
+          <button class="btnTiny blue" id="btnShareClientes" type="button">
+            Share Clientes
+          </button>
+
+          <button class="btnTiny green" id="btnNew" data-action="novo" type="button">
+            + Novo
+          </button>
+        </div>
+      </div>
+
+      <div class="ft-row">
+        <select class="ft-select" id="fRegional" title="Regional">
+          <option value="">Todas as regionais</option>
+        </select>
+
+        <select class="ft-select" id="fFilial" title="Filial">
+          <option value="">Todas as filiais</option>
+        </select>
+
+        <select class="ft-select" id="fContato" title="Contato">
+          <option value="">Todos os contatos</option>
+        </select>
+
+        <input
+          class="ft-search ft-search-wide"
+          id="fBusca"
+          placeholder="Buscar (cliente, origem, destino, produto, contato)..."
+        >
+      </div>
+    </div>
+
+    <div class="fretes-workspace">
+      <div class="card tableFull">
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    id="nfSelectAll"
+                    class="nfRowCheck"
+                    title="Selecionar todos"
+                  >
+                </th>
+                <th>Regional</th>
+                <th>Filial</th>
+                <th>Cliente</th>
+                <th>Origem</th>
+                <th>Coleta</th>
+                <th>Contato</th>
+                <th>Destino</th>
+                <th>UF</th>
+                <th>Descarga</th>
+                <th class="num">Volume</th>
+                <th class="num">Vlr Empresa</th>
+                <th class="num">Vlr Motorista</th>
+                <th class="num">KM</th>
+                <th class="num">Pedágio/Eixo</th>
+                <th class="num">5E</th>
+                <th class="num">6E</th>
+                <th class="num">7E</th>
+                <th class="num">4E</th>
+                <th class="num">9E</th>
+                <th>Produto</th>
+                <th>ICMS</th>
+                <th class="num">Margem</th>
+                <th class="num">Porta</th>
+                <th class="num">Trânsito</th>
+                <th>Status</th>
+                <th>Observações</th>
+                <th class="thUltimaAlteracao">Última Alteração</th>
+                <th class="num thAcoes">Ações</th>
+              </tr>
+            </thead>
+
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <aside class="nfPreviewPanel" id="nfPreviewPanel">
+        <div class="nfPreviewHead">
+          <h3>Prévia da Divulgação</h3>
+          <button class="nfClosePreview" id="nfClosePreview" type="button">✕</button>
+        </div>
+
+        <div class="nfProductBadge" id="nfPreviewProdutoBadge">SOJA</div>
+
+        <div class="nfArtCard" id="nfArtCard">
+          <div class="nfArtScale">
+            <img
+              class="previewBg"
+              id="nfArtBg"
+              src="../assets/img/SOJATESTE.png"
+              alt=""
+            >
+
+            <div class="previewColeta">
+              <div class="previewValue" id="nfArtColetaCidade"></div>
+              <div class="previewSmall" id="nfArtColetaLocal"></div>
+            </div>
+
+            <div class="previewDescarga">
+              <div class="previewValue" id="nfArtDescargaCidade"></div>
+              <div class="previewSmall" id="nfArtDescargaLocal"></div>
+            </div>
+
+            <div class="previewProduct" id="nfArtProduto"></div>
+            <div class="previewPrice" id="nfArtValor"></div>
+            <div class="previewNote" id="nfArtObs"></div>
+
+            <div class="previewContacts">
+              <div class="previewContactLine" id="nfArtContato1"></div>
+              <div class="previewContactLine" id="nfArtContato2"></div>
+              <div class="previewContactLine" id="nfArtContato3"></div>
+              <div class="previewContactLine" id="nfArtContato4"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nfPreviewButtons">
+          <button class="green" id="nfBaixarJPG" type="button">
+            ⬇ BAIXAR JPG
+          </button>
+
+          <button class="blue" id="nfCopiarImagem" type="button">
+            ❐ COPIAR IMAGEM
+          </button>
+
+          <button class="wa" id="nfEnviarWhatsapp" type="button">
+            🟢 ENVIAR POR WHATSAPP
+          </button>
+        </div>
+
+        <div class="nfReadyMsg">
+          <b>MENSAGEM PRONTA</b>
+
+          <textarea id="nfMensagemPronta" readonly></textarea>
+
+          <button
+            class="btnTiny blue"
+            id="nfCopiarMensagem"
+            type="button"
+            style="width:100%;margin-top:10px;"
+          >
+            COPIAR MENSAGEM
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <div id="modal" aria-hidden="true">
+      <div
+        class="modalCard"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+        <div class="modalHead">
+          <h2 id="modalTitle">Novo Frete</h2>
+          <button
+            class="iconClose"
+            id="btnCloseModal"
+            type="button"
+            title="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="modalBody">
+          <div class="grid2">
+            <div class="field">
+              <label for="mRegional">Regional</label>
+              <select id="mRegional"></select>
+            </div>
+
+            <div class="field">
+              <label for="mFilial">Filial</label>
+              <select id="mFilial"></select>
+            </div>
+
+            <div class="field">
+              <label for="mCliente">Cliente</label>
+              <select id="mCliente"></select>
+            </div>
+
+            <div class="field">
+              <label for="mContato">Contato (Responsável da Filial)</label>
+              <select id="mContato"></select>
+            </div>
+
+            <div class="field">
+              <label for="mOrigem">Origem</label>
+              <input id="mOrigem">
+            </div>
+
+            <div class="field">
+              <label for="mColeta">Coleta</label>
+              <input id="mColeta">
+            </div>
+
+            <div class="field">
+              <label for="mDestino">Destino</label>
+              <input id="mDestino">
+            </div>
+
+            <div class="field">
+              <label for="mUF">UF</label>
+              <input id="mUF">
+            </div>
+
+            <div class="field">
+              <label for="mDescarga">Descarga</label>
+              <input id="mDescarga">
+            </div>
+
+            <div class="field">
+              <label for="mProduto">Produto</label>
+              <input id="mProduto">
+            </div>
+
+            <div class="field">
+              <label for="mKM">KM</label>
+              <input id="mKM" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mPed">Pedágio/Eixo</label>
+              <input id="mPed" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mVolume">Volume</label>
+              <input id="mVolume" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mICMS">ICMS</label>
+              <input id="mICMS" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mEmpresa">Vlr Empresa</label>
+              <input id="mEmpresa" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mMotorista">Vlr Motorista</label>
+              <input id="mMotorista" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mSat">Pedido SAT</label>
+              <input id="mSat">
+            </div>
+
+            <div class="field">
+              <label for="mPorta">Porta</label>
+              <input id="mPorta">
+            </div>
+
+            <div class="field">
+              <label for="mTransito">Trânsito</label>
+              <input id="mTransito">
+            </div>
+
+            <div class="field">
+              <label for="mStatus">Status</label>
+              <select id="mStatus">
+                <option value="LIBERADO">LIBERADO</option>
+                <option value="FINALIZANDO">FINALIZANDO</option>
+                <option value="SUSPENSO">SUSPENSO</option>
+              </select>
+            </div>
+
+            <div class="field" style="grid-column:1 / -1;">
+              <label for="mObs">Observações</label>
+              <textarea id="mObs"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modalFoot">
+          <button class="btnTiny ghost" id="btnCancel" type="button">
+            Cancelar
+          </button>
+
+          <button class="btnTiny green" id="btnSave" type="button">
+            Salvar Frete
+          </button>
+        </div>
+
+        <div
+          class="nfModalLoading"
+          id="nfModalLoading"
+          aria-hidden="true"
+        >
+          <div
+            class="nfModalLoadingBox"
+            role="status"
+            aria-live="polite"
+          >
+            <div class="nfModalSpinner" aria-hidden="true"></div>
+
+            <div class="nfModalLoadingTitle" id="nfModalLoadingTitle">
+              Salvando...
+            </div>
+
+            <div class="nfModalLoadingSub" id="nfModalLoadingSub">
+              Aguarde alguns segundos.
+            </div>
+
+            <div class="nfModalProgress" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+
+  <script src="../assets/js/auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="../assets/js/fretes.js?v=14"></script>
+
+  <script>
+    requireHomeAuth();
+    bindLogoutButton();
+  </script>
 </body>
-</html>`;
-  }
-
-  function getDivulgacaoRows() {
-    return getFilteredRows().filter((row) => normalizeFreteStatus(row.status) === "LIBERADO");
-  }
-
-  function openDivulgacaoFrete() {
-    const rows = getDivulgacaoRows();
-
-    if (!rows.length) {
-      alert("Não há fretes LIBERADO para divulgar com os filtros atuais.");
-      return;
-    }
-
-    const html = buildDivulgacaoHtml(rows);
-    const win = window.open("", "_blank");
-
-    if (!win) {
-      alert("O navegador bloqueou a nova janela. Libere pop-up para continuar.");
-      return;
-    }
-
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
-
-    win.onload = () => {
-      setTimeout(() => {
-        win.focus();
-        win.print();
-      }, 400);
-    };
-  }
-
-  function modalShow(show) {
-    const el = MODAL.wrap();
-    if (!el) return;
-
-    el.style.display = show ? "flex" : "none";
-    el.setAttribute("aria-hidden", show ? "false" : "true");
-  }
-
-  function getModalLoadingElements() {
-    return {
-      overlay: document.getElementById("nfModalLoading"),
-      title: document.getElementById("nfModalLoadingTitle"),
-      sub: document.getElementById("nfModalLoadingSub"),
-      btnSave: document.getElementById("btnSave"),
-      btnCancel: document.getElementById("btnCancel"),
-      btnClose: document.getElementById("btnCloseModal"),
-    };
-  }
-
-  function setModalButtonsDisabled(disabled) {
-    const els = getModalLoadingElements();
-    [els.btnSave, els.btnCancel, els.btnClose].forEach((btn) => {
-      if (btn) btn.disabled = !!disabled;
-    });
-  }
-
-  function showModalLoading(title, sub) {
-    STATE.modalBusy = true;
-    const els = getModalLoadingElements();
-
-    if (els.title) els.title.textContent = title || "Aguarde...";
-    if (els.sub) els.sub.textContent = sub || "Processando informações.";
-
-    if (els.overlay) {
-      els.overlay.classList.add("show");
-      els.overlay.setAttribute("aria-hidden", "false");
-    }
-
-    setModalButtonsDisabled(true);
-  }
-
-  function hideModalLoading() {
-    const els = getModalLoadingElements();
-
-    if (els.overlay) {
-      els.overlay.classList.remove("show");
-      els.overlay.setAttribute("aria-hidden", "true");
-    }
-
-    setModalButtonsDisabled(false);
-    STATE.modalBusy = false;
-  }
-
-  function clearModalFields() {
-    STATE.editingId = "";
-
-    if (MODAL.title()) MODAL.title().textContent = "Novo Frete";
-
-    [
-      MODAL.origem(), MODAL.coleta(), MODAL.destino(), MODAL.uf(), MODAL.descarga(),
-      MODAL.produto(), MODAL.km(), MODAL.ped(), MODAL.volume(), MODAL.icms(),
-      MODAL.empresa(), MODAL.motorista(), MODAL.margem(), MODAL.porta(),
-      MODAL.transito(), MODAL.obs()
-    ].forEach((el) => {
-      if (el) el.value = "";
-    });
-
-    if (MODAL.status()) MODAL.status().value = "LIBERADO";
-    if (MODAL.regional()) MODAL.regional().value = "";
-    if (MODAL.filial()) MODAL.filial().value = "";
-    if (MODAL.cliente()) MODAL.cliente().value = "";
-    if (MODAL.contato()) MODAL.contato().value = "";
-  }
-
-  function fillModalSelectors() {
-    setSelectOptions(MODAL.regional(), DIRECTORY.regionais.map(upper), "SELECIONE A REGIONAL");
-    setSelectOptions(MODAL.cliente(), DIRECTORY.clientes.map(upper), "SELECIONE O CLIENTE");
-    setSelectOptions(MODAL.filial(), [], "SELECIONE A FILIAL");
-    setSelectOptions(MODAL.contato(), [], "SELECIONE O CONTATO");
-
-    MODAL.regional()?.addEventListener("change", () => {
-      const reg = upper(MODAL.regional()?.value);
-      const filiais = (DIRECTORY.filiaisPorRegional?.[reg] || []).map(upper);
-      setSelectOptions(MODAL.filial(), filiais, "SELECIONE A FILIAL");
-      setSelectOptions(MODAL.contato(), [], "SELECIONE O CONTATO");
-    });
-
-    MODAL.filial()?.addEventListener("change", () => {
-      const filial = upper(MODAL.filial()?.value);
-      const contatos = (DIRECTORY.contatosPorFilial?.[filial] || []).map((c) => upper(c.nome));
-
-      setSelectOptions(MODAL.contato(), contatos, "SELECIONE O CONTATO");
-
-      if (contatos.length === 1 && MODAL.contato()) {
-        MODAL.contato().value = contatos[0];
-      }
-    });
-  }
-
-  function fillModalFromRow(row) {
-    STATE.editingId = safeText(row.id);
-
-    if (MODAL.title()) MODAL.title().textContent = "Editar Frete";
-
-    if (MODAL.regional()) MODAL.regional().value = upper(row.regional);
-    MODAL.regional()?.dispatchEvent(new Event("change"));
-
-    if (MODAL.filial()) MODAL.filial().value = upper(row.filial);
-    MODAL.filial()?.dispatchEvent(new Event("change"));
-
-    if (MODAL.cliente()) MODAL.cliente().value = upper(row.cliente);
-    if (MODAL.contato()) MODAL.contato().value = upper(row.contato);
-
-    if (MODAL.origem()) MODAL.origem().value = safeText(row.origem);
-    if (MODAL.coleta()) MODAL.coleta().value = safeText(row.coleta);
-    if (MODAL.destino()) MODAL.destino().value = safeText(row.destino);
-    if (MODAL.uf()) MODAL.uf().value = safeText(row.uf);
-    if (MODAL.descarga()) MODAL.descarga().value = safeText(row.descarga);
-    if (MODAL.produto()) MODAL.produto().value = safeText(row.produto);
-    if (MODAL.km()) MODAL.km().value = safeText(row.km);
-    if (MODAL.ped()) MODAL.ped().value = safeText(row.pedagioEixo);
-    if (MODAL.volume()) MODAL.volume().value = safeText(row.volume);
-    
-    if (MODAL.icms()) MODAL.icms().value = normalizePercentage(row.icms);
-    
-    if (MODAL.empresa()) MODAL.empresa().value = normalizeMoneyInput(row.valorEmpresa);
-    if (MODAL.motorista()) MODAL.motorista().value = normalizeMoneyInput(row.valorMotorista);
-    if (MODAL.margem()) {
-      MODAL.margem().value = calcularMargem(
-        row.valorEmpresa,
-        row.valorMotorista
-      );
-    }
-    if (MODAL.porta()) MODAL.porta().value = safeText(row.porta);
-    if (MODAL.transito()) MODAL.transito().value = safeText(row.transito);
-    if (MODAL.status()) MODAL.status().value = normalizeFreteStatus(row.status) || "LIBERADO";
-    if (MODAL.obs()) MODAL.obs().value = safeText(row.obs);
-  }
-
-  function collectModalPayload() {
-    return {
-      regional: upper(MODAL.regional()?.value),
-      filial: upper(MODAL.filial()?.value),
-      cliente: upper(MODAL.cliente()?.value),
-      contato: upper(MODAL.contato()?.value),
-      origem: upper(MODAL.origem()?.value),
-      coleta: upper(MODAL.coleta()?.value),
-      destino: upper(MODAL.destino()?.value),
-      uf: upper(MODAL.uf()?.value),
-      descarga: upper(MODAL.descarga()?.value),
-      volume: safeText(MODAL.volume()?.value),
-      valorEmpresa: normalizeMoneyInput(MODAL.empresa()?.value),
-      valorMotorista: normalizeMoneyInput(MODAL.motorista()?.value),
-      km: safeText(MODAL.km()?.value),
-      pedagioEixo: safeText(MODAL.ped()?.value),
-      produto: upper(MODAL.produto()?.value),
-      icms: safeText(MODAL.icms()?.value),
-      margem: calcularMargem(MODAL.empresa()?.value, MODAL.motorista()?.value),
-      porta: safeText(MODAL.porta()?.value),
-      transito: safeText(MODAL.transito()?.value),
-      status: normalizeFreteStatus(MODAL.status()?.value),
-      obs: upperKeepSpaces(MODAL.obs()?.value).trim(),
-    };
-  }
-
-  function validateModalPayload(p) {
-    const missing = [];
-
-    if (!p.regional) missing.push("REGIONAL");
-    if (!p.filial) missing.push("FILIAL");
-    if (!p.cliente) missing.push("CLIENTE");
-    if (!p.contato) missing.push("CONTATO");
-    if (!p.origem) missing.push("ORIGEM");
-    if (!p.destino) missing.push("DESTINO");
-    if (!p.uf) missing.push("UF");
-    if (!p.km) missing.push("KM");
-    if (!p.valorMotorista) missing.push("VLR MOTORISTA");
-
-    if (missing.length) {
-      alert("Preencha: " + missing.join(", "));
-      return false;
-    }
-    return true;
-  }
-
-  async function saveFrete(payload) {
-    if (STATE.editingId) {
-      return await apiGet({ action: "fretes_update", id: STATE.editingId, ...payload });
-    }
-    return await apiGet({ action: "fretes_add", ...payload });
-  }
-
-  async function handleSave() {
-    if (STATE.modalBusy) return;
-
-    const payload = collectModalPayload();
-    if (!validateModalPayload(payload)) return;
-
-    try {
-      showModalLoading("Salvando Frete...", "Sincronizando. Aguarde alguns segundos.");
-      setStatus("💾 Salvando...");
-
-      await saveFrete(payload);
-
-      showModalLoading("Frete saved com sucesso ✓", "Atualizando a lista de fretes.");
-      await atualizar();
-
-      modalShow(false);
-      setStatus("✅ Salvo");
-    } catch (e) {
-      setStatus("❌ Erro ao salvar");
-      alert(e.message || "Falha ao salvar.");
-    } finally {
-      hideModalLoading();
-    }
-  }
-
-  function openNewModal() {
-    clearModalFields();
-    modalShow(true);
-  }
-
-  function openEditModal(row) {
-    clearModalFields();
-    fillModalFromRow(row);
-    modalShow(true);
-  }
-
-  function closeModal(force) {
-    if (STATE.modalBusy && !force) return;
-
-    showModalLoading("Cancelando...", "Fechando a janela com segurança.");
-
-    setTimeout(() => {
-      modalShow(false);
-      hideModalLoading();
-    }, 180);
-  }
-
-  async function atualizar() {
-    try {
-      setStatus("🔄 Carregando...");
-
-      const res = await apiGet({ action: "fretes_list" });
-
-      STATE.rows = Array.isArray(res.data)
-        ? res.data.map((row) => ({
-            ...row,
-            status: normalizeFreteStatus(row.status),
-            margem:
-              calcularMargem(row.valorEmpresa, row.valorMotorista) ||
-              normalizePercentage(row.margem)
-          }))
-        : [];
-
-      fillTopFilters(STATE.rows);
-      applyFilters();
-      renderPreview(getFilteredRows()[0] || STATE.rows[0]);
-      updateBulkUI();
-
-      setStatus("✅ Atualizado");
-    } catch (e) {
-      console.error("[fretes] erro ao atualizar:", e);
-      setStatus("❌ Erro ao sincronizar");
-    }
-  }
-
-  function ensureFloatingHorizontalBar() {
-    if (STATE.floatingBarReady) return;
-
-    if (document.getElementById("nfFloatingHBar")) {
-      STATE.floatingBarReady = true;
-      return;
-    }
-
-    const style = document.createElement("style");
-    style.id = "nfFloatingHBarStyle";
-    style.textContent = `
-      #nfFloatingHBar{
-        position:fixed;
-        left:12px;
-        right:330px;
-        bottom:8px;
-        height:18px;
-        display:none;
-        z-index:9999;
-        background:rgba(255,255,255,.96);
-        border:1px solid rgba(15,23,42,.12);
-        border-radius:999px;
-        box-shadow:0 4px 14px rgba(0,0,0,.12);
-        overflow-x:auto;
-        overflow-y:hidden;
-        backdrop-filter:blur(6px);
-      }
-      body.preview-hidden #nfFloatingHBar{ right:12px; }
-      #nfFloatingHBarInner{ height:1px; }
-      @media(max-width:1250px){ #nfFloatingHBar{ right:12px; } }
-    `;
-    document.head.appendChild(style);
-
-    const bar = document.createElement("div");
-    bar.id = "nfFloatingHBar";
-    bar.innerHTML = `<div id="nfFloatingHBarInner"></div>`;
-    document.body.appendChild(bar);
-
-    STATE.floatingBarReady = true;
-  }
-
-  function syncFloatingHorizontalBar() {
-    ensureFloatingHorizontalBar();
-
-    const wrap = document.querySelector(".tableWrap");
-    const bar = document.getElementById("nfFloatingHBar");
-    const inner = document.getElementById("nfFloatingHBarInner");
-
-    if (!wrap || !bar || !inner) return;
-
-    const hasOverflow = wrap.scrollWidth > wrap.clientWidth + 2;
-
-    if (!hasOverflow) {
-      bar.style.display = "none";
-      return;
-    }
-
-    inner.style.width = wrap.scrollWidth + "px";
-    bar.style.display = "block";
-
-    if (!STATE.floatingSyncing) bar.scrollLeft = wrap.scrollLeft;
-  }
-
-  function bindFloatingHorizontalBar() {
-    ensureFloatingHorizontalBar();
-
-    const wrap = document.querySelector(".tableWrap");
-    const bar = document.getElementById("nfFloatingHBar");
-
-    if (!wrap || !bar) return;
-
-    wrap.addEventListener("scroll", () => {
-      if (STATE.floatingSyncing) return;
-      STATE.floatingSyncing = true;
-      bar.scrollLeft = wrap.scrollLeft;
-      STATE.floatingSyncing = false;
-    }, { passive: true });
-
-    bar.addEventListener("scroll", () => {
-      if (STATE.floatingSyncing) return;
-      STATE.floatingSyncing = true;
-      wrap.scrollLeft = bar.scrollLeft;
-      STATE.floatingSyncing = false;
-    }, { passive: true });
-
-    window.addEventListener("resize", syncFloatingHorizontalBar, { passive: true });
-    window.addEventListener("scroll", syncFloatingHorizontalBar, { passive: true });
-  }
-
-  function bindFilters() {
-    $("#fRegional")?.addEventListener("change", applyFilters);
-    $("#fFilial")?.addEventListener("change", applyFilters);
-    $("#fContato")?.addEventListener("change", applyFilters);
-    $("#fBusca")?.addEventListener("input", applyFilters);
-  }
-
-  function bindMoneyMask(inputEl) {
-    if (!inputEl) return;
-    inputEl.addEventListener("blur", () => {
-      inputEl.value = normalizeMoneyInput(inputEl.value);
-    });
-  }
-
-  function initUppercaseFields() {
-    [
-      MODAL.origem(), MODAL.coleta(), MODAL.destino(), MODAL.uf(),
-      MODAL.descarga(), MODAL.produto(), MODAL.obs()
-    ].forEach((el) => {
-      if (!el) return;
-
-      el.addEventListener("input", () => {
-        const start = el.selectionStart;
-        const end = el.selectionEnd;
-
-        el.value = upperKeepSpaces(el.value);
-
-        if (start !== null && end !== null) {
-          el.setSelectionRange(start, end);
-        }
-      });
-    });
-  }
-
-  function initMasks() {
-    bindMoneyMask(MODAL.empresa());
-    bindMoneyMask(MODAL.motorista());
-
-    const empresaEl = MODAL.empresa();
-    const motoristaEl = MODAL.motorista();
-    const margemEl = MODAL.margem();
-
-    [empresaEl, motoristaEl].forEach((el) => {
-      if (!el) return;
-      el.addEventListener("input", atualizarMargemModal);
-      el.addEventListener("blur", () => setTimeout(atualizarMargemModal, 0));
-    });
-
-    if (margemEl) {
-      margemEl.readOnly = true;
-      margemEl.setAttribute("tabindex", "-1");
-      margemEl.title = "Calculada automaticamente: (Frete Empresa - Frete Motorista) / Frete Empresa × 100";
-    }
-
-    MODAL.icms()?.addEventListener("blur", () => {
-      MODAL.icms().value = normalizePercentage(MODAL.icms().value);
-    });
-  }
-
-  function bindButtons() {
-    $("#btnReloadFromSheets")?.addEventListener("click", atualizar);
-    $("#btnNew")?.addEventListener("click", openNewModal);
-    $("#btnCloseModal")?.addEventListener("click", closeModal);
-    $("#btnCancel")?.addEventListener("click", closeModal);
-    $("#btnSave")?.addEventListener("click", handleSave);
-    $("#btnDivulgacaoFrete")?.addEventListener("click", openDivulgacaoFrete);
-
-    if (!document.body.dataset.nfFretesDelegatedClicks) {
-      document.body.dataset.nfFretesDelegatedClicks = "1";
-
-      document.addEventListener("click", (e) => {
-        const btn = e.target.closest("button");
-        if (!btn) return;
-
-        const id = btn.id || "";
-
-        if (id === "btnSave") {
-          e.preventDefault(); e.stopPropagation();
-          handleSave(); return;
-        }
-        if (id === "btnCancel" || id === "btnCloseModal") {
-          e.preventDefault(); e.stopPropagation();
-          closeModal(); return;
-        }
-        if (id === "btnNew") {
-          e.preventDefault(); e.stopPropagation();
-          openNewModal(); return;
-        }
-        if (id === "btnReloadFromSheets") {
-          e.preventDefault(); e.stopPropagation();
-          atualizar(); return;
-        }
-        if (id === "btnDivulgacaoFrete") {
-          e.preventDefault(); e.stopPropagation();
-          openDivulgacaoFrete();
-        }
-      });
-    }
-
-    MODAL.wrap()?.addEventListener("click", (e) => {
-      if (STATE.modalBusy) return;
-      if (e.target === MODAL.wrap()) closeModal();
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        if (STATE.modalBusy) { e.preventDefault(); return; }
-        closeModal();
-      }
-    });
-
-    ["#w9", "#w4", "#w7", "#w6", "#w5"].forEach((sel) => {
-      document.querySelector(sel)?.addEventListener("input", applyFilters);
-    });
-
-    $("#btnResetWeights")?.addEventListener("click", () => {
-      if ($("#w9")) $("#w9").value = "47";
-      if ($("#w4")) $("#w4").value = "39";
-      if ($("#w7")) $("#w7").value = "36";
-      if ($("#w6")) $("#w6").value = "31";
-      if ($("#w5")) $("#w5").value = "26";
-      applyFilters();
-    });
-
-    $("#btnSaveWeights")?.addEventListener("click", () => {
-      applyFilters();
-      alert("Pesos recalculados ✅");
-    });
-  }
-
-  function bindModoRaio() {
-    document.getElementById("btnSelecionarTodosVisiveis")?.addEventListener("click", () => {
-      const visible = getFilteredRows().filter((r) => safeText(r.id));
-      const allSelected = visible.length && visible.every((r) => STATE.selectedIds.has(safeText(r.id)));
-
-      visible.forEach((r) => {
-        if (allSelected) STATE.selectedIds.delete(safeText(r.id));
-        else STATE.selectedIds.add(safeText(r.id));
-      });
-
-      applyFilters(); updateBulkUI();
-    });
-
-    document.getElementById("nfSelectAll")?.addEventListener("change", (e) => {
-      const checked = e.target.checked;
-
-      getFilteredRows().forEach((r) => {
-        const id = safeText(r.id);
-        if (!id) return;
-        if (checked) STATE.selectedIds.add(id);
-        else STATE.selectedIds.delete(id);
-      });
-
-      applyFilters(); updateBulkUI();
-    });
-
-    document.getElementById("btnGerarPacoteJPG")?.addEventListener("click", gerarPacoteJPG);
-    document.getElementById("btnEnviarWhatsAppPacote")?.addEventListener("click", enviarWhatsAppPacote);
-    document.getElementById("nfBaixarJPG")?.addEventListener("click", () => downloadDivulgacaoJPG(STATE.previewRow || getFilteredRows()[0]));
-    document.getElementById("nfCopiarImagem")?.addEventListener("click", () => copyPreviewImage(STATE.previewRow || getFilteredRows()[0]));
-    document.getElementById("nfEnviarWhatsApp")?.addEventListener("click", () => {
-      const row = STATE.previewRow || getFilteredRows()[0];
-      if (row) enviarWhatsAppRow(row);
-    });
-    document.getElementById("nfCopiarMensagem")?.addEventListener("click", () => copyMessage(STATE.previewRow || getFilteredRows()[0]));
-    document.getElementById("nfClosePreview")?.addEventListener("click", () => {
-      const workspace = document.querySelector(".fretes-workspace");
-      if (!workspace) return;
-
-      workspace.classList.toggle("preview-hidden");
-      document.body.classList.toggle("preview-hidden", workspace.classList.contains("preview-hidden"));
-
-      setTimeout(syncFloatingHorizontalBar, 80);
-      setTimeout(syncFloatingHorizontalBar, 240);
-    });
-  }
-
-  function init() {
-    ensureFloatingHorizontalBar();
-    fillModalSelectors();
-    initUppercaseFields();
-    initMasks();
-    bindButtons();
-    bindFilters();
-    bindFloatingHorizontalBar();
-    bindModoRaio();
-    atualizar();
-
-    setTimeout(syncFloatingHorizontalBar, 200);
-    setTimeout(syncFloatingHorizontalBar, 600);
-  }
-
-  window.addEventListener("DOMContentLoaded", init);
-})();
+</html>
