@@ -1026,7 +1026,7 @@
     return [
       `🏷️ ${origem}${coleta ? ` (${coleta})` : ""}`,
       `🏁 ${destino}${descarga ? ` (${descarga})` : ""}`,
-      `CN 💢 ${produto}`,
+      `💢 ${produto}`,
       `💰 ${valor}`
     ].join("\n");
   }
