@@ -1813,6 +1813,12 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
     $("#btnCancel")?.addEventListener("click", closeModal);
     $("#btnSave")?.addEventListener("click", handleSave);
     $("#btnDivulgacaoFrete")?.addEventListener("click", openDivulgacaoFrete);
+    $("#btnOrdemOffline")?.addEventListener("click", () => {
+      window.location.href = "./ordem.html";
+    });
+    $("#btnShareClientes")?.addEventListener("click", () => {
+      window.location.href = "./share-clientes.html";
+    });
 
     if (!document.body.dataset.nfFretesDelegatedClicks) {
       document.body.dataset.nfFretesDelegatedClicks = "1";
@@ -1841,7 +1847,15 @@ tbody tr:nth-child(even){ background:#f8f8f8; }
         }
         if (id === "btnDivulgacaoFrete") {
           e.preventDefault(); e.stopPropagation();
-          openDivulgacaoFrete();
+          openDivulgacaoFrete(); return;
+        }
+        if (id === "btnOrdemOffline") {
+          e.preventDefault(); e.stopPropagation();
+          window.location.href = "./ordem.html"; return;
+        }
+        if (id === "btnShareClientes") {
+          e.preventDefault(); e.stopPropagation();
+          window.location.href = "./share-clientes.html"; return;
         }
       });
     }
