@@ -1,0 +1,1181 @@
+<!DOCTYPE html><html lang="pt-BR" class="light" style=""><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Work+Sans:wght@600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-bright": "#f9f9ff",
+                      "primary-fixed": "#d6e3ff",
+                      "on-tertiary-fixed": "#181c1e",
+                      "on-tertiary": "#ffffff",
+                      "outline": "#74777f",
+                      "primary-container": "#112b4e",
+                      "surface": "#f9f9ff",
+                      "inverse-surface": "#263142",
+                      "on-secondary-container": "#00734c",
+                      "secondary": "#006c47",
+                      "outline-variant": "#c4c6cf",
+                      "tertiary-fixed": "#e0e3e6",
+                      "background": "#f9f9ff",
+                      "on-secondary-fixed-variant": "#005235",
+                      "primary-fixed-dim": "#b0c7f3",
+                      "secondary-container": "#85f9bf",
+                      "on-background": "#111c2c",
+                      "on-surface-variant": "#44474e",
+                      "on-primary-fixed-variant": "#30476c",
+                      "surface-container-high": "#dee8ff",
+                      "tertiary-fixed-dim": "#c3c7ca",
+                      "surface-dim": "#cfdaf1",
+                      "surface-container-low": "#f0f3ff",
+                      "surface-container-highest": "#d8e3fa",
+                      "on-primary-container": "#7c93bc",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#85f9bf",
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed-variant": "#43474a",
+                      "on-primary-fixed": "#001b3c",
+                      "primary": "#001633",
+                      "on-tertiary-container": "#8e9295",
+                      "surface-variant": "#d8e3fa",
+                      "on-error-container": "#93000a",
+                      "on-surface": "#111c2c",
+                      "surface-tint": "#485f85",
+                      "inverse-primary": "#b0c7f3",
+                      "error-container": "#ffdad6",
+                      "on-secondary-fixed": "#002113",
+                      "tertiary-container": "#272b2d",
+                      "secondary-fixed-dim": "#68dca5",
+                      "on-secondary": "#ffffff",
+                      "surface-container": "#e7eeff",
+                      "inverse-on-surface": "#ebf1ff",
+                      "tertiary": "#131719"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "margin-desktop": "32px",
+                      "base": "8px",
+                      "container-max-width": "1280px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "label-caps": ["Inter"],
+                      "headline-lg": ["Work Sans"],
+                      "headline-sm": ["Work Sans"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Work Sans"],
+                      "body-md": ["Inter"],
+                      "headline-md-mobile": ["Work Sans"],
+                      "data-mono": ["JetBrains Mono"]
+              },
+              "fontSize": {
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "data-mono": ["13px", {"lineHeight": "18px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    }catch(_e){}</script><meta charset="utf-8">
+<style>
+  .state-selector-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:380px;
+  }
+
+  .state-selector{
+    width:100%;
+    min-width:320px;
+    height:42px;
+    padding:0 14px;
+    border:2px solid #ef4444;
+    border-radius:4px;
+    background:#ffffff;
+    color:#dc2626;
+    font-size:14px;
+    font-weight:900;
+    text-align:center;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    outline:none;
+    cursor:pointer;
+  }
+
+  .state-selector:focus{
+    border-color:#001633;
+    box-shadow:0 0 0 3px rgba(0,22,51,.12);
+  }
+
+  .company-info-line{
+    font-size:14px;
+    line-height:20px;
+    color:#44474e;
+  }
+
+  .company-docs{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:0 16px;
+    font-family:"JetBrains Mono", monospace;
+    font-size:12px;
+    text-transform:uppercase;
+    color:#111c2c;
+  }
+
+  .company-email{
+    font-size:14px;
+    line-height:20px;
+    color:#001633;
+    font-weight:700;
+  }
+
+  @media (min-width:768px){
+    .company-docs{
+      justify-content:flex-start;
+    }
+  }
+
+  @media (max-width:900px){
+    .state-selector-wrap{
+      width:100%;
+      min-width:100%;
+      order:3;
+    }
+
+    .state-selector{
+      width:100%;
+      min-width:0;
+    }
+  }
+
+  #printSheet{display:none;}
+  .cut-line{display:none;}
+
+  @page{
+    size:A4 portrait;
+    margin:4mm;
+  }
+
+  @media print{
+    html,body{
+      width:210mm !important;
+      height:297mm !important;
+      margin:0 !important;
+      padding:0 !important;
+      background:#fff !important;
+      overflow:hidden !important;
+    }
+
+    body > main{display:none !important;}
+
+    #printSheet{
+      display:block !important;
+      width:202mm;
+      height:289mm;
+      margin:0 auto;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .print-copy{
+      width:202mm;
+      height:142mm;
+      overflow:hidden;
+      background:#fff;
+      border:1px solid #74777f;
+      page-break-inside:avoid;
+      break-inside:avoid;
+    }
+
+    .print-copy + .print-copy{margin-top:5mm;}
+
+    .print-copy .print-container{
+      width:100% !important;
+      max-width:none !important;
+      margin:0 !important;
+      border:0 !important;
+      border-radius:0 !important;
+      box-shadow:none !important;
+      overflow:hidden !important;
+    }
+
+    .print-copy .no-print{display:none !important;}
+
+    .print-copy .p-12{padding:7px !important}
+    .print-copy .p-8{padding:6px !important}
+    .print-copy .p-6{padding:5px !important}
+    .print-copy .p-4{padding:3px 5px !important}
+    .print-copy .px-6{padding-left:7px !important;padding-right:7px !important}
+    .print-copy .py-2{padding-top:2px !important;padding-bottom:2px !important}
+    .print-copy .gap-8{gap:12px !important}
+    .print-copy .gap-4{gap:5px !important}
+    .print-copy .gap-2{gap:3px !important}
+    .print-copy .mt-8{margin-top:5px !important}
+    .print-copy .mt-2{margin-top:2px !important}
+
+    .print-copy label,
+    .print-copy span,
+    .print-copy p,
+    .print-copy strong{
+      font-size:6.5px !important;
+      line-height:8px !important;
+    }
+
+    .print-copy h3{
+      font-size:9px !important;
+      line-height:11px !important;
+    }
+
+    .print-copy input,
+    .print-copy textarea{
+      min-height:0 !important;
+      height:18px !important;
+      padding:1px 5px !important;
+      border-radius:1px !important;
+      font-size:7px !important;
+      line-height:9px !important;
+      box-shadow:none !important;
+    }
+
+    .print-copy textarea{
+      height:32px !important;
+      resize:none !important;
+    }
+
+    .print-copy img{max-height:42px !important;}
+
+    .print-copy .company-info-line,
+    .print-copy .company-email,
+    .print-copy .company-docs{
+      font-size:6.5px !important;
+      line-height:8px !important;
+    }
+
+    .print-via-header{
+      height:18px;
+      padding:2px 7px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background:#f0f3ff;
+      border-bottom:1px solid #74777f;
+      font-family:"Inter",sans-serif;
+      font-size:7px;
+      font-weight:900;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+
+    .print-via-badge{
+      padding:2px 8px;
+      border-radius:2px;
+      background:#001633;
+      color:#fff;
+    }
+
+    .cut-line{
+      display:block !important;
+      position:absolute;
+      left:4mm;
+      top:145.5mm;
+      width:202mm;
+      border-top:1px dashed #64748b;
+      text-align:center;
+      color:#64748b;
+      font-size:6px;
+      line-height:1;
+    }
+
+    .cut-line span{
+      position:relative;
+      top:-4px;
+      padding:0 4px;
+      background:#fff;
+    }
+  }
+
+  /* IMPRESSÃO PROFISSIONAL: DUAS VIAS EM UMA FOLHA A4 */
+  @page{size:A4 portrait;margin:4mm}
+
+  @media print{
+    html,body{
+      width:210mm!important;
+      height:297mm!important;
+      margin:0!important;
+      padding:0!important;
+      overflow:hidden!important;
+      background:#fff!important;
+      -webkit-print-color-adjust:exact!important;
+      print-color-adjust:exact!important;
+    }
+
+    body>main{display:none!important}
+
+    #printSheet{
+      display:flex!important;
+      flex-direction:column;
+      width:202mm!important;
+      height:289mm!important;
+      margin:0 auto!important;
+      padding:0!important;
+      overflow:hidden!important;
+      background:#fff!important;
+    }
+
+    .print-copy-static{
+      width:202mm;
+      height:142mm;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      border:.25mm solid #536071;
+      background:#fff;
+      color:#111827;
+      font-family:Arial,Helvetica,sans-serif;
+      break-inside:avoid;
+      page-break-inside:avoid;
+    }
+
+    .print-copy-static+.print-copy-static{margin-top:5mm}
+
+    .ps-title{
+      height:7mm;
+      padding:0 2.5mm;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:.25mm solid #64748b;
+      background:#f3f6fb;
+      font-size:6.5pt;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      flex:0 0 auto;
+    }
+
+    .ps-badge{
+      padding:1mm 2.5mm;
+      border-radius:1mm;
+      background:#001633;
+      color:#fff;
+      font-size:6pt;
+    }
+
+    .ps-company{
+      height:26mm;
+      display:grid;
+      grid-template-columns:42% 58%;
+      border-bottom:.25mm solid #64748b;
+      flex:0 0 auto;
+    }
+
+    .ps-logo{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2mm 4mm;
+      border-right:.25mm solid #64748b;
+      background:#f8faff;
+    }
+
+    .ps-logo img{
+      max-width:100%;
+      max-height:17mm;
+      object-fit:contain;
+    }
+
+    .ps-company-info{
+      min-width:0;
+      padding:2mm 3mm;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:.6mm;
+    }
+
+    .ps-company-name{
+      color:#001633;
+      font-size:7.5pt;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .ps-company-line{
+      overflow:hidden;
+      color:#334155;
+      font-size:5.4pt;
+      line-height:1.15;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+
+    .ps-company-line strong{color:#111827}
+
+    .ps-filial{
+      display:flex;
+      align-items:center;
+      gap:1.5mm;
+      margin-top:.7mm;
+      font-size:5.5pt;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .ps-filial-value{
+      flex:1;
+      min-height:4mm;
+      padding:.6mm 1.5mm;
+      background:#e8eefc;
+      color:#c81e1e;
+      font-size:6.5pt;
+      font-weight:900;
+    }
+
+    .ps-section-title{
+      height:5mm;
+      padding:0 2.5mm;
+      display:flex;
+      align-items:center;
+      border-bottom:.25mm solid #64748b;
+      background:#eef3ff;
+      color:#001633;
+      font-size:5.4pt;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      flex:0 0 auto;
+    }
+
+    .ps-grid{
+      display:grid;
+      border-bottom:.25mm solid #64748b;
+      flex:0 0 auto;
+    }
+
+    .ps-grid.two{grid-template-columns:1fr 1fr}
+    .ps-grid.three{grid-template-columns:repeat(3,1fr)}
+    .ps-grid.five{grid-template-columns:repeat(5,1fr)}
+    .ps-grid.driver-top{grid-template-columns:3fr 1fr}
+    .ps-grid.driver-bottom{grid-template-columns:1fr 1fr 2fr}
+
+    .ps-field{
+      min-width:0;
+      min-height:10mm;
+      padding:1.2mm 2mm;
+      border-right:.25mm solid #c7ced8;
+    }
+
+    .ps-field:last-child{border-right:0}
+
+    .ps-label{
+      display:block;
+      margin-bottom:.7mm;
+      color:#475569;
+      font-size:4.7pt;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:.035em;
+      text-transform:uppercase;
+    }
+
+    .ps-value{
+      display:block;
+      width:100%;
+      min-height:4.2mm;
+      overflow:hidden;
+      color:#001633;
+      font-size:6.3pt;
+      line-height:1.2;
+      font-weight:900;
+      text-transform:uppercase;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+
+    .ps-value.red{color:#c81e1e}
+
+    .ps-collection{
+      min-height:8mm;
+      display:grid;
+      grid-template-columns:31mm 1fr;
+      align-items:center;
+      padding:1mm 2.5mm;
+      border-bottom:.25mm solid #64748b;
+      background:#001633;
+      color:#fff;
+      flex:0 0 auto;
+    }
+
+    .ps-collection-label{
+      font-size:5.2pt;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .ps-collection-value{
+      overflow:hidden;
+      font-size:7pt;
+      font-weight:900;
+      text-align:center;
+      text-transform:uppercase;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+
+    .ps-observation{
+      min-height:13mm;
+      padding:1.2mm 2.5mm;
+      border-bottom:.25mm solid #64748b;
+      flex:1 1 auto;
+      overflow:hidden;
+    }
+
+    .ps-observation .ps-value{
+      min-height:8mm;
+      color:#c81e1e;
+      font-size:5.7pt;
+      line-height:1.25;
+      white-space:normal;
+    }
+
+    .ps-signatures{
+      height:16mm;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12mm;
+      align-items:end;
+      padding:2mm 8mm 2.5mm;
+      flex:0 0 auto;
+    }
+
+    .ps-signature{text-align:center;min-width:0}
+    .ps-sign-line{border-top:.25mm solid #475569;padding-top:1mm}
+    .ps-sign-label{color:#475569;font-size:4.7pt;font-weight:900;text-transform:uppercase}
+    .ps-sign-name{
+      margin-top:.7mm;
+      overflow:hidden;
+      color:#001633;
+      font-size:5.8pt;
+      font-weight:900;
+      text-transform:uppercase;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+
+    .cut-line{
+      display:block!important;
+      position:absolute;
+      left:4mm;
+      top:145.5mm;
+      width:202mm;
+      border-top:.25mm dashed #64748b;
+      text-align:center;
+      color:#64748b;
+      font-size:5pt;
+      line-height:1;
+    }
+
+    .cut-line span{
+      position:relative;
+      top:-2mm;
+      padding:0 2mm;
+      background:#fff;
+    }
+  }
+
+</style>
+
+</head><body class="bg-surface-bright text-on-surface font-body-md min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+
+<main class="flex-grow flex flex-col">
+<!-- TopAppBar (Shared Component) -->
+<header class="sticky top-0 z-50 flex flex-wrap justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface-container-lowest border-b border-outline-variant no-print gap-4">
+  <div class="flex items-center gap-4">
+    <span class="md:hidden material-symbols-outlined text-primary">menu</span>
+    <h2 class="font-headline-md text-headline-md-mobile md:text-headline-md font-bold text-primary">Ordem de Carregamento</h2>
+  </div>
+
+  <div class="state-selector-wrap">
+    <select id="seletorEstado" class="state-selector" aria-label="Selecionar estado">
+      <option value="">SELECIONE O ESTADO</option>
+      <option value="GO">GOIÁS</option>
+      <option value="MG">MINAS GERAIS</option>
+      <option value="SP">SÃO PAULO</option>
+      <option value="MT">MATO GROSSO</option>
+      <option value="PR">PARANÁ</option>
+      <option value="SC">SANTA CATARINA</option>
+      <option value="TO">TOCANTINS</option>
+      <option value="PA">PARÁ</option>
+      <option value="MA">MARANHÃO</option>
+      <option value="BA">BAHIA</option>
+    </select>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3 flex-wrap justify-end">
+      <a href="./home.html"
+         class="px-4 py-2 border border-outline text-primary font-label-caps text-label-caps rounded hover:bg-surface-container-high transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">home</span>
+        HOME
+      </a>
+
+      <a href="./fretes.html"
+         class="px-4 py-2 border border-outline text-primary font-label-caps text-label-caps rounded hover:bg-surface-container-high transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">local_shipping</span>
+        FRETES
+      </a>
+
+      <button id="btnImprimirDuasVias" class="px-4 py-2 border border-outline text-primary font-label-caps text-label-caps rounded hover:bg-surface-container-high transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">print</span>
+        IMPRIMIR
+      </button>
+      <button id="btnLimpar" class="px-4 py-2 border border-outline text-primary font-label-caps text-label-caps rounded hover:bg-surface-container-high transition-all">LIMPAR</button>
+      <button id="btnNovaOrdem" class="px-4 py-2 bg-primary text-on-primary font-label-caps text-label-caps rounded font-bold flex items-center gap-2 hover:opacity-90 transition-all">
+        <span class="material-symbols-outlined text-sm">add</span>
+        + NOVA ORDEM
+      </button>
+    </div>
+  </div>
+</header>
+<!-- Main Form Canvas -->
+<div class="flex-grow p-4 md:p-8 overflow-y-auto">
+<div id="ordemEditavel" class="max-w-5xl mx-auto bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm print-container overflow-hidden">
+<!-- HEADER SECTOR (Ref: Image Section 1) -->
+<div class="grid grid-cols-1 md:grid-cols-2 border-b border-outline">
+<div class="p-6 flex items-center justify-center md:border-r border-outline bg-surface-container-low">
+<img class="w-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgQxERrd_f6nqKVQsXrtUGmy9nLCFOMg14En51CLtzur1s6mIvp-bz1XDpVlDcHrSlXwcT3xIkWc8oUBch_mhp00Rk8Liw7tLVkicran5UCP4rQdvvVuhCBPsw3NLPH1X-Rw3iMTw_uNCAWhmHbwlr4Ww5qfH5Vti45FPU64Vebte60n0-DRFW5w30a1iLkyJ8r-3t_FXgok5OZZLO-D4sJBeXA-jEd7-qpiKTst7gkNyt4LhUVQJT3jTadIWmz3y_k_TuvuDcTFmI" alt="ROCA LOG">
+</div>
+<div class="p-6 flex flex-col justify-center text-center md:text-left space-y-1">
+  <h3 id="empresaNome" class="font-headline-sm text-headline-sm text-primary uppercase">ROCA LOG</h3>
+  <p id="empresaEndereco" class="company-info-line">SELECIONE UM ESTADO</p>
+
+  <div class="company-docs">
+    <span>CNPJ: <strong id="empresaCnpj">--</strong></span>
+    <span>IE: <strong id="empresaIe">--</strong></span>
+  </div>
+
+  <p id="empresaEmail" class="company-email">--</p>
+
+  <div class="mt-2 flex items-center gap-2">
+    <span class="font-label-caps text-label-caps text-on-surface-variant">FILIAL:</span>
+    <div id="empresaFilial" class="flex-grow border-b border-outline-variant px-2 py-1 bg-surface-container-high rounded text-error font-bold min-h-[34px] flex items-center">
+      SELECIONE UM ESTADO
+    </div>
+  </div>
+</div>
+</div>
+</div>
+<!-- ROUTE SECTION (Ref: Image Section 2) -->
+<div class="bg-surface-container-low px-6 py-2 border-b border-outline flex items-center gap-2 no-print">
+<span class="material-symbols-outlined text-primary text-sm">route</span>
+<span class="font-label-caps text-label-caps text-primary">Informações de Rota</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-outline">
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Remetente (Local de Coleta)</label>
+<input id="remetenteColeta" class="w-full border border-outline-variant rounded px-3 py-2 text-primary font-bold form-input-focus" type="text" value="XXXXX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Cidade de Origem</label>
+<input id="cidadeOrigem" class="w-full border border-outline-variant rounded px-3 py-2 text-primary font-bold form-input-focus" type="text" value="XXXXX-XX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1 border-t border-outline">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Recebedor (Local de Descarga)</label>
+<input id="recebedorDescarga" class="w-full border border-outline-variant rounded px-3 py-2 text-primary font-bold form-input-focus" type="text" value="XXXXX -XX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1 border-t border-outline">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Cidade de Destino</label>
+<input id="cidadeDestino" class="w-full border border-outline-variant rounded px-3 py-2 text-primary font-bold form-input-focus" type="text" value="XXXXX-XX">
+</div>
+</div>
+<!-- CARGO SECTION (Ref: Image Section 3) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-outline border-t border-outline">
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Peso (Ton)</label>
+<input id="pesoTon" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-data-mono font-bold form-input-focus" type="text" value="XX.XXX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Produto</label>
+<input id="produtoCarga" class="w-full border border-outline-variant rounded px-3 py-2 text-primary font-bold form-input-focus" type="text" value="XXXXX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Cliente</label>
+<input id="clienteCarga" class="w-full border border-outline-variant rounded px-3 py-2 text-primary font-bold form-input-focus" type="text" value="XXXXX">
+</div>
+</div>
+<!-- VEHICLE SECTION (Ref: Image Section 4) -->
+<div class="bg-surface-container-low px-6 py-2 border-y border-outline flex items-center gap-2 no-print">
+<span class="material-symbols-outlined text-primary text-sm">local_shipping</span>
+<span class="font-label-caps text-label-caps text-primary">Dados do Veículo</span>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-5 gap-px bg-outline">
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Placa Cavalo</label>
+<input id="placaCavalo" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-data-mono font-bold form-input-focus" type="text" value="XXX-XXX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Placa Carreta 1</label>
+<input id="placaCarreta1" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-data-mono font-bold form-input-focus" type="text" value="XXX-XXX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Placa Dolly 2</label>
+<input id="placaDolly2" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-data-mono font-bold form-input-focus" type="text" value="XXX-XXX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Placa Carreta 3</label>
+<input id="placaCarreta3" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-data-mono font-bold form-input-focus" type="text" value="XXX-XXX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Cidade Empl.</label>
+<input id="cidadeEmplacamento" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-bold form-input-focus" type="text" value="XXXXX">
+</div>
+</div>
+<!-- DRIVER SECTION (Ref: Image Section 5) -->
+<div class="bg-surface-container-low px-6 py-2 border-y border-outline flex items-center gap-2 no-print">
+<span class="material-symbols-outlined text-primary text-sm">person</span>
+<span class="font-label-caps text-label-caps text-primary">Dados do Motorista</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-px bg-outline">
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1 md:col-span-3">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Motorista</label>
+<input id="motoristaNome" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-bold form-input-focus" type="text" value="XXXXXXXXXXXXXX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Fone</label>
+<input id="foneMotorista" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-data-mono font-bold form-input-focus" type="text" value="(X) X XXXX-XXXX">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1 border-t border-outline">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">CPF</label>
+<input id="cpfMotorista" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-data-mono font-bold form-input-focus" type="text" value="000.000.000-00">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1 border-t border-outline">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">RG</label>
+<input id="rgMotorista" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-data-mono font-bold form-input-focus" type="text" value="XXXXX-SSP/GO">
+</div>
+<div class="bg-surface-container-lowest p-4 flex flex-col gap-1 border-t border-outline md:col-span-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">CNH</label>
+<input id="cnhMotorista" class="w-full border border-outline-variant rounded px-3 py-2 text-error font-data-mono font-bold form-input-focus" type="text" value="XXXXXXXXX-CAT E">
+</div>
+</div>
+<!-- FOOTER SECTION (Ref: Image Footer) -->
+<div class="bg-primary p-4 border-t border-outline flex items-center gap-4 px-6">
+  <div class="shrink-0">
+    <label for="localColetaRodape" class="font-label-caps text-label-caps text-on-primary">
+      LOCAL DE COLETA:
+    </label>
+  </div>
+
+  <div class="flex-1">
+    <input
+      id="localColetaRodape"
+      class="w-full bg-white/10 border border-white/30 rounded px-3 py-2 text-center text-on-primary font-headline-sm text-headline-sm font-bold uppercase placeholder:text-white/60 focus:border-white focus:ring-2 focus:ring-white/20"
+      type="text"
+      placeholder="DIGITE O LOCAL DE COLETA"
+    >
+  </div>
+</div>
+<div class="p-6 bg-surface-container-lowest flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Observações Gerais</label>
+<textarea id="observacoesGerais" class="w-full border border-outline-variant rounded p-3 text-error font-body-md form-input-focus resize-none uppercase" rows="3">XXXXXXXXXXXXXX.</textarea>
+</div>
+<!-- SIGNATURES -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-12 bg-surface-container-lowest border-t border-outline-variant">
+<div class="flex flex-col items-center">
+<div class="w-full border-t border-on-surface-variant mt-8"></div>
+<span class="mt-2 font-label-caps text-label-caps text-on-surface-variant">ASSINATURA MOTORISTA</span>
+<input id="assinaturaMotorista" class="w-full border-none text-center font-bold text-primary focus:ring-0 uppercase" type="text" value="XXXXXXXXXXXXXX" readonly>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-full border-t border-on-surface-variant mt-8"></div>
+<span class="mt-2 font-label-caps text-label-caps text-on-surface-variant">EMBARCADOR RESPONSÁVEL</span>
+<input id="embarcadorResponsavel" class="w-full border-none text-center font-bold text-primary focus:ring-0 uppercase" type="text" value="ROCA LOG">
+</div>
+</div>
+</div>
+<!-- Print Action (Mobile FAB logic) -->
+
+</div>
+<!-- BottomNavBar (Shared Component - Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center bg-surface-container-lowest pb-safe border-t border-outline-variant md:hidden no-print">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 active:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] uppercase font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary-fixed-dim bg-primary-container rounded-full p-2 scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-[10px] uppercase font-bold">Ordens</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 active:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-original-icon="truck">circle</span>
+<span class="text-[10px] uppercase font-bold">Frota</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 active:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] uppercase font-bold">Perfil</span>
+</a>
+</nav>
+</main>
+
+<section id="printSheet" aria-hidden="true"></section>
+<div class="cut-line"><span>✂ LINHA DE CORTE</span></div>
+
+<script>
+  const EMPRESAS_POR_ESTADO = {
+    GO: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDA",
+      filial: "GOIÁS",
+      cnpj: "62.717.752/0001-25",
+      TEL: (64) 99227-7537,
+      endereco: "ROD BR 060, SN KM 388 SALA 156",
+      email: "operacional@rocalogistica.com.br"
+    },
+    MG: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDAS",
+      filial: "MINAS GERAIS",
+      cnpj: "PREENCHER",
+      ie: "PREENCHER",
+      endereco: "PREENCHER",
+      email: "PREENCHER"
+    },
+    SP: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDA",
+      filial: "SÃO PAULO",
+      cnpj: "PREENCHER",
+      ie: "PREENCHER",
+      endereco: "PREENCHER",
+      email: "PREENCHER"
+    },
+    MT: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDA",
+      filial: "MATO GROSSO",
+      cnpj: "PREENCHER",
+      ie: "PREENCHER",
+      endereco: "PREENCHER",
+      email: "PREENCHER"
+    },
+    PR: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDA",
+      filial: "PARANÁ",
+      cnpj: "PREENCHER",
+      ie: "PREENCHER",
+      endereco: "PREENCHER",
+      email: "PREENCHER"
+    },
+    SC: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDA",
+      filial: "SANTA CATARINA",
+      cnpj: "PREENCHER",
+      ie: "PREENCHER",
+      endereco: "PREENCHER",
+      email: "PREENCHER"
+    },
+    TO: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDA",
+      filial: "TOCANTINS",
+      cnpj: "PREENCHER",
+      ie: "PREENCHER",
+      endereco: "PREENCHER",
+      email: "PREENCHER"
+    },
+    PA: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDA",
+      filial: "PARÁ",
+      cnpj: "PREENCHER",
+      ie: "PREENCHER",
+      endereco: "PREENCHER",
+      email: "PREENCHER"
+    },
+    MA: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDA",
+      filial: "MARANHÃO",
+      cnpj: "PREENCHER",
+      ie: "PREENCHER",
+      endereco: "PREENCHER",
+      email: "PREENCHER"
+    },
+    BA: {
+      nome: "ROCA SOLUCOES LOGISTICAS LTDA",
+      filial: "BAHIA",
+      cnpj: "PREENCHER",
+      ie: "PREENCHER",
+      endereco: "PREENCHER",
+      email: "PREENCHER"
+    }
+  };
+
+  const STORAGE_KEY_ESTADO_ORDEM = "nf_ordem_estado";
+
+  function preencherDadosEmpresa(uf){
+    const dados = EMPRESAS_POR_ESTADO[uf];
+
+    const nomeEl = document.getElementById("empresaNome");
+    const enderecoEl = document.getElementById("empresaEndereco");
+    const cnpjEl = document.getElementById("empresaCnpj");
+    const ieEl = document.getElementById("empresaIe");
+    const emailEl = document.getElementById("empresaEmail");
+    const filialEl = document.getElementById("empresaFilial");
+
+    if(!dados){
+      if(nomeEl) nomeEl.textContent = "ROCA SOLUCOES LOGISTICAS";
+      if(enderecoEl) enderecoEl.textContent = "SELECIONE UM ESTADO";
+      if(cnpjEl) cnpjEl.textContent = "--";
+      if(ieEl) ieEl.textContent = "--";
+      if(emailEl) emailEl.textContent = "--";
+      if(filialEl) filialEl.textContent = "SELECIONE UM ESTADO";
+      return;
+    }
+
+    if(nomeEl) nomeEl.textContent = dados.nome;
+    if(enderecoEl) enderecoEl.textContent = dados.endereco;
+    if(cnpjEl) cnpjEl.textContent = dados.cnpj;
+    if(ieEl) ieEl.textContent = dados.ie;
+    if(emailEl) emailEl.textContent = dados.email;
+    if(filialEl) filialEl.textContent = dados.filial;
+
+    if(typeof prepararDuasViasParaImpressao === "function"){
+      prepararDuasViasParaImpressao();
+    }
+  }
+
+  function iniciarSeletorEstado(){
+    const seletor = document.getElementById("seletorEstado");
+    if(!seletor) return;
+
+    const estadoSalvo = localStorage.getItem(STORAGE_KEY_ESTADO_ORDEM) || "";
+
+    if(estadoSalvo && EMPRESAS_POR_ESTADO[estadoSalvo]){
+      seletor.value = estadoSalvo;
+      preencherDadosEmpresa(estadoSalvo);
+    }else{
+      preencherDadosEmpresa("");
+    }
+
+    seletor.addEventListener("change", function(){
+      const uf = String(this.value || "").trim().toUpperCase();
+
+      if(uf){
+        localStorage.setItem(STORAGE_KEY_ESTADO_ORDEM, uf);
+      }else{
+        localStorage.removeItem(STORAGE_KEY_ESTADO_ORDEM);
+      }
+
+      preencherDadosEmpresa(uf);
+    });
+  }
+
+  function limparOrdem(){
+    document.querySelectorAll("input, textarea").forEach((campo) => {
+      campo.value = "";
+    });
+
+    document.querySelectorAll("select").forEach((select) => {
+      if(select.id !== "seletorEstado") select.selectedIndex = 0;
+    });
+
+    sincronizarNomeMotorista();
+  }
+
+  function novaOrdem(){
+    limparOrdem();
+    window.scrollTo({ top:0, behavior:"smooth" });
+  }
+
+  function sincronizarNomeMotorista(){
+    const motorista = document.getElementById("motoristaNome");
+    const assinatura = document.getElementById("assinaturaMotorista");
+
+    if(!motorista || !assinatura) return;
+
+    assinatura.value = motorista.value || "";
+  }
+
+  function iniciarSincronizacaoMotorista(){
+    const motorista = document.getElementById("motoristaNome");
+
+    if(!motorista) return;
+
+    motorista.addEventListener("input", sincronizarNomeMotorista);
+    motorista.addEventListener("change", sincronizarNomeMotorista);
+
+    sincronizarNomeMotorista();
+  }
+
+  function valorDoCampo(id){
+    const elemento = document.getElementById(id);
+    if(!elemento) return "-";
+
+    const valor = "value" in elemento
+      ? elemento.value
+      : elemento.textContent;
+
+    return String(valor || "").trim() || "-";
+  }
+
+  function escaparImpressao(valor){
+    return String(valor || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function campoPrint(rotulo, id, extraClass=""){
+    return `
+      <div class="ps-field">
+        <span class="ps-label">${rotulo}</span>
+        <span class="ps-value ${extraClass}">${escaparImpressao(valorDoCampo(id))}</span>
+      </div>
+    `;
+  }
+
+  function montarViaImpressao(nomeVia){
+    return `
+      <article class="print-copy-static">
+        <div class="ps-title">
+          <span>Ordem de Carregamento</span>
+          <span class="ps-badge">${nomeVia}</span>
+        </div>
+
+        <div class="ps-company">
+          <div class="ps-logo">
+            <img src="../assets/img/logo-roca.png" alt="ROCA LOG">
+          </div>
+
+          <div class="ps-company-info">
+            <div class="ps-company-name">${escaparImpressao(valorDoCampo("empresaNome"))}</div>
+            <div class="ps-company-line">${escaparImpressao(valorDoCampo("empresaEndereco"))}</div>
+            <div class="ps-company-line">
+              CNPJ: <strong>${escaparImpressao(valorDoCampo("empresaCnpj"))}</strong>
+              &nbsp;&nbsp; IE: <strong>${escaparImpressao(valorDoCampo("empresaIe"))}</strong>
+            </div>
+            <div class="ps-company-line">${escaparImpressao(valorDoCampo("empresaEmail"))}</div>
+            <div class="ps-filial">
+              <span>Filial:</span>
+              <span class="ps-filial-value">${escaparImpressao(valorDoCampo("empresaFilial"))}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ps-grid two">
+          ${campoPrint("Remetente (Local de Coleta)","remetenteColeta")}
+          ${campoPrint("Cidade de Origem","cidadeOrigem")}
+          ${campoPrint("Recebedor (Local de Descarga)","recebedorDescarga")}
+          ${campoPrint("Cidade de Destino","cidadeDestino")}
+        </div>
+
+        <div class="ps-grid three">
+          ${campoPrint("Peso (Ton)","pesoTon","red")}
+          ${campoPrint("Produto","produtoCarga")}
+          ${campoPrint("Cliente","clienteCarga")}
+        </div>
+
+        <div class="ps-section-title">Dados do Veículo</div>
+        <div class="ps-grid five">
+          ${campoPrint("Placa Cavalo","placaCavalo","red")}
+          ${campoPrint("Placa Carreta 1","placaCarreta1","red")}
+          ${campoPrint("Placa Dolly 2","placaDolly2","red")}
+          ${campoPrint("Placa Carreta 3","placaCarreta3","red")}
+          ${campoPrint("Cidade Empl.","cidadeEmplacamento","red")}
+        </div>
+
+        <div class="ps-section-title">Dados do Motorista</div>
+        <div class="ps-grid driver-top">
+          ${campoPrint("Motorista","motoristaNome","red")}
+          ${campoPrint("Fone","foneMotorista","red")}
+        </div>
+
+        <div class="ps-grid driver-bottom">
+          ${campoPrint("CPF","cpfMotorista","red")}
+          ${campoPrint("RG","rgMotorista","red")}
+          ${campoPrint("CNH","cnhMotorista","red")}
+        </div>
+
+        <div class="ps-collection">
+          <span class="ps-collection-label">Local de Coleta:</span>
+          <span class="ps-collection-value">${escaparImpressao(valorDoCampo("localColetaRodape"))}</span>
+        </div>
+
+        <div class="ps-observation">
+          <span class="ps-label">Observações Gerais</span>
+          <span class="ps-value">${escaparImpressao(valorDoCampo("observacoesGerais"))}</span>
+        </div>
+
+        <div class="ps-signatures">
+          <div class="ps-signature">
+            <div class="ps-sign-line">
+              <div class="ps-sign-label">Assinatura Motorista</div>
+              <div class="ps-sign-name">${escaparImpressao(valorDoCampo("assinaturaMotorista"))}</div>
+            </div>
+          </div>
+
+          <div class="ps-signature">
+            <div class="ps-sign-line">
+              <div class="ps-sign-label">Embarcador Responsável</div>
+              <div class="ps-sign-name">${escaparImpressao(valorDoCampo("embarcadorResponsavel"))}</div>
+            </div>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function prepararDuasViasParaImpressao(){
+    sincronizarNomeMotorista();
+
+    const folha = document.getElementById("printSheet");
+    if(!folha) return;
+
+    folha.innerHTML =
+      montarViaImpressao("1ª VIA • MOTORISTA") +
+      montarViaImpressao("2ª VIA • EMBARCADOR");
+  }
+
+  function imprimirDuasVias(){
+    prepararDuasViasParaImpressao();
+    requestAnimationFrame(() => window.print());
+  }
+
+  document.getElementById("ordemEditavel")?.addEventListener("input", prepararDuasViasParaImpressao);
+  document.getElementById("ordemEditavel")?.addEventListener("change", prepararDuasViasParaImpressao);
+
+  document.querySelectorAll("input, textarea").forEach((input) => {
+    input.addEventListener("focus", () => {
+      input.parentElement?.classList.add("bg-surface-container-high");
+    });
+
+    input.addEventListener("blur", () => {
+      input.parentElement?.classList.remove("bg-surface-container-high");
+    });
+  });
+
+  document.getElementById("btnLimpar")?.addEventListener("click", limparOrdem);
+  document.getElementById("btnNovaOrdem")?.addEventListener("click", novaOrdem);
+  document.getElementById("btnImprimirDuasVias")?.addEventListener("click", imprimirDuasVias);
+  window.addEventListener("beforeprint", prepararDuasViasParaImpressao);
+
+  window.addEventListener("DOMContentLoaded", function(){
+    iniciarSeletorEstado();
+    iniciarSincronizacaoMotorista();
+
+    setTimeout(prepararDuasViasParaImpressao, 120);
+  });
+</script>
+
+</body></html>
