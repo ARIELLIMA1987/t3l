@@ -1073,6 +1073,14 @@
           </button>
 
           <button
+            class="btnTiny blue"
+            id="btnOrdemOffline"
+            type="button"
+          >
+            📄 Ordem Offline
+          </button>
+
+          <button
             class="btnTiny gold"
             id="btnDivulgacaoFrete"
             type="button"
@@ -1548,7 +1556,12 @@
 
   </div>
 
-  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/auth.js">
+document.getElementById("btnOrdemOffline")?.addEventListener("click",()=>{
+  window.location.href="./ordem.html";
+});
+
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
