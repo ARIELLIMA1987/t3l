@@ -1,983 +1,310 @@
-<!-- fretes.html -->
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fretes | ROCA LOG</title>
-
-  <link rel="stylesheet" href="../assets/css/app.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home | ROCA LOG</title>
+  <link rel="stylesheet" href="../assets/css/app.css" />
 
   <style>
-    :root {
-      --bg: #F5F7FA;
-      --panel: #FFFFFF;
-      --line: #E5E7EB;
-      --text: #0F172A;
-      --muted: #64748B;
-      --navy: #0F172A;
-      --blue: #102A6B;
-      --green: #0B3B2E;
-      --gold: #8A6A12;
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      width: 100%;
-      min-height: 100%;
-      margin: 0;
-    }
-
-    body {
-      overflow-x: hidden;
-    }
-
-    input,
-    select,
-    textarea {
-      text-transform: uppercase;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    .container.nfWide.pageFretes {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 100%;
-      max-width: none !important;
-      min-height: calc(100vh - 72px);
-      margin: 0;
-      padding: 10px 12px 14px;
-      background: var(--bg);
-    }
-
-    .fretes-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
-      width: 100%;
-      margin: 0;
-      padding: 10px 14px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
-    }
-
-    .fretes-top .title {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .fretes-top .title h1 {
-      margin: 0;
-      font-size: 17px;
-      font-weight: 900;
-      letter-spacing: .2px;
-      color: var(--text);
-    }
-
-    .fretes-top .title .sub {
-      max-width: 1100px;
-      font-size: 11px;
-      line-height: 1.35;
-      color: rgba(17, 24, 39, .72);
-    }
-
-    .fretes-toolbar {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      width: 100%;
-      margin: 0;
-      padding: 8px 10px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--panel);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
-    }
-
-    .ft-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      width: 100%;
-    }
-
-    .ft-label {
-      display: inline-flex;
-      align-items: center;
-      margin-right: 2px;
-      font-size: 10px;
-      font-weight: 900;
-      color: var(--text);
-    }
-
-    .ft-mini {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      font-weight: 900;
-      color: var(--text);
-    }
-
-    .ft-mini input {
-      width: 60px;
-      height: 28px;
-      margin: 0;
-      padding: 3px 6px;
-      border: 1px solid #D1D5DB;
-      border-radius: 8px;
-      background: #FFFFFF;
-      color: #111827;
-      outline: none;
-      font-size: 10px;
-    }
-
-    .ft-mini input:focus,
-    .ft-select:focus,
-    .ft-search:focus,
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus,
-    .inlineCellInput:focus {
-      border-color: #5B7CFA;
-      box-shadow: 0 0 0 3px rgba(91, 124, 250, .18);
-    }
-
-    .ft-select,
-    .ft-search {
-      height: 30px;
-      margin: 0;
-      padding: 4px 9px;
-      border: 1px solid #D1D5DB;
-      border-radius: 8px;
-      background: #FFFFFF;
-      color: #111827;
-      outline: none;
-      font-size: 10px;
-    }
-
-    .ft-select {
-      width: 200px;
-      flex: 0 0 200px;
-    }
-
-    .ft-search,
-    .ft-search-wide {
-      min-width: 240px;
-      flex: 1 1 420px;
-      max-width: none;
-    }
-
-    .ft-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .ft-actions.top-actions {
-      margin-left: auto;
-    }
-
-    .btnTiny {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 28px;
-      margin: 0;
-      padding: 0 10px;
-      border: 1px solid rgba(15, 23, 42, .14);
-      border-radius: 8px;
-      background: var(--navy);
-      color: #FFFFFF;
-      font-size: 10px;
-      font-weight: 900;
-      line-height: 1;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .btnTiny:hover {
-      filter: brightness(1.06);
-    }
-
-    .btnTiny:disabled,
-    .iconClose:disabled {
-      cursor: not-allowed;
-      opacity: .65;
-      filter: grayscale(.1);
-    }
-
-    .btnTiny.ghost {
-      background: #FFFFFF;
-      color: var(--text);
-      border-color: #D1D5DB;
-    }
-
-    .btnTiny.green {
-      background: var(--green);
-      color: #FFFFFF;
-    }
-
-    .btnTiny.blue {
-      background: var(--blue);
-      color: #FFFFFF;
-    }
-
-    .btnTiny.gold {
-      background: var(--gold);
-      color: #FFFFFF;
-    }
-
-    .fretes-workspace {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 300px;
-      gap: 12px;
-      align-items: start;
-      flex: 1 1 auto;
-      min-height: 0;
-      width: 100%;
-    }
-
-    .fretes-workspace.preview-hidden {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .fretes-workspace.preview-hidden .nfPreviewPanel {
-      display: none;
-    }
-
-    .card.tableFull {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      min-height: calc(100vh - 220px);
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #FFFFFF;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
-    }
-
-    .tableWrap {
-      flex: 1 1 auto;
-      width: 100%;
-      height: calc(100vh - 235px);
-      min-height: 480px;
-      overflow: auto;
-      border: 0;
-      border-radius: 0;
-      background: #FFFFFF;
-    }
-
-    .tableWrap table {
-      width: 100%;
-      min-width: 1700px;
-      border-collapse: collapse;
-      background: #FFFFFF;
-    }
-
-    .tableWrap th,
-    .tableWrap td {
-      padding: 4px 8px;
-      border-bottom: 1px solid #D1D5DB;
-      color: #111827;
-      font-size: 11px;
-      line-height: 1.15;
-      vertical-align: middle;
-      white-space: nowrap;
-    }
-
-    .tableWrap thead th {
-      position: sticky;
-      top: 0;
-      z-index: 4;
-      padding: 6px 8px;
-      background: var(--navy);
-      color: #FFFFFF;
-      border-bottom: 1px solid #0B1220;
-      font-size: 10px;
-      letter-spacing: .02em;
-    }
-
-    .tableWrap tbody tr:nth-child(even) {
-      background: #F1F4F9;
-    }
-
-    .tableWrap tbody tr:hover {
-      background: #E8EDFF;
-    }
-
-    .num {
-      text-align: right;
-    }
-
-    .groupRow td {
-      position: sticky;
-      top: 29px;
-      z-index: 3;
-      padding: 6px 8px;
-      background: var(--navy) !important;
-      color: #FFFFFF !important;
-      font-weight: 900;
-      letter-spacing: .02em;
-      border-bottom: 1px solid #0B1220;
-    }
-
-    .nfRowCheck {
-      width: 16px;
-      height: 16px;
-      accent-color: #2563EB;
-      cursor: pointer;
-    }
-
-    .tdUltimaAlteracao {
-      min-width: 118px;
-      color: #334155;
-      font-size: 10px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    th.thUltimaAlteracao {
-      min-width: 118px;
-    }
-
-    th.thAcoes {
-      min-width: 116px;
-    }
-
-    .nfActionGroup {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .nfIconBtn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      border: 1px solid #D1D5DB;
-      border-radius: 8px;
-      background: #FFFFFF;
-      font-size: 14px;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    .nfIconBtn.raio {
-      border-color: #F59E0B;
-      color: #B45309;
-      background: #FFFBEB;
-    }
-
-    .nfIconBtn.eye {
-      border-color: #60A5FA;
-      color: #1D4ED8;
-      background: #EFF6FF;
-    }
-
-    .nfIconBtn.wa {
-      border-color: #22C55E;
-      color: #15803D;
-      background: #F0FDF4;
-    }
-
-    .nfIconBtn:hover {
-      filter: brightness(.96);
-      transform: translateY(-1px);
-    }
-
-    .waIcon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      padding: 0;
-      border: 1px solid rgba(17, 24, 39, .12);
-      border-radius: 8px;
-      background: #FFFFFF;
-      line-height: 1;
-      flex: 0 0 auto;
-    }
-
-    .waIcon img {
-      display: block;
-      width: 15px;
-      height: 15px;
-    }
-
-    .pillSN {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 18px;
-      border: 1px solid rgba(17, 24, 39, .18);
-      border-radius: 999px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
-      font-size: 10px;
-      font-weight: 950;
-      letter-spacing: .02em;
-      user-select: none;
-    }
-
-    .pillSN.s {
-      background: #DCFCE7;
-      border-color: #86EFAC;
-      color: #166534;
-    }
-
-    .pillSN.n {
-      background: #FEE2E2;
-      border-color: #FCA5A5;
-      color: #7F1D1D;
-    }
-
-    .pillSN.empty {
-      background: #EEF2F7;
-      border-color: #CBD5E1;
-      color: #475569;
-    }
-
-    .inlineCellWrap {
-      position: relative;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      min-width: 48px;
-    }
-
-    .inlineCellInput {
-      width: 48px;
-      height: 24px;
-      padding: 0 4px;
-      border: 1px solid #D1D5DB;
-      border-radius: 7px;
-      background: #FFFFFF;
-      color: #111827;
-      outline: none;
-      text-align: center;
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: none !important;
-    }
-
-    .inlineCellWrap.isSaving::after {
-      content: "...";
-      position: absolute;
-      right: -14px;
-      color: #64748B;
-      font-size: 10px;
-      font-weight: 900;
-    }
-
-    .nfPreviewPanel {
-      position: sticky;
-      top: 10px;
-      width: 300px;
-      margin: 0;
-      padding: 12px;
-      overflow: hidden;
-      background: #FFFFFF;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
-    }
-
-    .nfPreviewHead {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .nfPreviewHead h3 {
-      margin: 0;
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 950;
-      text-transform: uppercase;
-    }
-
-    .nfClosePreview {
-      border: 0;
-      background: transparent;
-      color: #64748B;
-      font-size: 22px;
-      line-height: 1;
-      cursor: pointer;
-    }
-
-    .nfProductBadge {
-      display: inline-flex;
-      align-items: center;
-      margin-bottom: 8px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      background: #16A34A;
-      color: #FFFFFF;
-      font-size: 10px;
-      font-weight: 950;
-    }
-
-    .nfArtCard {
-      position: relative;
-      width: 240px;
-      height: 429px;
-      margin: 0 auto;
-      overflow: hidden;
-      border-radius: 12px;
-      background: #1F2937;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, .20);
-      color: #FFFFFF;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .nfArtScale {
-      position: absolute;
-      inset: 0;
-      width: 380px;
-      height: 680px;
-      transform: scale(.63158);
-      transform-origin: top left;
-    }
-
-    .nfArtScale .previewBg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border: 0;
-      outline: 0;
-    }
-
-    .nfArtScale .previewColeta,
-    .nfArtScale .previewDescarga,
-    .nfArtScale .previewProduct,
-    .nfArtScale .previewPrice,
-    .nfArtScale .previewNote,
-    .nfArtScale .previewContacts {
-      z-index: 2;
-    }
-
-    .nfArtScale .previewColeta {
-      position: absolute;
-      top: 185px;
-      left: 32px;
-      width: 215px;
-      text-align: center;
-    }
-
-    .nfArtScale .previewDescarga {
-      position: absolute;
-      top: 265px;
-      left: 32px;
-      width: 215px;
-      text-align: center;
-    }
-
-    .nfArtScale .previewProduct {
-      position: absolute;
-      top: 350px;
-      left: 30px;
-      width: 215px;
-      color: #FFFFFF;
-      text-align: center;
-      font-size: 19px;
-      font-weight: 900;
-      line-height: 1;
-      text-transform: uppercase;
-    }
-
-    .nfArtScale .previewPrice {
-      position: absolute;
-      top: 390px;
-      left: 32px;
-      width: 215px;
-      color: #FFFFFF;
-      text-align: center;
-      font-size: 26px;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .nfArtScale .previewContacts {
-      position: absolute;
-      top: 455px;
-      left: 58px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      width: 200px;
-    }
-
-    .nfArtScale .previewNote {
-      position: absolute;
-      top: 560px;
-      left: 32px;
-      width: 215px;
-      color: #FFFFFF;
-      text-align: center;
-      font-size: 11px;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-
-    .nfArtScale .previewValue {
-      color: #FFFFFF;
-      font-size: 21px;
-      font-weight: 900;
-      line-height: 1;
-      text-transform: uppercase;
-    }
-
-    .nfArtScale .previewSmall {
-      margin-top: 4px;
-      color: #FFFFFF;
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .nfArtScale .previewContactLine {
-      overflow: hidden;
-      color: #FFFFFF;
-      font-size: 10px;
-      font-weight: 800;
-      line-height: 1.05;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .nfArtScale .previewValue,
-    .nfArtScale .previewSmall,
-    .nfArtScale .previewProduct,
-    .nfArtScale .previewPrice,
-    .nfArtScale .previewNote,
-    .nfArtScale .previewContactLine {
-      text-shadow:
-        0 2px 4px rgba(0, 0, 0, .85),
-        0 0 6px rgba(0, 0, 0, .50);
-    }
+    .topbar .actions a.icon-btn{ text-decoration:none; }
 
-    .nfPreviewButtons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 10px;
+    .topbar-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
     }
 
-    .nfPreviewButtons button {
-      height: 32px;
-      border: 1px solid #D1D5DB;
-      border-radius: 9px;
-      font-size: 10px;
-      font-weight: 950;
-      cursor: pointer;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:220px;
     }
 
-    .nfPreviewButtons .green,
-    .nfPreviewButtons .wa {
-      background: #16A34A;
-      border-color: #16A34A;
-      color: #FFFFFF;
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-left:auto;
+      flex-wrap:wrap;
     }
 
-    .nfPreviewButtons .blue {
-      background: #1D4ED8;
-      border-color: #1D4ED8;
-      color: #FFFFFF;
+    .hero .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:14px;
+      margin-top:16px;
     }
 
-    .nfPreviewButtons .wa {
-      grid-column: 1 / -1;
+    @media (max-width: 900px){
+      .hero .grid{ grid-template-columns: 1fr; }
     }
 
-    .nfReadyMsg {
-      margin-top: 10px;
-      padding: 10px;
-      border: 1px solid #E5E7EB;
-      border-radius: 12px;
-      background: #F8FAFC;
-      color: var(--text);
-      font-size: 11px;
-      line-height: 1.35;
+    .hero .card{
+      min-height: 112px;
+      display:flex;
+      align-items:center;
+      gap:14px;
     }
 
-    .nfReadyMsg textarea {
-      width: 100%;
-      min-height: 120px;
-      margin-top: 6px;
-      padding: 8px;
-      border: 1px solid #D1D5DB;
-      border-radius: 9px;
-      background: #FFFFFF;
-      color: var(--text);
-      font-size: 10px;
-      text-transform: none;
+    .hero .card-left{
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
 
-    #modal {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(0, 0, 0, .55);
+    .hero .tile{
+      width:64px;
+      height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:18px;
+      background: rgba(255,255,255,.12);
       backdrop-filter: blur(6px);
     }
 
-    .modalCard {
-      position: relative;
-      width: min(980px, 100%);
-      overflow: hidden;
-      background: #FFFFFF;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      box-shadow: 0 18px 45px rgba(0, 0, 0, .28);
+    .hero .card-right h3{ margin:0 0 4px; }
+    .hero .card-right p{ margin:0; opacity:.9; }
+
+    .badge{
+      margin-left:6px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:18px;
+      height:18px;
+      padding:0 6px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
     }
 
-    .modalHead {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--line);
-      background: #F8FAFC;
+    /* Solicitações no topo */
+    .sumCard{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(17,26,51,.70);
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      transition:transform .12s ease, filter .12s ease;
+      min-width:190px;
+      appearance:none;
+      -webkit-appearance:none;
     }
 
-    .modalHead h2 {
-      margin: 0;
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 950;
+    .sumCard:hover{
+      transform:translateY(-2px);
+      filter:brightness(1.06);
     }
 
-    .iconClose {
-      width: 34px;
-      height: 34px;
-      border: 1px solid #D1D5DB;
-      border-radius: 12px;
-      background: #FFFFFF;
-      color: var(--text);
-      font-weight: 900;
-      cursor: pointer;
+    .sumIcon{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      display:grid;
+      place-items:center;
+      font-size:18px;
+      flex:0 0 auto;
     }
 
-    .modalBody {
-      max-height: calc(100vh - 220px);
-      padding: 14px;
-      overflow: auto;
+    .sumTxt{
+      display:flex;
+      flex-direction:column;
+      line-height:1.15;
     }
 
-    .grid2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+    .sumTitle{
+      font-weight:950;
+      font-size:13px;
     }
 
-    .field label {
-      display: block;
-      margin: 0 0 6px;
-      color: var(--text);
-      font-size: 11px;
-      font-weight: 900;
+    .sumValue{
+      margin-top:2px;
+      font-weight:1000;
+      opacity:.92;
+    }
+
+    .sumGold{
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color:#1a1a1a;
+  border:1px solid rgba(255,215,0,.6);
+  box-shadow:
+    0 0 12px rgba(255,215,0,.4),
+    0 0 24px rgba(255,165,0,.25);
+}
+
+.sumGold .sumIcon{
+  background: rgba(0,0,0,.15);
+  border:1px solid rgba(255,255,255,.25);
+}
+
+.sumGold:hover{
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.15);
+  box-shadow:
+    0 0 18px rgba(255,215,0,.6),
+    0 0 32px rgba(255,165,0,.35);
+}
+
+    .topSolicWrap{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-left:auto;
+      margin-right:6px;
+    }
+
+    @media (max-width: 1100px){
+      .topSolicWrap{
+        order:3;
+        width:100%;
+        justify-content:flex-start;
+        margin:0;
+      }
+    }
+
+    /* Modal */
+    #homeSolicModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(8px);
+      padding:18px;
+    }
+
+    #homeSolicModal.isOpen{ display:flex; }
+
+    .modalCard{
+      width:min(980px, 100%);
+      border-radius:18px;
+      background:rgba(17,26,51,.92);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 18px 55px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+
+    .modalHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 14px;
+      background:rgba(255,255,255,.06);
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+
+    .modalHead h2{
+      margin:0;
+      font-size:14px;
+      font-weight:1000;
+      color:var(--text);
+    }
+
+    .iconClose{
+      width:36px;
+      height:36px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:1000;
+    }
+
+    .modalBody{
+      padding:14px;
+      max-height:calc(100vh - 220px);
+      overflow:auto;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    @media (max-width: 900px){
+      .grid2{ grid-template-columns:1fr; }
+    }
+
+    .field label{
+      display:block;
+      font-size:11px;
+      font-weight:950;
+      color:rgba(233,238,252,.92);
+      margin:0 0 6px;
     }
 
     .field input,
     .field select,
-    .field textarea {
-      width: 100%;
-      height: 32px;
-      padding: 5px 10px;
-      border: 1px solid #D1D5DB;
-      border-radius: 12px;
-      background: #FFFFFF;
-      color: #111827;
-      outline: none;
-      font-size: 12px;
+    .field textarea{
+      width:100%;
+      border-radius:12px;
+      padding:10px 10px;
+      outline:none;
+      color:var(--text);
+      background:rgba(13,20,48,.65);
+      border:1px solid rgba(255,255,255,.14);
     }
 
-    .field textarea {
-      height: auto;
-      min-height: 72px;
-      resize: vertical;
+    .field textarea{
+      min-height:110px;
+      resize:vertical;
     }
 
-    .modalFoot {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      padding: 12px 14px;
-      border-top: 1px solid var(--line);
-      background: #F8FAFC;
+    .field input[readonly]{
+      opacity:.92;
+      cursor:default;
     }
 
-    .nfModalLoading {
-      position: absolute;
-      inset: 0;
-      z-index: 20;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: rgba(255, 255, 255, .88);
-      backdrop-filter: blur(4px);
+    .modalFoot{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      padding:12px 14px;
+      border-top:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06);
     }
 
-    .nfModalLoading.show {
-      display: flex;
+    .btnAdmin{
+      height:38px;
+      padding:0 14px;
+      border-radius:12px;
+      border:1px solid rgba(91,124,250,.60);
+      background:rgba(27,42,90,.75);
+      color:var(--text);
+      font-weight:900;
+      cursor:pointer;
+      transition:filter .12s ease, transform .12s ease, opacity .12s ease;
     }
 
-    .nfModalLoadingBox {
-      min-width: 260px;
-      max-width: 360px;
-      padding: 24px 22px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: #FFFFFF;
-      box-shadow: 0 18px 45px rgba(15, 23, 42, .18);
-      color: var(--text);
-      text-align: center;
+    .btnAdmin:hover{
+      filter:brightness(1.06);
     }
 
-    .nfModalSpinner {
-      width: 58px;
-      height: 58px;
-      margin: 0 auto 14px;
-      border: 8px solid #E2E8F0;
-      border-top-color: #1D9BF0;
-      border-right-color: #1D9BF0;
-      border-radius: 50%;
-      animation: nfSpin .85s linear infinite;
+    .btnAdmin:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+      transform:none;
     }
 
-    .nfModalLoadingTitle {
-      color: #1D9BF0;
-      font-size: 17px;
-      font-weight: 950;
-      line-height: 1.2;
-    }
-
-    .nfModalLoadingSub {
-      margin-top: 6px;
-      color: #64748B;
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.35;
-    }
-
-    .nfModalProgress {
-      width: 100%;
-      height: 5px;
-      margin-top: 16px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: #E5E7EB;
-    }
-
-    .nfModalProgress::before {
-      content: "";
-      display: block;
-      width: 42%;
-      height: 100%;
-      border-radius: 999px;
-      background: #1D9BF0;
-      animation: nfProgress 1.1s ease-in-out infinite;
-    }
-
-    @keyframes nfSpin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes nfProgress {
-      0% {
-        transform: translateX(-110%);
-      }
-
-      100% {
-        transform: translateX(250%);
-      }
-    }
-
-    @media (max-width: 1250px) {
-      .fretes-workspace {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .nfPreviewPanel {
-        position: relative;
-        top: auto;
-        width: 100%;
-      }
-    }
-
-    @media (max-width: 1100px) {
-      .ft-actions.top-actions {
-        width: 100%;
-        margin-left: 0;
-        justify-content: flex-start;
-      }
-    }
-
-    @media (max-width: 900px) {
-      .container.nfWide.pageFretes {
-        padding: 8px;
-      }
-
-      .ft-select,
-      .ft-search,
-      .ft-search-wide {
-        width: 100%;
-        max-width: none;
-        flex: 1 1 100%;
-      }
-
-      .ft-actions {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .grid2 {
-        grid-template-columns: 1fr;
-      }
-
-      .tableWrap {
-        height: auto;
-        min-height: 420px;
-      }
+    .btnAdmin.ghost{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
     }
   </style>
 </head>
@@ -986,591 +313,178 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <a class="burger" href="./home.html" title="Voltar">🏠</a>
+        <div class="burger" title="Menu">🏠</div>
+        <img src="../assets/img/roca-logo.png" alt="ROCA LOG" />
+      </div>
 
-        <img
-          src="../assets/img/roca-logo.png"
-          alt="T3L / ROCA"
-        >
+      <div class="topSolicWrap">
+        <button class="sumCard sumGold" id="homeSolicCard" type="button">
+          <div class="sumIcon">📋</div>
+          <div class="sumTxt">
+            <div class="sumTitle">Solicitações</div>
+            <div class="sumValue"><span id="homeSolicOpen">0</span> abertas</div>
+          </div>
+        </button>
       </div>
 
       <div class="actions">
-        <div class="icon-btn" title="Sair" data-logout>↩️</div>
+        <a class="icon-btn" href="./config.html" title="Configurações" aria-label="Configurações">⚙️</a>
+        <div class="icon-btn" title="Sair" data-logout aria-label="Sair">SAIR</div>
       </div>
     </div>
   </div>
 
-  <div class="container nfWide pageFretes">
-
-    <div class="fretes-top">
-      <div class="title">
-        <h1>
-          Fretes (Operacional)
-
-          <span
-            id="syncStatus"
-            data-sync-status
-            style="font-size:11px;opacity:.7;margin-left:8px;"
-          >
-            🔄 Carregando...
-          </span>
-        </h1>
-
-        <div class="sub">
-          Permissão Frete Mínimo: indica quais tipos (eixos) atendem ao piso mínimo ANTT por embarque.
-          <b>Dados sincronizados com Google Sheets em tempo real.</b>
-        </div>
-      </div>
-    </div>
-
-    <div class="fretes-toolbar">
-
-      <div class="ft-row">
-        <span class="ft-label">Pesos:</span>
-
-        <div class="ft-mini">
-          <span>9E</span>
-          <input id="w9" type="number" step="0.01" value="47">
-        </div>
-
-        <div class="ft-mini">
-          <span>4E</span>
-          <input id="w4" type="number" step="0.01" value="39">
-        </div>
-
-        <div class="ft-mini">
-          <span>7E</span>
-          <input id="w7" type="number" step="0.01" value="36">
-        </div>
-
-        <div class="ft-mini">
-          <span>6E</span>
-          <input id="w6" type="number" step="0.01" value="31">
-        </div>
-
-        <div class="ft-mini">
-          <span>5E</span>
-          <input id="w5" type="number" step="0.01" value="26">
-        </div>
-
-        <button class="btnTiny" id="btnSaveWeights" type="button">
-          Salvar
-        </button>
-
-        <button class="btnTiny ghost" id="btnResetWeights" type="button">
-          Reset
-        </button>
-
-        <div class="ft-actions top-actions">
-
-          <button
-            class="btnTiny"
-            id="btnReloadFromSheets"
-            data-action="atualizar"
-            type="button"
-          >
-            🔄 Atualizar
-          </button>
-
-          <button
-            class="btnTiny blue"
-            id="btnOrdemOffline"
-            type="button"
-          >
-            📄 Ordem Offline
-          </button>
-
-          <button
-            class="btnTiny gold"
-            id="btnDivulgacaoFrete"
-            type="button"
-          >
-            DIVULGAÇÃO DE FRETE
-          </button>
-
-          <button
-            class="btnTiny blue"
-            id="btnShareClientes"
-            type="button"
-          >
-            Compartilhar com Clientes
-          </button>
-
-          <button
-            class="btnTiny green"
-            id="btnNew"
-            data-action="novo"
-            type="button"
-          >
-            + Novo
-          </button>
-
-        </div>
+  <div id="homeSolicModal" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="homeSolicTitle">
+      <div class="modalHead">
+        <h2 id="homeSolicTitle">Nova Solicitação</h2>
+        <button class="iconClose" id="homeSolicClose" type="button">✕</button>
       </div>
 
-      <div class="ft-row">
+      <div class="modalBody">
+        <div class="grid2">
+          <div class="field">
+            <label>Filial</label>
+            <select id="hsFilial"></select>
+          </div>
 
-        <select class="ft-select" id="fRegional" title="Regional">
-          <option value="">Todas as regionais</option>
-        </select>
+          <div class="field">
+            <label>Tipo (editável)</label>
+            <input id="hsTipo" placeholder="Ex: CHEQUES / MANUTENÇÃO / TONER..." />
+          </div>
 
-        <select class="ft-select" id="fFilial" title="Filial">
-          <option value="">Todas as filiais</option>
-        </select>
+          <div class="field">
+            <label>Data</label>
+            <input id="hsData" placeholder="dd/mm/aaaa" />
+          </div>
 
-        <select class="ft-select" id="fContato" title="Contato">
-          <option value="">Todos os contatos</option>
-        </select>
+          <div class="field">
+            <label>Status</label>
+            <select id="hsStatus">
+              <option value="ABERTA">ABERTA</option>
+              <option value="EM ANDAMENTO">EM ANDAMENTO</option>
+              <option value="FINALIZADA">FINALIZADA</option>
+            </select>
+          </div>
 
-        <input
-          class="ft-search ft-search-wide"
-          id="fBusca"
-          placeholder="Buscar (cliente, origem, destino, produto, contato)..."
-        >
-      </div>
-    </div>
+          <div class="field" style="grid-column:1/-1;">
+            <label>Observação</label>
+            <textarea id="hsObs" placeholder="Descreva o pedido..."></textarea>
+          </div>
 
-    <div class="fretes-workspace">
-
-      <div class="card tableFull">
-
-        <div class="tableWrap">
-          <table>
-
-            <thead>
-              <tr>
-
-                <th>
-                  <input
-                    type="checkbox"
-                    id="nfSelectAll"
-                    class="nfRowCheck"
-                    title="Selecionar todos"
-                  >
-                </th>
-
-                <th>Regional</th>
-                <th>Filial</th>
-                <th>Cliente</th>
-                <th>Origem</th>
-                <th>Coleta</th>
-                <th>Contato</th>
-                <th>Destino</th>
-                <th>UF</th>
-                <th>Descarga</th>
-                <th class="num">Volume</th>
-                <th class="num">Vlr. Empresa</th>
-                <th class="num">Vlr. Motorista</th>
-                <th class="num">KM</th>
-                <th class="num">Pedágio/Eixo</th>
-                <th class="num">5E</th>
-                <th class="num">6E</th>
-                <th class="num">7E</th>
-                <th class="num">4E</th>
-                <th class="num">9E</th>
-                <th>Produto</th>
-                <th>ICMS</th>
-                <th class="num">Margem</th>
-                <th class="num">Porta</th>
-                <th class="num">Trânsito</th>
-                <th>Status</th>
-                <th>Observações</th>
-                <th class="thUltimaAlteracao">Última Alteração</th>
-                <th class="num thAcoes">Ações</th>
-
-              </tr>
-            </thead>
-
-            <tbody id="tbody"></tbody>
-
-          </table>
-        </div>
-
-      </div>
-
-      <aside class="nfPreviewPanel" id="nfPreviewPanel">
-
-        <div class="nfPreviewHead">
-
-          <h3>Prévia da Divulgação</h3>
-
-          <button
-            class="nfClosePreview"
-            id="nfClosePreview"
-            type="button"
-            title="Fechar prévia"
-          >
-            ×
-          </button>
-
-        </div>
-
-        <div
-          class="nfProductBadge"
-          id="nfPreviewProdutoBadge"
-        >
-          SOJA
-        </div>
-
-        <div class="nfArtCard" id="nfArtCard">
-
-          <div class="nfArtScale">
-
-            <img
-              class="previewBg"
-              id="nfArtBg"
-              src="../assets/img/SOJATESTE.png"
-              alt=""
-            >
-
-            <div class="previewColeta">
-              <div
-                class="previewValue"
-                id="nfArtColetaCidade"
-              ></div>
-
-              <div
-                class="previewSmall"
-                id="nfArtColetaLocal"
-              ></div>
-            </div>
-
-            <div class="previewDescarga">
-
-              <div
-                class="previewValue"
-                id="nfArtDescargaCidade"
-              ></div>
-
-              <div
-                class="previewSmall"
-                id="nfArtDescargaLocal"
-              ></div>
-
-            </div>
-
-            <div
-              class="previewProduct"
-              id="nfArtProduto"
-            ></div>
-
-            <div
-              class="previewPrice"
-              id="nfArtValor"
-            ></div>
-
-            <div
-              class="previewNote"
-              id="nfArtObs"
-            ></div>
-
-            <div class="previewContacts">
-
-              <div
-                class="previewContactLine"
-                id="nfArtContato1"
-              ></div>
-
-              <div
-                class="previewContactLine"
-                id="nfArtContato2"
-              ></div>
-
-              <div
-                class="previewContactLine"
-                id="nfArtContato3"
-              ></div>
-
-              <div
-                class="previewContactLine"
-                id="nfArtContato4"
-              ></div>
-
-            </div>
-
+          <div class="field" style="grid-column:1/-1;">
+            <label>Solicitante</label>
+            <input id="hsSolicitante" readonly />
           </div>
         </div>
+      </div>
 
-        <div class="nfPreviewButtons">
-
-          <button
-            class="green"
-            id="nfBaixarJPG"
-            type="button"
-          >
-            ⬇ BAIXAR JPG
-          </button>
-
-          <button
-            class="blue"
-            id="nfCopiarImagem"
-            type="button"
-          >
-            ▣ COPIAR IMAGEM
-          </button>
-
-          <button
-            class="wa"
-            id="nfEnviarWhatsapp"
-            type="button"
-          >
-            🟢 ENVIAR POR WHATSAPP
-          </button>
-
-        </div>
-
-        <div class="nfReadyMsg">
-
-          <b>MENSAGEM PRONTA</b>
-
-          <textarea
-            id="nfMensagemPronta"
-            readonly
-          ></textarea>
-
-          <button
-            class="btnTiny blue"
-            id="nfCopiarMensagem"
-            type="button"
-            style="width:100%;margin-top:10px;"
-          >
-            COPIAR MENSAGEM
-          </button>
-
-        </div>
-
-      </aside>
-    </div>
-
-    <div id="modal" aria-hidden="true">
-
-      <div
-        class="modalCard"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modalTitle"
-      >
-
-        <div class="modalHead">
-
-          <h2 id="modalTitle">
-            Novo Frete
-          </h2>
-
-          <button
-            class="iconClose"
-            id="btnCloseModal"
-            type="button"
-            title="Fechar"
-          >
-            ✕
-          </button>
-
-        </div>
-
-        <div class="modalBody">
-
-          <div class="grid2">
-
-            <div class="field">
-              <label for="mRegional">Regional</label>
-              <select id="mRegional"></select>
-            </div>
-
-            <div class="field">
-              <label for="mFilial">Filial</label>
-              <select id="mFilial"></select>
-            </div>
-
-            <div class="field">
-              <label for="mCliente">Cliente</label>
-              <select id="mCliente"></select>
-            </div>
-
-            <div class="field">
-              <label for="mContato">
-                Contato (Responsável da Filial)
-              </label>
-
-              <select id="mContato"></select>
-            </div>
-
-            <div class="field">
-              <label for="mOrigem">Origem</label>
-              <input id="mOrigem">
-            </div>
-
-            <div class="field">
-              <label for="mColeta">Coleta</label>
-              <input id="mColeta">
-            </div>
-
-            <div class="field">
-              <label for="mDestino">Destino</label>
-              <input id="mDestino">
-            </div>
-
-            <div class="field">
-              <label for="mUF">UF</label>
-              <input id="mUF">
-            </div>
-
-            <div class="field">
-              <label for="mDescarga">Descarga</label>
-              <input id="mDescarga">
-            </div>
-
-            <div class="field">
-              <label for="mProduto">Produto</label>
-              <input id="mProduto">
-            </div>
-
-            <div class="field">
-              <label for="mKM">KM</label>
-              <input id="mKM" inputmode="decimal">
-            </div>
-
-            <div class="field">
-              <label for="mPed">Pedágio/Eixo</label>
-              <input id="mPed" inputmode="decimal">
-            </div>
-
-            <div class="field">
-              <label for="mVolume">Volume</label>
-              <input id="mVolume" inputmode="decimal">
-            </div>
-
-            <div class="field">
-              <label for="mICMS">ICMS</label>
-              <input id="mICMS" inputmode="decimal">
-            </div>
-
-            <div class="field">
-              <label for="mEmpresa">Vlr. Empresa</label>
-              <input id="mEmpresa" inputmode="decimal">
-            </div>
-
-            <div class="field">
-              <label for="mMotorista">Vlr. Motorista</label>
-              <input id="mMotorista" inputmode="decimal">
-            </div>
-
-            <div class="field">
-              <label for="mSat">Pedido SAT</label>
-              <input id="mSat">
-            </div>
-
-            <div class="field">
-              <label for="mPorta">Porta</label>
-              <input id="mPorta">
-            </div>
-
-            <div class="field">
-              <label for="mTransito">Trânsito</label>
-              <input id="mTransito">
-            </div>
-
-            <div class="field">
-              <label for="mStatus">Status</label>
-
-              <select id="mStatus">
-                <option value="LIBERADO">LIBERADO</option>
-                <option value="FINALIZANDO">FINALIZANDO</option>
-                <option value="SUSPENSO">SUSPENSO</option>
-              </select>
-
-            </div>
-
-            <div
-              class="field"
-              style="grid-column:1 / -1;"
-            >
-              <label for="mObs">Observações</label>
-              <textarea id="mObs"></textarea>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="modalFoot">
-
-          <button
-            class="btnTiny ghost"
-            id="btnCancel"
-            type="button"
-          >
-            Cancelar
-          </button>
-
-          <button
-            class="btnTiny green"
-            id="btnSave"
-            type="button"
-          >
-            Salvar Frete
-          </button>
-
-        </div>
-
-        <div
-          class="nfModalLoading"
-          id="nfModalLoading"
-          aria-hidden="true"
-        >
-
-          <div
-            class="nfModalLoadingBox"
-            role="status"
-            aria-live="polite"
-          >
-
-            <div
-              class="nfModalSpinner"
-              aria-hidden="true"
-            ></div>
-
-            <div
-              class="nfModalLoadingTitle"
-              id="nfModalLoadingTitle"
-            >
-              Salvando...
-            </div>
-
-            <div
-              class="nfModalLoadingSub"
-              id="nfModalLoadingSub"
-            >
-              Aguarde alguns segundos.
-            </div>
-
-            <div
-              class="nfModalProgress"
-              aria-hidden="true"
-            ></div>
-
-          </div>
-        </div>
-
+      <div class="modalFoot">
+        <button class="btnAdmin ghost" id="homeSolicCancel" type="button">Cancelar</button>
+        <button class="btnAdmin" id="homeSolicSend" type="button">Salvar</button>
       </div>
     </div>
-
   </div>
 
-  <script src="../assets/js/auth.js">
-document.getElementById("btnOrdemOffline")?.addEventListener("click",()=>{
-  window.location.href="./ordem.html";
-});
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-title">Bem-vindo ao <b>Sistema Operacional</b></div>
 
-</script>
+      <div class="hero-sub" id="homeSub">
+        Escolha uma das opções abaixo para continuar
+      </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<div class="grid">
 
-  <script src="../assets/js/fretes.js?v=14"></script>
+  <a class="card theme-blue" data-feature="piso" href="./calculo-piso.html">
+    <div class="card-left">
+      <div class="tile" style="font-size:34px;">📈</div>
+    </div>
+    <div class="card-right">
+      <h3>Cálculo de Piso ANTT</h3>
+      <p>Faça o cálculo do piso mínimo de frete</p>
+    </div>
+  </a>
 
+  <a class="card theme-blue" data-feature="piso2" href="./calculo-antt.html">
+    <div class="card-left">
+      <div class="tile" style="font-size:34px;">📈</div>
+    </div>
+    <div class="card-right">
+      <h3>2-Cálculo de Piso ANTT</h3>
+      <p>Completo - com base no Site</p>
+    </div>
+  </a>
+
+  <a class="card theme-green" data-feature="fretes" href="./fretes.html">
+    <div class="card-left">
+      <div class="tile" style="font-size:40px;">🚛</div>
+    </div>
+    <div class="card-right">
+      <h3>Fretes (Operacional)</h3>
+      <p>Gerencie e atualize os fretes diários</p>
+    </div>
+  </a>
+
+  <a class="card theme-purple" data-feature="share" href="./share-clientes.html">
+    <div class="card-left">
+      <div class="tile" style="font-size:40px;">👥</div>
+    </div>
+    <div class="card-right">
+      <h3>Share Clientes</h3>
+      <p>Compartilhe informações com clientes</p>
+    </div>
+  </a>
+
+   <a class="card theme-gold" data-feature="divulgacao" href="./divulgacao.html">
+    <div class="card-left">
+      <div class="tile" style="font-size:38px;">📣</div>
+    </div>
+    <div class="card-right">
+      <h3>Divulgação</h3>
+      <p>Ferramentas para comunicação e marketing</p>
+    </div>
+  </a>
+</div>
+    </div>
+  </section>
+
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/home-solicitacoes.js"></script>
   <script>
     requireHomeAuth();
     bindLogoutButton();
-  </script>
 
+    window.addEventListener("DOMContentLoaded", () => {
+      const uf = getSelectedState?.() || "";
+      const user = getUser?.() || "";
+      const sub = document.getElementById("homeSub");
+
+      if (sub) {
+        sub.textContent = `Acesso liberado para ${user} | Estado: ${uf}`;
+      }
+
+      const solicitante = document.getElementById("hsSolicitante");
+      if (solicitante) {
+        solicitante.value = String(user || "").toUpperCase();
+      }
+
+      const data = document.getElementById("hsData");
+      if (data && !data.value) {
+        const agora = new Date();
+        const dd = String(agora.getDate()).padStart(2, "0");
+        const mm = String(agora.getMonth() + 1).padStart(2, "0");
+        const yy = agora.getFullYear();
+        data.value = `${dd}/${mm}/${yy}`;
+      }
+
+      document.querySelectorAll("[data-feature]").forEach((card) => {
+        const feature = card.getAttribute("data-feature");
+        if (typeof canAccessFeature === "function" && !canAccessFeature(feature)) {
+          card.style.display = "none";
+        }
+      });
+    });
+  </script>
 </body>
 </html>
