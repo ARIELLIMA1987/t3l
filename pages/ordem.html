@@ -659,7 +659,7 @@
 <!-- HEADER SECTOR (Ref: Image Section 1) -->
 <div class="grid grid-cols-1 md:grid-cols-2 border-b border-outline">
 <div class="p-6 flex items-center justify-center md:border-r border-outline bg-surface-container-low">
-<img class="w-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgQxERrd_f6nqKVQsXrtUGmy9nLCFOMg14En51CLtzur1s6mIvp-bz1XDpVlDcHrSlXwcT3xIkWc8oUBch_mhp00Rk8Liw7tLVkicran5UCP4rQdvvVuhCBPsw3NLPH1X-Rw3iMTw_uNCAWhmHbwlr4Ww5qfH5Vti45FPU64Vebte60n0-DRFW5w30a1iLkyJ8r-3t_FXgok5OZZLO-D4sJBeXA-jEd7-qpiKTst7gkNyt4LhUVQJT3jTadIWmz3y_k_TuvuDcTFmI" alt="ROCA LOG">
+<img class="w-full object-contain" src="roca-logo.png" alt="ROCA LOG">
 </div>
 <div class="p-6 flex flex-col justify-center text-center md:text-left space-y-1">
   <h3 id="empresaNome" class="font-headline-sm text-headline-sm text-primary uppercase">ROCA LOG</h3>
@@ -1055,7 +1055,7 @@
 
         <div class="ps-company">
           <div class="ps-logo">
-            <img src="../assets/img/logo-roca.png" alt="ROCA LOG">
+            <img src="roca-logo.png" alt="ROCA LOG">
           </div>
 
           <div class="ps-company-info">
@@ -1149,7 +1149,7 @@
 
   function imprimirDuasVias(){
     prepararDuasViasParaImpressao();
-    requestAnimationFrame(() => window.print());
+    setTimeout(() => {try{window.print();}catch(e){console.error(e);}},100);
   }
 
   document.getElementById("ordemEditavel")?.addEventListener("input", prepararDuasViasParaImpressao);
