@@ -1297,6 +1297,7 @@
         <td>${escapeHtml(row.descarga)}</td>
         <td>${escapeHtml(row.produto)}</td>
         <td class="freteCol">${escapeHtml(formatMoneyBR(row.valorMotorista))}</td>
+        <td>${escapeHtml(row.observações)}</td>
         <td>${escapeHtml(row.contato)}</td>
       </tr>
     `).join("");
