@@ -18,14 +18,12 @@
     ],
     contatosPorFilial: {
       "RIO VERDE": [{ nome: "ARIEL", fone: "5564992277537" }],
-      "ANAPOLIS": [{ nome: "ARIEL", fone: "5564992277537" }]
     }
   };
 
   const FILIAIS_CONTATOS_ARTE = {
     RIOVERDE: [
-      "ARIEL (64) 99227-7537",
-    ],
+      "ARIEL (64) 99227-7537",],
   };
 
   const CONTACT_PHONE = (() => {
