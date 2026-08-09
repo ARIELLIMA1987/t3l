@@ -9,7 +9,7 @@
     regionais: ["GOIAS"],
     filiaisPorRegional: {
       GOIAS: [
-        "RIO VERDE ", "ANAPOLIS"
+        "RIO VERDE ",
       ],
     },
     clientes: [
