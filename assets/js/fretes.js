@@ -128,24 +128,7 @@
   };
 
   const FIXED_CONTACT_COLORS = {
-    ARIEL: { bg: "#DBEAFE", fg: "#1D4ED8" },
-    ROBSON: { bg: "#DCFCE7", fg: "#15803D" },
-    SERGIO: { bg: "#FEF3C7", fg: "#B45309" },
-    EVERALDO: { bg: "#EDE9FE", fg: "#6D28D9" },
-    FABIOLA: { bg: "#FCE7F3", fg: "#BE185D" },
-    RAFAEL: { bg: "#E0F2FE", fg: "#0369A1" },
-    JHONATAN: { bg: "#FFE4E6", fg: "#BE123C" },
-    KIEWERSON: { bg: "#ECFCCB", fg: "#4D7C0F" },
-    RONE: { bg: "#F3E8FF", fg: "#7E22CE" },
-    RICARDO: { bg: "#FDE68A", fg: "#92400E" },
-    GUILHERME: { bg: "#D1FAE5", fg: "#047857" },
-    NARCISO: { bg: "#E2E8F0", fg: "#334155" },
-    ALFREDO: { bg: "#FEE2E2", fg: "#B91C1C" },
-    MATEUS: { bg: "#CCFBF1", fg: "#0F766E" },
-    FHELLIPE: { bg: "#F5D0FE", fg: "#A21CAF" },
-    "EVERALDO JR": { bg: "#CFFAFE", fg: "#0E7490" },
-    DIOGO: { bg: "#DCFCE7", fg: "#15803D" },
-  };
+    ARIEL: { bg: "#DBEAFE", fg: "#1D4ED8" },};
 
   const FIXED_PRODUCT_COLORS = {
     SOJA: { bg: "#FEF3C7", fg: "#B45309" },
