@@ -25,7 +25,6 @@
   const FILIAIS_CONTATOS_ARTE = {
     RIOVERDE: [
       "ARIEL (64) 99227-7537",
-      "MARCOS VINICIUS (64) 99928-0210",
     ],
   };
 
