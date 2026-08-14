@@ -1,474 +1,1571 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!-- fretes.html -->
+<!doctype html>
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fretes (Operacional) | T3L Transportes</title>
-  <link rel="stylesheet" href="../assets/css/app.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fretes | ROCA LOG</title>
+
+  <link rel="stylesheet" href="../assets/css/app.css">
 
   <style>
-    * {
+    :root {
+      --bg: #F5F7FA;
+      --panel: #FFFFFF;
+      --line: #E5E7EB;
+      --text: #0F172A;
+      --muted: #64748B;
+      --navy: #0F172A;
+      --blue: #102A6B;
+      --green: #0B3B2E;
+      --gold: #8A6A12;
+    }
+
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
       margin: 0;
-      padding: 0;
     }
 
     body {
-      background-color: #0b1020;
-      color: #e9eefc;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      padding-bottom: 40px;
+      overflow-x: hidden;
     }
 
-    .topbar {
-      background: rgba(12, 16, 26, 0.9);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 12px 24px;
+    input,
+    select,
+    textarea {
+      text-transform: uppercase;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .container.nfWide.pageFretes {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .topbar h2 {
-      font-size: 1.2rem;
-      color: #f59e0b;
-      letter-spacing: 0.5px;
-    }
-
-    .layout-fretes {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
-      padding: 20px;
-      max-width: 1600px;
-      margin: 0 auto;
-      align-items: start;
-    }
-
-    @media (max-width: 1200px) {
-      .layout-fretes {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Painel da Tabela */
-    .painel-tabela {
-      background: rgba(18, 26, 52, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 16px;
-      overflow-x: auto;
-    }
-
-    .tabela-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    table.tabela-fretes {
+      flex-direction: column;
+      gap: 8px;
       width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      text-align: left;
+      max-width: none !important;
+      min-height: calc(100vh - 72px);
+      margin: 0;
+      padding: 10px 12px 14px;
+      background: var(--bg);
     }
 
-    table.tabela-fretes th {
-      background: rgba(13, 20, 48, 0.85);
-      padding: 10px 8px;
-      color: #94a3b8;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    .fretes-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      width: 100%;
+      margin: 0;
+      padding: 10px 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+    }
+
+    .fretes-top .title {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .fretes-top .title h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      color: var(--text);
+    }
+
+    .fretes-top .title .sub {
+      max-width: 1100px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: rgba(17, 24, 39, .72);
+    }
+
+    .fretes-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      width: 100%;
+      margin: 0;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+    }
+
+    .ft-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .ft-label {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 2px;
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .ft-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .ft-mini input {
+      width: 60px;
+      height: 28px;
+      margin: 0;
+      padding: 3px 6px;
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      background: #FFFFFF;
+      color: #111827;
+      outline: none;
+      font-size: 10px;
+    }
+
+    .ft-mini input:focus,
+    .ft-select:focus,
+    .ft-search:focus,
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus,
+    .inlineCellInput:focus {
+      border-color: #5B7CFA;
+      box-shadow: 0 0 0 3px rgba(91, 124, 250, .18);
+    }
+
+    .ft-select,
+    .ft-search {
+      height: 30px;
+      margin: 0;
+      padding: 4px 9px;
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      background: #FFFFFF;
+      color: #111827;
+      outline: none;
+      font-size: 10px;
+    }
+
+    .ft-select {
+      width: 200px;
+      flex: 0 0 200px;
+    }
+
+    .ft-search,
+    .ft-search-wide {
+      min-width: 240px;
+      flex: 1 1 420px;
+      max-width: none;
+    }
+
+    .ft-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .ft-actions.top-actions {
+      margin-left: auto;
+    }
+
+    .btnTiny {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 28px;
+      margin: 0;
+      padding: 0 10px;
+      border: 1px solid rgba(15, 23, 42, .14);
+      border-radius: 8px;
+      background: var(--navy);
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
       white-space: nowrap;
     }
 
-    table.tabela-fretes td {
-      padding: 10px 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    .btnTiny:hover {
+      filter: brightness(1.06);
+    }
+
+    .btnTiny:disabled,
+    .iconClose:disabled {
+      cursor: not-allowed;
+      opacity: .65;
+      filter: grayscale(.1);
+    }
+
+    .btnTiny.ghost {
+      background: #FFFFFF;
+      color: var(--text);
+      border-color: #D1D5DB;
+    }
+
+    .btnTiny.green {
+      background: var(--green);
+      color: #FFFFFF;
+    }
+
+    .btnTiny.blue {
+      background: var(--blue);
+      color: #FFFFFF;
+    }
+
+    .btnTiny.gold {
+      background: var(--gold);
+      color: #FFFFFF;
+    }
+
+    .fretes-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 12px;
+      align-items: start;
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+    }
+
+    .fretes-workspace.preview-hidden {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fretes-workspace.preview-hidden .nfPreviewPanel {
+      display: none;
+    }
+
+    .card.tableFull {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: calc(100vh - 220px);
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+    }
+
+    .tableWrap {
+      flex: 1 1 auto;
+      width: 100%;
+      height: calc(100vh - 235px);
+      min-height: 480px;
+      overflow: auto;
+      border: 0;
+      border-radius: 0;
+      background: #FFFFFF;
+    }
+
+    .tableWrap table {
+      width: 100%;
+      min-width: 1700px;
+      border-collapse: collapse;
+      background: #FFFFFF;
+    }
+
+    .tableWrap th,
+    .tableWrap td {
+      padding: 4px 8px;
+      border-bottom: 1px solid #D1D5DB;
+      color: #111827;
+      font-size: 11px;
+      line-height: 1.15;
       vertical-align: middle;
       white-space: nowrap;
     }
 
-    table.tabela-fretes tr:hover {
-      background: rgba(255, 255, 255, 0.04);
+    .tableWrap thead th {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      padding: 6px 8px;
+      background: var(--navy);
+      color: #FFFFFF;
+      border-bottom: 1px solid #0B1220;
+      font-size: 10px;
+      letter-spacing: .02em;
+    }
+
+    .tableWrap tbody tr:nth-child(even) {
+      background: #F1F4F9;
+    }
+
+    .tableWrap tbody tr:hover {
+      background: #E8EDFF;
+    }
+
+    .num {
+      text-align: right;
+    }
+
+    .groupRow td {
+      position: sticky;
+      top: 29px;
+      z-index: 3;
+      padding: 6px 8px;
+      background: var(--navy) !important;
+      color: #FFFFFF !important;
+      font-weight: 900;
+      letter-spacing: .02em;
+      border-bottom: 1px solid #0B1220;
+    }
+
+    .nfRowCheck {
+      width: 16px;
+      height: 16px;
+      accent-color: #2563EB;
       cursor: pointer;
     }
 
-    table.tabela-fretes tr.selected {
-      background: rgba(245, 158, 11, 0.15);
-      border-left: 3px solid #f59e0b;
+    .tdUltimaAlteracao {
+      min-width: 118px;
+      color: #334155;
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
     }
 
-    /* Coluna Lateral de Prévia */
-    .painel-lateral {
-      background: rgba(18, 26, 52, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 16px;
+    th.thUltimaAlteracao {
+      min-width: 118px;
+    }
+
+    th.thAcoes {
+      min-width: 116px;
+    }
+
+    .nfActionGroup {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .nfIconBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      background: #FFFFFF;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .nfIconBtn.raio {
+      border-color: #F59E0B;
+      color: #B45309;
+      background: #FFFBEB;
+    }
+
+    .nfIconBtn.eye {
+      border-color: #60A5FA;
+      color: #1D4ED8;
+      background: #EFF6FF;
+    }
+
+    .nfIconBtn.wa {
+      border-color: #22C55E;
+      color: #15803D;
+      background: #F0FDF4;
+    }
+
+    .nfIconBtn:hover {
+      filter: brightness(.96);
+      transform: translateY(-1px);
+    }
+
+    .waIcon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid rgba(17, 24, 39, .12);
+      border-radius: 8px;
+      background: #FFFFFF;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+
+    .waIcon img {
+      display: block;
+      width: 15px;
+      height: 15px;
+    }
+
+    .pillSN {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 18px;
+      border: 1px solid rgba(17, 24, 39, .18);
+      border-radius: 999px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: .02em;
+      user-select: none;
+    }
+
+    .pillSN.s {
+      background: #DCFCE7;
+      border-color: #86EFAC;
+      color: #166534;
+    }
+
+    .pillSN.n {
+      background: #FEE2E2;
+      border-color: #FCA5A5;
+      color: #7F1D1D;
+    }
+
+    .pillSN.empty {
+      background: #EEF2F7;
+      border-color: #CBD5E1;
+      color: #475569;
+    }
+
+    .inlineCellWrap {
+      position: relative;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      min-width: 48px;
+    }
+
+    .inlineCellInput {
+      width: 48px;
+      height: 24px;
+      padding: 0 4px;
+      border: 1px solid #D1D5DB;
+      border-radius: 7px;
+      background: #FFFFFF;
+      color: #111827;
+      outline: none;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: none !important;
+    }
+
+    .inlineCellWrap.isSaving::after {
+      content: "...";
+      position: absolute;
+      right: -14px;
+      color: #64748B;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .nfPreviewPanel {
       position: sticky;
-      top: 20px;
+      top: 10px;
+      width: 300px;
+      margin: 0;
+      padding: 12px;
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
     }
 
-    .painel-lateral h3 {
-      font-size: 0.95rem;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #ffffff;
+    .nfPreviewHead {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
     }
 
-    /* Container de Proporção 9:16 para o Card */
-    .previewContainer {
-      width: 100%;
-      max-width: 308px;
-      height: 547px;
-      position: relative;
-      overflow: hidden;
-      border-radius: 10px;
-      background-color: #000000;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-      margin: 0 auto 16px auto;
-    }
-
-    .previewInner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 1080px;
-      height: 1920px;
-      transform: scale(0.285185);
-      transform-origin: top left;
-      background-color: #000000;
-    }
-
-    .previewInner .previewBg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 1080px;
-      height: 1920px;
-      z-index: 1;
-      display: block;
-    }
-
-    .previewInner [data-bind] {
-      position: absolute;
-      z-index: 5;
-      font-family: 'Impact', 'Arial Black', sans-serif;
+    .nfPreviewHead h3 {
+      margin: 0;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 950;
       text-transform: uppercase;
-      box-sizing: border-box;
     }
 
-    /* Posições Perfeitas no Padrão 1080x1920 */
-    .previewColeta {
-      top: 920px;
-      left: 0;
-      width: 1080px;
+    .nfClosePreview {
+      border: 0;
+      background: transparent;
+      color: #64748B;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .nfProductBadge {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #16A34A;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 950;
+    }
+
+    .nfArtCard {
+      position: relative;
+      width: 240px;
+      height: 429px;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #1F2937;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .20);
+      color: #FFFFFF;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .nfArtScale {
+      position: absolute;
+      inset: 0;
+      width: 380px;
+      height: 680px;
+      transform: scale(.63158);
+      transform-origin: top left;
+    }
+
+    .nfArtScale .previewBg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 0;
+      outline: 0;
+    }
+
+    .nfArtScale .previewColeta,
+    .nfArtScale .previewDescarga,
+    .nfArtScale .previewProduct,
+    .nfArtScale .previewPrice,
+    .nfArtScale .previewNote,
+    .nfArtScale .previewContacts {
+      z-index: 2;
+    }
+
+    .nfArtScale .previewColeta {
+      position: absolute;
+      top: 185px;
+      left: 32px;
+      width: 215px;
       text-align: center;
-      z-index: 5;
-    }
-    .previewColeta .val {
-      font-size: 54px;
-      font-weight: 900;
-      color: #ffffff;
-      text-shadow: 4px 4px 6px #000000;
-      line-height: 1.1;
-    }
-    .previewColeta .sub {
-      font-size: 36px;
-      font-weight: bold;
-      color: #111111;
-      margin-top: 4px;
     }
 
-    .previewDescarga {
-      top: 1145px;
-      left: 0;
-      width: 1080px;
+    .nfArtScale .previewDescarga {
+      position: absolute;
+      top: 265px;
+      left: 32px;
+      width: 215px;
       text-align: center;
-      z-index: 5;
-    }
-    .previewDescarga .val {
-      font-size: 54px;
-      font-weight: 900;
-      color: #ffffff;
-      text-shadow: 4px 4px 6px #000000;
-      line-height: 1.1;
-    }
-    .previewDescarga .sub {
-      font-size: 36px;
-      font-weight: bold;
-      color: #111111;
-      margin-top: 4px;
     }
 
-    .previewProduct {
-      top: 1395px;
-      left: 0;
-      width: 1080px;
+    .nfArtScale .previewProduct {
+      position: absolute;
+      top: 350px;
+      left: 30px;
+      width: 215px;
+      color: #FFFFFF;
       text-align: center;
-      font-size: 52px;
+      font-size: 19px;
       font-weight: 900;
-      color: #ffffff;
-      text-shadow: 4px 4px 8px #000000;
+      line-height: 1;
+      text-transform: uppercase;
     }
 
-    .previewPrice {
-      top: 1475px;
-      left: 520px;
-      width: 500px;
-      text-align: left;
-      font-size: 64px;
+    .nfArtScale .previewPrice {
+      position: absolute;
+      top: 390px;
+      left: 32px;
+      width: 215px;
+      color: #FFFFFF;
+      text-align: center;
+      font-size: 26px;
       font-weight: 900;
-      color: #111111;
       line-height: 1;
     }
 
-    .previewContacts {
-      top: 1625px;
-      left: 0;
-      width: 1080px;
+    .nfArtScale .previewContacts {
+      position: absolute;
+      top: 455px;
+      left: 58px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      text-align: center;
-      z-index: 5;
-    }
-    .previewContacts .line {
-      font-size: 38px;
-      font-weight: 900;
-      color: #ffffff;
-      text-shadow: 3px 3px 6px #000000;
+      gap: 2px;
+      width: 200px;
     }
 
-    .previewNote {
-      bottom: 45px;
-      left: 0;
-      width: 1080px;
+    .nfArtScale .previewNote {
+      position: absolute;
+      top: 560px;
+      left: 32px;
+      width: 215px;
+      color: #FFFFFF;
       text-align: center;
-      font-size: 36px;
-      font-weight: 900;
-      color: #f59e0b;
-      text-shadow: 2px 2px 4px #000000;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.1;
     }
 
-    /* Ações da Prévia */
-    .preview-btns {
+    .nfArtScale .previewValue {
+      color: #FFFFFF;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .nfArtScale .previewSmall {
+      margin-top: 4px;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .nfArtScale .previewContactLine {
+      overflow: hidden;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.05;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .nfArtScale .previewValue,
+    .nfArtScale .previewSmall,
+    .nfArtScale .previewProduct,
+    .nfArtScale .previewPrice,
+    .nfArtScale .previewNote,
+    .nfArtScale .previewContactLine {
+      text-shadow:
+        0 2px 4px rgba(0, 0, 0, .85),
+        0 0 6px rgba(0, 0, 0, .50);
+    }
+
+    .nfPreviewButtons {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-top: 10px;
     }
 
-    .btn-side {
-      padding: 9px 12px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 0.82rem;
-      border: none;
+    .nfPreviewButtons button {
+      height: 32px;
+      border: 1px solid #D1D5DB;
+      border-radius: 9px;
+      font-size: 10px;
+      font-weight: 950;
       cursor: pointer;
-      display: flex;
+    }
+
+    .nfPreviewButtons .green,
+    .nfPreviewButtons .wa {
+      background: #16A34A;
+      border-color: #16A34A;
+      color: #FFFFFF;
+    }
+
+    .nfPreviewButtons .blue {
+      background: #1D4ED8;
+      border-color: #1D4ED8;
+      color: #FFFFFF;
+    }
+
+    .nfPreviewButtons .wa {
+      grid-column: 1 / -1;
+    }
+
+    .nfReadyMsg {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      background: #F8FAFC;
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .nfReadyMsg textarea {
+      width: 100%;
+      min-height: 120px;
+      margin-top: 6px;
+      padding: 8px;
+      border: 1px solid #D1D5DB;
+      border-radius: 9px;
+      background: #FFFFFF;
+      color: var(--text);
+      font-size: 10px;
+      text-transform: none;
+    }
+
+    #modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      padding: 18px;
+      background: rgba(0, 0, 0, .55);
+      backdrop-filter: blur(6px);
     }
 
-    .btn-green { background: #10b981; color: #fff; }
-    .btn-blue { background: #3b82f6; color: #fff; }
-    .btn-whats { background: #25d366; color: #fff; width: 100%; }
+    .modalCard {
+      position: relative;
+      width: min(980px, 100%);
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, .28);
+    }
 
-    .textarea-msg {
+    .modalHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #F8FAFC;
+    }
+
+    .modalHead h2 {
+      margin: 0;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 950;
+    }
+
+    .iconClose {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #D1D5DB;
+      border-radius: 12px;
+      background: #FFFFFF;
+      color: var(--text);
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .modalBody {
+      max-height: calc(100vh - 220px);
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      margin: 0 0 6px;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
       width: 100%;
-      height: 100px;
-      background: rgba(13, 20, 48, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 6px;
-      padding: 8px;
-      color: #e9eefc;
-      font-size: 0.8rem;
-      resize: vertical;
-      font-family: monospace;
+      height: 32px;
+      padding: 5px 10px;
+      border: 1px solid #D1D5DB;
+      border-radius: 12px;
+      background: #FFFFFF;
+      color: #111827;
       outline: none;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="topbar">
-    <h2>T3L TRANSPORTES | FRETES OPERACIONAL</h2>
-    <a href="./home.html" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem;">Voltar</a>
-  </div>
-
-  <main class="layout-fretes">
-    <!-- Tabela Principal -->
-    <div class="painel-tabela">
-      <div class="tabela-header">
-        <h3>Lista de Fretes Disponíveis</h3>
-      </div>
-      <table class="tabela-fretes" id="tabelaFretes">
-        <thead>
-          <tr>
-            <th>Sel.</th>
-            <th>Origem / Coleta</th>
-            <th>Destino / Descarga</th>
-            <th>Produto</th>
-            <th>Valor Mot.</th>
-            <th>Contato</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Exemplo dinâmico -->
-          <tr class="selected" onclick="selecionarLinha(this, 'ITUMBIARA/GO', 'PANORAMA', 'ITAJU/SP', 'CIDADE', 'ACUCAR BIG BAG', 'R$ 150,00', 'ARIEL (64) 99227-7537')">
-            <td><input type="radio" name="selFrete" checked /></td>
-            <td><strong>ITUMBIARA/GO</strong><br><small style="color:#94a3b8">PANORAMA</small></td>
-            <td><strong>ITAJU/SP</strong><br><small style="color:#94a3b8">CIDADE</small></td>
-            <td><span style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 2px 6px; border-radius: 4px; font-weight: bold;">ACUCAR BIG BAG</span></td>
-            <td style="font-weight: bold; color: #f59e0b;">R$ 150,00</td>
-            <td>ARIEL 📞</td>
-          </tr>
-          <tr onclick="selecionarLinha(this, 'RIO VERDE/GO', 'TERMINAL RUMO', 'INDIARA/GO', 'COMIGO', 'SOJA EM GRAOS', 'R$ 80,00', 'ARIEL (64) 99227-7537')">
-            <td><input type="radio" name="selFrete" /></td>
-            <td><strong>RIO VERDE/GO</strong><br><small style="color:#94a3b8">TERMINAL RUMO</small></td>
-            <td><strong>INDIARA/GO</strong><br><small style="color:#94a3b8">COMIGO</small></td>
-            <td><span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 2px 6px; border-radius: 4px; font-weight: bold;">SOJA EM GRAOS</span></td>
-            <td style="font-weight: bold; color: #f59e0b;">R$ 80,00</td>
-            <td>ARIEL 📞</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Painel Lateral de Prévia -->
-    <aside class="painel-lateral">
-      <h3>Prévia da Divulgação</h3>
-
-      <div class="previewContainer">
-        <div class="previewInner" id="cardPreview">
-          <img class="previewBg" id="imgFundoCard" src="../assets/img/postt3l.png" alt="Template" />
-
-          <div class="previewColeta">
-            <div class="val" id="prevColetaCidade">ITUMBIARA/GO</div>
-            <div class="sub" id="prevColetaLocal">PANORAMA</div>
-          </div>
-
-          <div class="previewDescarga">
-            <div class="val" id="prevDescargaCidade">ITAJU/SP</div>
-            <div class="sub" id="prevDescargaLocal">CIDADE</div>
-          </div>
-
-          <div class="previewProduct" id="prevProduto">ACUCAR BIG BAG</div>
-          <div class="previewPrice" id="prevValor">R$ 150,00</div>
-
-          <div class="previewContacts">
-            <div class="line" id="prevContato1">ARIEL (64) 99227-7537</div>
-            <div class="line" id="prevContato2"></div>
-          </div>
-
-          <div class="previewNote" id="prevObs">PAGAMENTO NO PIX</div>
-        </div>
-      </div>
-
-      <div class="preview-btns">
-        <button class="btn-side btn-green" onclick="baixarJPG()">⬇ Baixar JPG</button>
-        <button class="btn-side btn-blue" onclick="copiarTexto()">📋 Copiar Texto</button>
-      </div>
-      <button class="btn-side btn-whats" onclick="enviarWhatsApp()">📲 Compartilhar WhatsApp</button>
-
-      <div style="margin-top: 12px;">
-        <label style="font-size: 0.75rem; color: #94a3b8; font-weight: bold; display: block; margin-bottom: 4px;">MENSAGEM PRONTA</label>
-        <textarea class="textarea-msg" id="txtMensagem" readonly></textarea>
-      </div>
-    </aside>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
-  <script>
-    // Configurações e Imagem Padrão Segura
-    const DEFAULT_BG = "../assets/img/postt3l.png";
-
-    // Garante que o fundo não quebre em caso de 404
-    const imgEl = document.getElementById("imgFundoCard");
-    if (imgEl) {
-      imgEl.onerror = function() {
-        this.onerror = null;
-        this.src = DEFAULT_BG;
-      };
-      imgEl.src = DEFAULT_BG;
+      font-size: 12px;
     }
 
-    function selecionarLinha(tr, coletaCid, coletaLoc, descCid, descLoc, prod, val, contato) {
-      document.querySelectorAll("#tabelaFretes tr").forEach(el => el.classList.remove("selected"));
-      tr.classList.add("selected");
-      const radio = tr.querySelector("input[type='radio']");
-      if (radio) radio.checked = true;
-
-      // Atualiza o Card Visual
-      document.getElementById("prevColetaCidade").textContent = coletaCid;
-      document.getElementById("prevColetaLocal").textContent = coletaLoc;
-      document.getElementById("prevDescargaCidade").textContent = descCid;
-      document.getElementById("prevDescargaLocal").textContent = descLoc;
-      document.getElementById("prevProduto").textContent = prod;
-      document.getElementById("prevValor").textContent = val;
-      document.getElementById("prevContato1").textContent = contato;
-
-      // Atualiza o Texto para WhatsApp
-      atualizarMensagem(coletaCid, coletaLoc, descCid, descLoc, prod, val, contato);
+    .field textarea {
+      height: auto;
+      min-height: 72px;
+      resize: vertical;
     }
 
-    function atualizarMensagem(coletaCid, coletaLoc, descCid, descLoc, prod, val, contato) {
-      const msg = `📢 *FRETES LIBERADOS*\n\n` +
-                  `📍 *COLETA:* ${coletaCid} (${coletaLoc})\n` +
-                  `🏁 *DESCARGA:* ${descCid} (${descLoc})\n` +
-                  `📦 *PRODUTO:* ${prod}\n` +
-                  `💰 *VALOR:* ${val}\n` +
-                  `📞 *CONTATO:* ${contato}\n\n` +
-                  `_T3L Transportes_`;
-      document.getElementById("txtMensagem").value = msg;
+    .modalFoot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      background: #F8FAFC;
     }
 
-    async function baixarJPG() {
-      const card = document.getElementById("cardPreview");
-      if (!card) return;
+    .nfModalLoading {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(255, 255, 255, .88);
+      backdrop-filter: blur(4px);
+    }
 
-      try {
-        const canvas = await html2canvas(card, {
-          backgroundColor: null,
-          scale: 1,
-          useCORS: true
-        });
+    .nfModalLoading.show {
+      display: flex;
+    }
 
-        const link = document.createElement("a");
-        link.download = `frete-${Date.now()}.jpg`;
-        link.href = canvas.toDataURL("image/jpeg", 0.95);
-        link.click();
-      } catch (e) {
-        console.error("Erro ao gerar imagem:", e);
+    .nfModalLoadingBox {
+      min-width: 260px;
+      max-width: 360px;
+      padding: 24px 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #FFFFFF;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, .18);
+      color: var(--text);
+      text-align: center;
+    }
+
+    .nfModalSpinner {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      border: 8px solid #E2E8F0;
+      border-top-color: #1D9BF0;
+      border-right-color: #1D9BF0;
+      border-radius: 50%;
+      animation: nfSpin .85s linear infinite;
+    }
+
+    .nfModalLoadingTitle {
+      color: #1D9BF0;
+      font-size: 17px;
+      font-weight: 950;
+      line-height: 1.2;
+    }
+
+    .nfModalLoadingSub {
+      margin-top: 6px;
+      color: #64748B;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .nfModalProgress {
+      width: 100%;
+      height: 5px;
+      margin-top: 16px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #E5E7EB;
+    }
+
+    .nfModalProgress::before {
+      content: "";
+      display: block;
+      width: 42%;
+      height: 100%;
+      border-radius: 999px;
+      background: #1D9BF0;
+      animation: nfProgress 1.1s ease-in-out infinite;
+    }
+
+    @keyframes nfSpin {
+      to {
+        transform: rotate(360deg);
       }
     }
 
-    function copiarTexto() {
-      const txt = document.getElementById("txtMensagem");
-      txt.select();
-      navigator.clipboard.writeText(txt.value);
-      alert("Texto copiado para a área de transferência!");
+    @keyframes nfProgress {
+      0% {
+        transform: translateX(-110%);
+      }
+
+      100% {
+        transform: translateX(250%);
+      }
     }
 
-    function enviarWhatsApp() {
-      const txt = encodeURIComponent(document.getElementById("txtMensagem").value);
-      window.open(`https://api.whatsapp.com/send?text=${txt}`, "_blank");
+    @media (max-width: 1250px) {
+      .fretes-workspace {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .nfPreviewPanel {
+        position: relative;
+        top: auto;
+        width: 100%;
+      }
     }
 
-    // Inicializa a primeira mensagem
-    window.addEventListener("DOMContentLoaded", () => {
-      const selTr = document.querySelector("#tabelaFretes tr.selected");
-      if (selTr) selTr.click();
-    });
+    @media (max-width: 1100px) {
+      .ft-actions.top-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .container.nfWide.pageFretes {
+        padding: 8px;
+      }
+
+      .ft-select,
+      .ft-search,
+      .ft-search-wide {
+        width: 100%;
+        max-width: none;
+        flex: 1 1 100%;
+      }
+
+      .ft-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+
+      .tableWrap {
+        height: auto;
+        min-height: 420px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <a class="burger" href="./home.html" title="Voltar">🏠</a>
+
+        <img
+          src="../assets/img/roca-logo.png"
+          alt="T3L / ROCA"
+        >
+      </div>
+
+      <div class="actions">
+        <div class="icon-btn" title="Sair" data-logout>↩️</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container nfWide pageFretes">
+
+    <div class="fretes-top">
+      <div class="title">
+        <h1>
+          Fretes (Operacional)
+
+          <span
+            id="syncStatus"
+            data-sync-status
+            style="font-size:11px;opacity:.7;margin-left:8px;"
+          >
+            🔄 Carregando...
+          </span>
+        </h1>
+
+        <div class="sub">
+          Permissão Frete Mínimo: indica quais tipos (eixos) atendem ao piso mínimo ANTT por embarque.
+          <b>Dados sincronizados com Google Sheets em tempo real.</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="fretes-toolbar">
+
+      <div class="ft-row">
+        <span class="ft-label">Pesos:</span>
+
+        <div class="ft-mini">
+          <span>9E</span>
+          <input id="w9" type="number" step="0.01" value="47">
+        </div>
+
+        <div class="ft-mini">
+          <span>4E</span>
+          <input id="w4" type="number" step="0.01" value="39">
+        </div>
+
+        <div class="ft-mini">
+          <span>7E</span>
+          <input id="w7" type="number" step="0.01" value="36">
+        </div>
+
+        <div class="ft-mini">
+          <span>6E</span>
+          <input id="w6" type="number" step="0.01" value="31">
+        </div>
+
+        <div class="ft-mini">
+          <span>5E</span>
+          <input id="w5" type="number" step="0.01" value="26">
+        </div>
+
+        <button class="btnTiny" id="btnSaveWeights" type="button">
+          Salvar
+        </button>
+
+        <button class="btnTiny ghost" id="btnResetWeights" type="button">
+          Reset
+        </button>
+
+        <div class="ft-actions top-actions">
+
+          <button
+            class="btnTiny"
+            id="btnReloadFromSheets"
+            data-action="atualizar"
+            type="button"
+          >
+            🔄 Atualizar
+          </button>
+
+          <button
+            class="btnTiny blue"
+            id="btnOrdemOffline"
+            type="button"
+          >
+            📄 Ordem Offline
+          </button>
+
+          <button
+            class="btnTiny gold"
+            id="btnDivulgacaoFrete"
+            type="button"
+          >
+            DIVULGAÇÃO DE FRETE
+          </button>
+
+          <button
+            class="btnTiny blue"
+            id="btnShareClientes"
+            type="button"
+          >
+            Compartilhar com Clientes
+          </button>
+
+          <button
+            class="btnTiny green"
+            id="btnNew"
+            data-action="novo"
+            type="button"
+          >
+            + Novo
+          </button>
+
+        </div>
+      </div>
+
+      <div class="ft-row">
+
+        <select class="ft-select" id="fRegional" title="Regional">
+          <option value="">Todas as regionais</option>
+        </select>
+
+        <select class="ft-select" id="fFilial" title="Filial">
+          <option value="">Todas as filiais</option>
+        </select>
+
+        <select class="ft-select" id="fContato" title="Contato">
+          <option value="">Todos os contatos</option>
+        </select>
+
+        <input
+          class="ft-search ft-search-wide"
+          id="fBusca"
+          placeholder="Buscar (cliente, origem, destino, produto, contato)..."
+        >
+      </div>
+    </div>
+
+    <div class="fretes-workspace">
+
+      <div class="card tableFull">
+
+        <div class="tableWrap">
+          <table>
+
+            <thead>
+              <tr>
+
+                <th>
+                  <input
+                    type="checkbox"
+                    id="nfSelectAll"
+                    class="nfRowCheck"
+                    title="Selecionar todos"
+                  >
+                </th>
+
+                <th>Regional</th>
+                <th>Filial</th>
+                <th>Cliente</th>
+                <th>Origem</th>
+                <th>Coleta</th>
+                <th>Contato</th>
+                <th>Destino</th>
+                <th>UF</th>
+                <th>Descarga</th>
+                <th class="num">Volume</th>
+                <th class="num">Vlr. Empresa</th>
+                <th class="num">Vlr. Motorista</th>
+                <th class="num">KM</th>
+                <th class="num">Pedágio/Eixo</th>
+                <th class="num">5E</th>
+                <th class="num">6E</th>
+                <th class="num">7E</th>
+                <th class="num">4E</th>
+                <th class="num">9E</th>
+                <th>Produto</th>
+                <th>ICMS</th>
+                <th class="num">Margem</th>
+                <th class="num">Porta</th>
+                <th class="num">Trânsito</th>
+                <th>Status</th>
+                <th>Observações</th>
+                <th class="thUltimaAlteracao">Última Alteração</th>
+                <th class="num thAcoes">Ações</th>
+
+              </tr>
+            </thead>
+
+            <tbody id="tbody"></tbody>
+
+          </table>
+        </div>
+
+      </div>
+
+      <aside class="nfPreviewPanel" id="nfPreviewPanel">
+
+        <div class="nfPreviewHead">
+
+          <h3>Prévia da Divulgação</h3>
+
+          <button
+            class="nfClosePreview"
+            id="nfClosePreview"
+            type="button"
+            title="Fechar prévia"
+          >
+            ×
+          </button>
+
+        </div>
+
+        <div
+          class="nfProductBadge"
+          id="nfPreviewProdutoBadge"
+        >
+          SOJA
+        </div>
+
+        <div class="nfArtCard" id="nfArtCard">
+
+          <div class="nfArtScale">
+
+            <img
+              class="previewBg"
+              id="nfArtBg"
+              src="../assets/img/SOJATESTE.png"
+              alt=""
+            >
+
+            <div class="previewColeta">
+              <div
+                class="previewValue"
+                id="nfArtColetaCidade"
+              ></div>
+
+              <div
+                class="previewSmall"
+                id="nfArtColetaLocal"
+              ></div>
+            </div>
+
+            <div class="previewDescarga">
+
+              <div
+                class="previewValue"
+                id="nfArtDescargaCidade"
+              ></div>
+
+              <div
+                class="previewSmall"
+                id="nfArtDescargaLocal"
+              ></div>
+
+            </div>
+
+            <div
+              class="previewProduct"
+              id="nfArtProduto"
+            ></div>
+
+            <div
+              class="previewPrice"
+              id="nfArtValor"
+            ></div>
+
+            <div
+              class="previewNote"
+              id="nfArtObs"
+            ></div>
+
+            <div class="previewContacts">
+
+              <div
+                class="previewContactLine"
+                id="nfArtContato1"
+              ></div>
+
+              <div
+                class="previewContactLine"
+                id="nfArtContato2"
+              ></div>
+
+              <div
+                class="previewContactLine"
+                id="nfArtContato3"
+              ></div>
+
+              <div
+                class="previewContactLine"
+                id="nfArtContato4"
+              ></div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <div class="nfPreviewButtons">
+
+          <button
+            class="green"
+            id="nfBaixarJPG"
+            type="button"
+          >
+            ⬇ BAIXAR JPG
+          </button>
+
+          <button
+            class="blue"
+            id="nfCopiarImagem"
+            type="button"
+          >
+            ▣ COPIAR IMAGEM
+          </button>
+
+          <button
+            class="wa"
+            id="nfEnviarWhatsapp"
+            type="button"
+          >
+            🟢 ENVIAR POR WHATSAPP
+          </button>
+
+        </div>
+
+        <div class="nfReadyMsg">
+
+          <b>MENSAGEM PRONTA</b>
+
+          <textarea
+            id="nfMensagemPronta"
+            readonly
+          ></textarea>
+
+          <button
+            class="btnTiny blue"
+            id="nfCopiarMensagem"
+            type="button"
+            style="width:100%;margin-top:10px;"
+          >
+            COPIAR MENSAGEM
+          </button>
+
+        </div>
+
+      </aside>
+    </div>
+
+    <div id="modal" aria-hidden="true">
+
+      <div
+        class="modalCard"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+
+        <div class="modalHead">
+
+          <h2 id="modalTitle">
+            Novo Frete
+          </h2>
+
+          <button
+            class="iconClose"
+            id="btnCloseModal"
+            type="button"
+            title="Fechar"
+          >
+            ✕
+          </button>
+
+        </div>
+
+        <div class="modalBody">
+
+          <div class="grid2">
+
+            <div class="field">
+              <label for="mRegional">Regional</label>
+              <select id="mRegional"></select>
+            </div>
+
+            <div class="field">
+              <label for="mFilial">Filial</label>
+              <select id="mFilial"></select>
+            </div>
+
+            <div class="field">
+              <label for="mCliente">Cliente</label>
+              <select id="mCliente"></select>
+            </div>
+
+            <div class="field">
+              <label for="mContato">
+                Contato (Responsável da Filial)
+              </label>
+
+              <select id="mContato"></select>
+            </div>
+
+            <div class="field">
+              <label for="mOrigem">Origem</label>
+              <input id="mOrigem">
+            </div>
+
+            <div class="field">
+              <label for="mColeta">Coleta</label>
+              <input id="mColeta">
+            </div>
+
+            <div class="field">
+              <label for="mDestino">Destino</label>
+              <input id="mDestino">
+            </div>
+
+            <div class="field">
+              <label for="mUF">UF</label>
+              <input id="mUF">
+            </div>
+
+            <div class="field">
+              <label for="mDescarga">Descarga</label>
+              <input id="mDescarga">
+            </div>
+
+            <div class="field">
+              <label for="mProduto">Produto</label>
+              <input id="mProduto">
+            </div>
+
+            <div class="field">
+              <label for="mKM">KM</label>
+              <input id="mKM" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mPed">Pedágio/Eixo</label>
+              <input id="mPed" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mVolume">Volume</label>
+              <input id="mVolume" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mICMS">ICMS</label>
+              <input id="mICMS" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mEmpresa">Vlr. Empresa</label>
+              <input id="mEmpresa" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mMotorista">Vlr. Motorista</label>
+              <input id="mMotorista" inputmode="decimal">
+            </div>
+
+            <div class="field">
+              <label for="mSat">Pedido SAT</label>
+              <input id="mSat">
+            </div>
+
+            <div class="field">
+              <label for="mPorta">Porta</label>
+              <input id="mPorta">
+            </div>
+
+            <div class="field">
+              <label for="mTransito">Trânsito</label>
+              <input id="mTransito">
+            </div>
+
+            <div class="field">
+              <label for="mStatus">Status</label>
+
+              <select id="mStatus">
+                <option value="LIBERADO">LIBERADO</option>
+                <option value="FINALIZANDO">FINALIZANDO</option>
+                <option value="SUSPENSO">SUSPENSO</option>
+              </select>
+
+            </div>
+
+            <div
+              class="field"
+              style="grid-column:1 / -1;"
+            >
+              <label for="mObs">Observações</label>
+              <textarea id="mObs"></textarea>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modalFoot">
+
+          <button
+            class="btnTiny ghost"
+            id="btnCancel"
+            type="button"
+          >
+            Cancelar
+          </button>
+
+          <button
+            class="btnTiny green"
+            id="btnSave"
+            type="button"
+          >
+            Salvar Frete
+          </button>
+
+        </div>
+
+        <div
+          class="nfModalLoading"
+          id="nfModalLoading"
+          aria-hidden="true"
+        >
+
+          <div
+            class="nfModalLoadingBox"
+            role="status"
+            aria-live="polite"
+          >
+
+            <div
+              class="nfModalSpinner"
+              aria-hidden="true"
+            ></div>
+
+            <div
+              class="nfModalLoadingTitle"
+              id="nfModalLoadingTitle"
+            >
+              Salvando...
+            </div>
+
+            <div
+              class="nfModalLoadingSub"
+              id="nfModalLoadingSub"
+            >
+              Aguarde alguns segundos.
+            </div>
+
+            <div
+              class="nfModalProgress"
+              aria-hidden="true"
+            ></div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../assets/js/auth.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script src="../assets/js/fretes.js?v=15"></script>
+
+  <script>
+    requireHomeAuth();
+    bindLogoutButton();
   </script>
+
 </body>
 </html>
