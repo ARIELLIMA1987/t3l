@@ -1,15 +1,30 @@
-/* divulgacao.js | ROCA LOG */
+/* divulgacao.js | ROCA LOG / T3L Transportes */
 (function () {
   "use strict";
 
-  const DEFAULT: "../assets/img/postt3l.png",
-  SOJA: "../assets/img/postt3l.png",
-  FARELODESOJA: "../assets/img/postt3l.png",
-  MILHO: "../assets/img/postt3l.png",
-  ACUCAR: "../assets/img/postt3l.png",
-  CALCARIO: "../assets/img/postt3l.png",
-  SORGO: "../assets/img/postt3l.png",
-  FERTILIZANTE: "../assets/img/postt3l.png"
+  const DEFAULT_IMAGE_PATH = "../assets/img/postt3l.png";
+
+  const PRODUCT_BG_MAP = {
+    DEFAULT: "../assets/img/postt3l.png",
+    SOJA: "../assets/img/postt3l.png",
+    FARELODESOJA: "../assets/img/postt3l.png",
+    MILHO: "../assets/img/postt3l.png",
+    ACUCAR: "../assets/img/postt3l.png",
+    CALCARIO: "../assets/img/postt3l.png",
+    SORGO: "../assets/img/postt3l.png",
+    FERTILIZANTE: "../assets/img/postt3l.png"
+  };
+
+  const PRODUCT_ALIAS = {
+    SOJA: "SOJA",
+    SOJAEMGRAOS: "SOJA",
+    GRAODESOJA: "SOJA",
+    MILHO: "MILHO",
+    ACUCAR: "ACUCAR",
+    ACUCARBIGBAG: "ACUCAR",
+    SORGO: "SORGO",
+    CALCARIO: "CALCARIO"
+  };
 
   const FILIAIS_CONTATOS = {
     RIOVERDE: [
@@ -22,7 +37,7 @@
 
   const DEFAULT_BG = PRODUCT_BG_MAP.DEFAULT || DEFAULT_IMAGE_PATH;
 
-   function getPreview(templateId) {
+  function getPreview(templateId) {
     return document.querySelector(`[data-template-preview="${templateId}"]`);
   }
 
@@ -123,6 +138,10 @@
     const bgImg = getBgImgEl(preview);
 
     if (bgImg) {
+      bgImg.onerror = function () {
+        this.onerror = null;
+        this.src = DEFAULT_IMAGE_PATH;
+      };
       bgImg.src = img;
     } else {
       preview.style.backgroundImage = `url("${img}")`;
@@ -227,16 +246,20 @@
       return;
     }
 
-    const canvas = await html2canvas(preview, {
-      backgroundColor: null,
-      scale: 2,
-      useCORS: true
-    });
+    try {
+      const canvas = await html2canvas(preview, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true
+      });
 
-    const link = document.createElement("a");
-    link.download = `divulgacao-modelo-${templateId}.jpg`;
-    link.href = canvas.toDataURL("image/jpeg", 0.95);
-    link.click();
+      const link = document.createElement("a");
+      link.download = `divulgacao-modelo-${templateId}.jpg`;
+      link.href = canvas.toDataURL("image/jpeg", 0.95);
+      link.click();
+    } catch (err) {
+      console.error("Erro ao gerar o JPG:", err);
+    }
   }
 
   function initDefaults() {
