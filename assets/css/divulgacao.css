@@ -1,181 +1,9 @@
-/* ===================================================
-   1. ESTRUTURA GERAL DA PÁGINA (Layout em 2 Colunas)
-=================================================== */
-.divulgacao-page {
-  padding: 24px 16px;
-  max-width: 1200px;
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.page-header h1 {
-  margin: 0 0 4px 0;
-  font-size: 1.6rem;
-  color: #fff;
-}
-
-.page-header p {
-  margin: 0;
-  color: #94a3b8;
-  font-size: 0.95rem;
-}
-
-/* Card Branco Container */
-.templateCard {
-  background: #ffffff !important;
-  color: #1e293b !important;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
-  margin-bottom: 32px;
-}
-
-.templateHeader {
-  margin-bottom: 20px;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 12px;
-}
-
-.templateHeader h2 {
-  font-size: 1.3rem;
-  margin: 0 0 4px 0;
-  color: #0f172a;
-}
-
-.templateHeader p {
-  color: #64748b;
-  margin: 0;
-  font-size: 0.85rem;
-}
-
-/* Duas Colunas: Formulário na Esquerda (flexível) e Card na Direita (420px) */
-.templateBody {
-  display: grid !important;
-  grid-template-columns: 1fr 420px !important;
-  gap: 32px !important;
-  align-items: start !important;
-}
-
-@media (max-width: 960px) {
-  .templateBody {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ===================================================
-   2. FORMULÁRIO (Coluna da Esquerda)
-=================================================== */
-.templateForm {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 12px !important;
-  width: 100% !important;
-}
-
-.templateForm label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #334155;
-  margin-bottom: -6px;
-}
-
-.templateForm input,
-.templateForm select {
-  width: 100% !important;
-  padding: 10px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  background-color: #fff;
-  color: #1e293b;
-  box-sizing: border-box;
-  outline: none;
-}
-
-.templateForm input:focus,
-.templateForm select:focus {
-  border-color: #f59e0b;
-}
-
-/* Botões */
-.templateActions {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.btnTiny {
-  padding: 10px 22px;
-  font-size: 0.95rem;
-  font-weight: bold;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btnTiny.green {
-  background-color: #10b981;
-  color: #ffffff;
-}
-
-.btnTiny.ghost {
-  background-color: transparent;
-  border: 1px solid #cbd5e1;
-  color: #475569;
-}
-
-/* ===================================================
-   3. PREVIEW / CARD (Coluna da Direita)
-=================================================== */
-.templatePreview {
-  position: relative !important;
-  width: 100% !important;
-  max-width: 420px !important;
-  margin: 0 auto !important;
-  aspect-ratio: 9 / 16 !important;
-  overflow: hidden !important;
-  border-radius: 10px !important;
-  background-color: #000000 !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
-}
-
-.templatePreview .previewBg {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: fill !important;
-  z-index: 1 !important;
-}
-
-.templatePreview [data-bind] {
-  position: relative;
-  z-index: 5;
-  font-family: 'Impact', 'Arial Black', sans-serif;
-  text-transform: uppercase;
-  box-sizing: border-box;
-}
-
 /* -------------------------------------------
    A) CARREGAMENTO / COLETA
 ------------------------------------------- */
 .templatePreview .previewColeta {
   position: absolute !important;
-  top: 45% !important;
+  top: 47.5% !important; /* Desceu para não encostar no título */
   bottom: auto !important;
   left: 0 !important;
   width: 100% !important;
@@ -205,7 +33,7 @@
 ------------------------------------------- */
 .templatePreview .previewDescarga {
   position: absolute !important;
-  top: 55.5% !important;
+  top: 59.5% !important; /* Desceu para ficar livre abaixo de DESCARGA */
   bottom: auto !important;
   left: 0 !important;
   width: 100% !important;
@@ -235,7 +63,7 @@
 ------------------------------------------- */
 .templatePreview .previewProduct {
   position: absolute !important;
-  top: 65% !important;
+  top: 72.5% !important; /* Desceu para ficar logo abaixo de PRODUTO */
   bottom: auto !important;
   left: 0 !important;
   width: 100% !important;
@@ -249,17 +77,17 @@
 }
 
 /* -------------------------------------------
-   D) VALOR / PREÇO (Na mesma linha do R$)
+   D) VALOR / PREÇO (Alinhado com o R$)
 ------------------------------------------- */
 .templatePreview .previewPrice {
   position: absolute !important;
-  top: 70.2% !important;
+  top: 76.8% !important; /* Desceu exatamente para a linha do R$ */
   bottom: auto !important;
-  left: 54% !important;
-  width: 42% !important;
+  left: 48% !important;  /* Encaixa logo à direita do R$ */
+  width: 48% !important;
   text-align: left !important;
   z-index: 5 !important;
-  font-size: 1.35rem !important;
+  font-size: 1.4rem !important;
   font-weight: 900 !important;
   color: #111111 !important;
   text-shadow: none !important;
@@ -268,11 +96,11 @@
 }
 
 /* -------------------------------------------
-   E) CONTATOS (No bloco preto inferior)
+   E) CONTATOS (Faixa preta inferior)
 ------------------------------------------- */
 .templatePreview .previewContacts {
   position: absolute !important;
-  top: 83% !important;
+  top: 84.5% !important;
   bottom: auto !important;
   left: 5% !important;
   width: 90% !important;
@@ -293,7 +121,7 @@
 }
 
 /* -------------------------------------------
-   F) OBSERVAÇÕES (Base do bloco preto inferior)
+   F) OBSERVAÇÕES (Base da faixa preta)
 ------------------------------------------- */
 .templatePreview .previewNote {
   position: absolute !important;
