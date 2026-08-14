@@ -1,32 +1,267 @@
-/* 3. PRODUTO (Desceu um pouco para dar respiro da palavra PRODUTO) */
-    .previewProduct {
-      position: absolute !important;
-      top: 73.2% !important;
-      bottom: auto !important;
-      left: 0 !important;
-      width: 100% !important;
-      text-align: center !important;
-      z-index: 10 !important;
-      font-size: 1.25rem !important;
-      font-weight: 900 !important;
-      color: #ffffff !important;
-      text-shadow: 2px 2px 4px #000000 !important;
-      letter-spacing: 0.5px !important;
+/* divulgacao.js | ROCA LOG */
+(function () {
+  "use strict";
+
+  const DEFAULT_IMAGE_PATH = "../assets/img/postt3l.png";
+
+  // Fallbacks seguros caso os mapas globais não estejam definidos
+  const BG_MAP = typeof PRODUCT_BG_MAP !== "undefined" ? PRODUCT_BG_MAP : {};
+  const ALIAS_MAP = typeof PRODUCT_ALIAS !== "undefined" ? PRODUCT_ALIAS : {};
+
+  const FILIAIS_CONTATOS = {
+    RIOVERDE: [
+      "ARIEL (64) 99227-7537",
+      "",
+      "",
+      ""
+    ]
+  };
+
+  const DEFAULT_BG = BG_MAP.DEFAULT || DEFAULT_IMAGE_PATH;
+
+  function getPreview(templateId) {
+    return document.querySelector(`[data-template-preview="${templateId}"]`);
+  }
+
+  function getBgImgEl(preview) {
+    return preview ? preview.querySelector(".previewBg") : null;
+  }
+
+  function normalizeKey(value) {
+    return String(value || "")
+      .trim()
+      .toUpperCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^A-Z0-9]/g, "");
+  }
+
+  function updatePreview(templateId, field, value) {
+    const preview = getPreview(templateId);
+    if (!preview) return;
+
+    const target = preview.querySelector(`[data-bind="${field}"]`);
+    if (target) target.textContent = value || "";
+  }
+
+  function hasLetters(value) {
+    return /[A-ZÀ-Ü]/i.test(String(value || ""));
+  }
+
+  function limparDigitacaoNumerica(valor) {
+    if (valor == null) return "";
+
+    let v = String(valor)
+      .replace(/R\$\s?/gi, "")
+      .replace(/[^\d,.]/g, "");
+
+    const parts = v.split(/[,.]/);
+    if (parts.length <= 1) return v;
+
+    const dec = parts.pop() || "";
+    const intPart = parts.join("");
+
+    return intPart + "," + dec;
+  }
+
+  function formatarMoedaBR(valor) {
+    if (valor == null) return "";
+
+    let v = String(valor).trim();
+    if (!v) return "";
+
+    if (hasLetters(v)) return v.toUpperCase();
+
+    v = v.replace(/R\$\s?/gi, "").replace(/\./g, "").replace(/[^\d,]/g, "");
+
+    const partes = v.split(",");
+    let reais = partes[0] || "0";
+    let centavos = partes[1] || "";
+
+    centavos = centavos.substring(0, 2).padEnd(2, "0");
+    reais = reais.replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    return `R$ ${reais || "0"},${centavos}`;
+  }
+
+  function inferProductFamily(normalized) {
+    if (normalized.includes("FARELO") && normalized.includes("SOJA")) return "FARELODESOJA";
+    if (normalized.includes("SOJA")) return "SOJA";
+    if (normalized.includes("MILHO") && !normalized.includes("PIPOCA")) return "MILHO";
+    if (normalized.includes("ACUCAR")) return "ACUCAR";
+    if (normalized.includes("CALCARIO")) return "CALCARIO";
+    if (normalized.includes("SORGO")) return "SORGO";
+    if (normalized.includes("FERT") || normalized.includes("ADUBO")) return "FERTILIZANTE";
+    return "";
+  }
+
+  function productToImage(productValue) {
+    const normalized = normalizeKey(productValue);
+    const aliased = ALIAS_MAP[normalized];
+
+    if (aliased && BG_MAP[aliased]) return BG_MAP[aliased];
+
+    const family = inferProductFamily(normalized);
+    if (family && BG_MAP[family]) return BG_MAP[family];
+
+    return DEFAULT_BG;
+  }
+
+  function setPreviewBackgroundByProduct(templateId, productValue) {
+    const preview = getPreview(templateId);
+    if (!preview) return;
+
+    const img = productToImage(productValue);
+    const bgImg = getBgImgEl(preview);
+
+    if (bgImg) {
+      bgImg.src = img;
+    } else {
+      preview.style.backgroundImage = `url("${img}")`;
+    }
+  }
+
+  function preencherContatosFilial(templateId, filialValue) {
+    const key = normalizeKey(filialValue);
+    const lista = FILIAIS_CONTATOS[key] || ["", "", "", ""];
+
+    ["contato1", "contato2", "contato3", "contato4"].forEach((campo, index) => {
+      const input = document.querySelector(
+        `[data-template="${templateId}"][data-field="${campo}"]`
+      );
+
+      const valor = lista[index] || "";
+      if (input) input.value = valor;
+      updatePreview(templateId, campo, valor);
+    });
+  }
+
+  function handleInput(event) {
+    const el = event.target;
+    const templateId = el.dataset.template;
+    const field = el.dataset.field;
+
+    if (!templateId || !field) return;
+
+    let value = el.value ?? "";
+
+    if (field === "valor") {
+      let v = String(value).toUpperCase();
+
+      if (!hasLetters(v)) {
+        v = limparDigitacaoNumerica(v);
+      }
+
+      el.value = v;
+      updatePreview(templateId, "valor", v);
+      return;
     }
 
-    /* 4. VALOR / PREÇO (Desceu um pouquinho para cravar na linha do R$) */
-    .previewPrice {
-      position: absolute !important;
-      top: 77.3% !important;
-      bottom: auto !important;
-      left: 48% !important;
-      width: 48% !important;
-      text-align: left !important;
-      z-index: 10 !important;
-      font-size: 1.4rem !important;
-      font-weight: 900 !important;
-      color: #111111 !important;
-      text-shadow: none !important;
-      line-height: 1 !important;
-      margin: 0 !important;
+    value = String(value).trim();
+    updatePreview(templateId, field, value);
+
+    if (field === "produto") {
+      setPreviewBackgroundByProduct(templateId, value);
     }
+
+    if (templateId === "1" && field === "filial") {
+      preencherContatosFilial(templateId, value);
+    }
+  }
+
+  function handleBlur(event) {
+    const el = event.target;
+    const templateId = el.dataset.template;
+    const field = el.dataset.field;
+
+    if (!templateId || field !== "valor") return;
+
+    const raw = String(el.value || "").toUpperCase().trim();
+    const finalValue = formatarMoedaBR(raw);
+
+    el.value = finalValue;
+    updatePreview(templateId, "valor", finalValue);
+  }
+
+  function resetTemplate(templateId) {
+    const card = document.querySelector(`.templateCard[data-template="${templateId}"]`);
+    if (!card) return;
+
+    card.querySelectorAll("input, select").forEach((el) => {
+      if (el.tagName === "SELECT") {
+        el.selectedIndex = 0;
+      } else {
+        el.value = "";
+      }
+
+      if (el.dataset.field) updatePreview(templateId, el.dataset.field, "");
+    });
+
+    setPreviewBackgroundByProduct(templateId, "SOJA");
+  }
+
+  async function saveTemplate(templateId) {
+    const preview = getPreview(templateId);
+    if (!preview) return;
+
+    const bgImg = getBgImgEl(preview);
+
+    if (bgImg && (!bgImg.complete || bgImg.naturalWidth === 0)) {
+      await new Promise((resolve) => {
+        bgImg.addEventListener("load", resolve, { once: true });
+        bgImg.addEventListener("error", resolve, { once: true });
+      });
+    }
+
+    if (typeof html2canvas === "undefined") {
+      console.error("Biblioteca html2canvas não foi carregada no HTML.");
+      return;
+    }
+
+    try {
+      const canvas = await html2canvas(preview, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true
+      });
+
+      const link = document.createElement("a");
+      link.download = `divulgacao-modelo-${templateId}.jpg`;
+      link.href = canvas.toDataURL("image/jpeg", 0.95);
+      link.click();
+    } catch (err) {
+      console.error("Erro ao gerar a imagem do template:", err);
+    }
+  }
+
+  function bindActions() {
+    const fields = document.querySelectorAll("[data-template][data-field]");
+
+    fields.forEach((el) => {
+      const eventName = el.tagName === "SELECT" ? "change" : "input";
+      el.addEventListener(eventName, handleInput);
+
+      if (el.dataset.field === "valor") {
+        el.addEventListener("blur", handleBlur);
+      }
+    });
+
+    document.querySelectorAll("[data-action='reset']").forEach((btn) => {
+      btn.addEventListener("click", () => resetTemplate(btn.dataset.template));
+    });
+
+    document.querySelectorAll("[data-action='save']").forEach((btn) => {
+      btn.addEventListener("click", () => saveTemplate(btn.dataset.template));
+    });
+
+    // Sincroniza o estado inicial de todos os campos
+    fields.forEach((el) => {
+      handleInput({ target: el });
+      if (el.dataset.field === "valor") {
+        handleBlur({ target: el });
+      }
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", bindActions);
+})();
