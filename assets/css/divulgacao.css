@@ -1,10 +1,265 @@
-/* =========================================
-   VALOR / PREÇO (Alinhado exatamente com o R$)
-========================================= */
+/* ===================================================
+   1. RESET E ESTRUTURA DA PÁGINA
+=================================================== */
+.divulgacao-page {
+  padding: 24px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin: 0 0 4px 0;
+  font-size: 1.6rem;
+  color: #fff;
+}
+
+.page-header p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+/* Card Branco que segura o formulário e o preview */
+.templateCard {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  margin-bottom: 32px;
+}
+
+.templateHeader {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.templateHeader h2 {
+  font-size: 1.3rem;
+  margin: 0 0 4px 0;
+  color: #0f172a;
+}
+
+.templateHeader p {
+  color: #64748b;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+/* Grid de 2 Colunas */
+.templateBody {
+  display: grid !important;
+  grid-template-columns: 1fr 420px !important;
+  gap: 32px !important;
+  align-items: start !important;
+}
+
+@media (max-width: 960px) {
+  .templateBody {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ===================================================
+   2. FORMULÁRIO (Coluna da Esquerda)
+=================================================== */
+.templateForm {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.templateForm label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: -6px;
+}
+
+.templateForm input,
+.templateForm select {
+  width: 100% !important;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background-color: #fff;
+  color: #1e293b;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.templateForm input:focus,
+.templateForm select:focus {
+  border-color: #f59e0b;
+}
+
+/* Botões */
+.templateActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btnTiny {
+  padding: 10px 22px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnTiny.green {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.btnTiny.ghost {
+  background-color: transparent;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+/* ===================================================
+   3. PREVIEW / CARD (Coluna da Direita)
+=================================================== */
+.templatePreview {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: 0 auto !important;
+  aspect-ratio: 9 / 16 !important;
+  overflow: hidden !important;
+  border-radius: 10px !important;
+  background-color: #000000 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+.templatePreview .previewBg {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: fill !important;
+  z-index: 1 !important;
+}
+
+.templatePreview [data-bind] {
+  position: relative;
+  z-index: 5;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  text-transform: uppercase;
+  box-sizing: border-box;
+}
+
+/* -------------------------------------------
+   A) COLETA / CARREGAMENTO
+   Posicionado logo abaixo de "CARREGAMENTO"
+------------------------------------------- */
+.templatePreview .previewColeta {
+  position: absolute !important;
+  top: 45% !important;
+  bottom: auto !important;
+  left: 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  z-index: 5 !important;
+  padding: 0 12px !important;
+}
+
+.templatePreview .previewColeta .previewValue {
+  font-size: 1.25rem !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  text-shadow: 2px 2px 3px #000000 !important;
+  line-height: 1.1 !important;
+}
+
+.templatePreview .previewColeta .previewSmall {
+  font-size: 0.85rem !important;
+  font-weight: bold !important;
+  color: #111111 !important;
+  text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.8) !important;
+  margin-top: 1px !important;
+}
+
+/* -------------------------------------------
+   B) DESCARGA
+   Posicionado logo abaixo de "DESCARGA"
+------------------------------------------- */
+.templatePreview .previewDescarga {
+  position: absolute !important;
+  top: 56.5% !important;
+  bottom: auto !important;
+  left: 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  z-index: 5 !important;
+  padding: 0 12px !important;
+}
+
+.templatePreview .previewDescarga .previewValue {
+  font-size: 1.25rem !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  text-shadow: 2px 2px 3px #000000 !important;
+  line-height: 1.1 !important;
+}
+
+.templatePreview .previewDescarga .previewSmall {
+  font-size: 0.85rem !important;
+  font-weight: bold !important;
+  color: #111111 !important;
+  text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.8) !important;
+  margin-top: 1px !important;
+}
+
+/* -------------------------------------------
+   C) PRODUTO
+   Centralizado logo abaixo do título "PRODUTO"
+------------------------------------------- */
+.templatePreview .previewProduct {
+  position: absolute !important;
+  top: 67% !important;
+  bottom: auto !important;
+  left: 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  z-index: 5 !important;
+  font-size: 1.25rem !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  text-shadow: 2px 2px 4px #000000 !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* -------------------------------------------
+   D) VALOR / PREÇO
+   Encaixado diretamente ao lado direito do "R$"
+------------------------------------------- */
 .templatePreview .previewPrice {
   position: absolute !important;
-  top: 72.8% !important; /* Altura exata da linha do R$ */
-  left: 54% !important;  /* Fica à direita do R$ */
+  top: 72.8% !important;
+  bottom: auto !important;
+  left: 54% !important;
   width: 42% !important;
   text-align: left !important;
   z-index: 5 !important;
@@ -16,12 +271,13 @@
   margin: 0 !important;
 }
 
-/* =========================================
-   CONTATOS (Faixa preta inferior)
-========================================= */
+/* -------------------------------------------
+   E) CONTATOS
+   Centralizados na faixa preta inferior
+------------------------------------------- */
 .templatePreview .previewContacts {
   position: absolute !important;
-  top: 86% !important;
+  top: 85% !important;
   bottom: auto !important;
   left: 5% !important;
   width: 90% !important;
@@ -33,7 +289,7 @@
 }
 
 .templatePreview .previewContactLine {
-  font-size: 0.85rem !important;
+  font-size: 0.82rem !important;
   font-weight: 900 !important;
   color: #ffffff !important;
   text-shadow: 1px 1px 2px #000000 !important;
@@ -41,21 +297,22 @@
   line-height: 1.2 !important;
 }
 
-/* =========================================
-   OBSERVAÇÕES (Fixada na base da faixa preta)
-========================================= */
+/* -------------------------------------------
+   F) OBSERVAÇÕES
+   Fixado na base final do rodapé preto
+------------------------------------------- */
 .templatePreview .previewNote {
   position: absolute !important;
-  top: auto !important;      /* Anula qualquer top que esteja empurrando pro topo */
-  bottom: 2% !important;     /* Fixa a 2% do final da imagem */
+  top: auto !important;
+  bottom: 2.2% !important;
   left: 0 !important;
   width: 100% !important;
   text-align: center !important;
   z-index: 10 !important;
   font-size: 0.82rem !important;
   font-weight: 900 !important;
-  color: #f59e0b !important; /* Amarelo ouro para contraste total no preto */
-  letter-spacing: 0.5px !important;
+  color: #f59e0b !important; /* Destaque em amarelo sobre o fundo preto */
+  letter-spacing: 0.6px !important;
   padding: 0 10px !important;
   text-shadow: 1px 1px 2px #000000 !important;
 }
