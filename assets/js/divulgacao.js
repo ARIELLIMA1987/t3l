@@ -2,7 +2,14 @@
 (function () {
   "use strict";
 
-  const DEFAULT_IMAGE_PATH = "../assets/img/postt3l.png";
+  const DEFAULT: "../assets/img/postt3l.png",
+  SOJA: "../assets/img/postt3l.png",
+  FARELODESOJA: "../assets/img/postt3l.png",
+  MILHO: "../assets/img/postt3l.png",
+  ACUCAR: "../assets/img/postt3l.png",
+  CALCARIO: "../assets/img/postt3l.png",
+  SORGO: "../assets/img/postt3l.png",
+  FERTILIZANTE: "../assets/img/postt3l.png"
 
   const FILIAIS_CONTATOS = {
     RIOVERDE: [
