@@ -1,267 +1,199 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Divulgação | T3L</title>
-  <link rel="stylesheet" href="../assets/css/app.css" />
-
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: #0b1020;
       color: #e9eefc;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      margin: 0;
-      padding: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      padding-bottom: 40px;
     }
-
-    .divulgacao-page {
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 24px 18px;
-    }
-
-    .page-header {
+    .topbar {
+      background: rgba(12, 16, 26, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
     }
-
-    .page-header h1 {
-      margin: 0 0 4px 0;
-      font-size: 1.6rem;
-      color: #ffffff;
-    }
-
-    .page-header p {
-      margin: 0;
-      color: rgba(233, 238, 252, 0.7);
+    .btnVoltar {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      text-decoration: none;
       font-size: 0.9rem;
     }
+    .container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .page-header { margin-bottom: 20px; }
+    .page-header h1 { font-size: 1.6rem; color: #fff; }
+    .page-header p { color: #94a3b8; font-size: 0.9rem; margin-top: 4px; }
 
     .templateCard {
       background: #ffffff;
       color: #1e293b;
-      border-radius: 16px;
+      border-radius: 12px;
       padding: 24px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
-      margin-bottom: 32px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     }
-
     .templateHeader {
-      margin-bottom: 20px;
       border-bottom: 1px solid #e2e8f0;
       padding-bottom: 12px;
+      margin-bottom: 20px;
     }
+    .templateHeader h2 { font-size: 1.2rem; color: #0f172a; }
 
-    .templateHeader h2 {
-      font-size: 1.3rem;
-      margin: 0 0 4px 0;
-      color: #0f172a;
-    }
-
-    .templateHeader p {
-      color: #64748b;
-      margin: 0;
-      font-size: 0.85rem;
-    }
-
+    /* Layout 2 Colunas */
     .templateBody {
-      display: grid;
-      grid-template-columns: 1fr 430px;
+      display: flex;
+      flex-direction: row;
       gap: 32px;
-      align-items: start;
+      align-items: flex-start;
+    }
+    @media (max-width: 900px) {
+      .templateBody { flex-direction: column; }
     }
 
-    @media (max-width: 960px) {
-      .templateBody {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Formulário */
     .templateForm {
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 12px;
+      width: 100%;
     }
-
     .templateForm label {
       font-size: 0.85rem;
       font-weight: 700;
       color: #334155;
-      margin-bottom: -6px;
+      margin-bottom: -4px;
     }
-
-    .templateForm input,
-    .templateForm select {
+    .templateForm input, .templateForm select {
       width: 100%;
-      padding: 10px 14px;
+      padding: 9px 12px;
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
+      border-radius: 6px;
       font-size: 0.95rem;
-      background-color: #fff;
-      color: #1e293b;
-      box-sizing: border-box;
       outline: none;
+      background: #fff;
+      color: #1e293b;
     }
 
-    .templateForm input:focus,
-    .templateForm select:focus {
-      border-color: #f59e0b;
-    }
-
-    .templateActions {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-      padding-top: 16px;
-      border-top: 1px solid #e2e8f0;
-    }
-
-    .btnTiny {
-      padding: 10px 22px;
-      font-size: 0.95rem;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      border: none;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btnTiny.green {
-      background-color: #10b981;
-      color: #ffffff;
-    }
-
-    .btnTiny.ghost {
-      background-color: transparent;
-      border: 1px solid #cbd5e1;
-      color: #475569;
-    }
-
-    /* ===================================================
-       CONTAINER COM ESCALA TRAVADA EM 1080x1920
-    =================================================== */
-    .previewWrapper {
+    /* Card Preview Travado */
+    .previewContainer {
       width: 400px;
-      height: 711px; /* Proporção exata 9:16 para 400px de largura */
+      height: 711px;
       position: relative;
       overflow: hidden;
-      border-radius: 12px;
-      background-color: #000;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      margin: 0 auto;
+      border-radius: 8px;
+      background: #000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      flex-shrink: 0;
     }
-
-    /* Canvas nativo com resolução de alta definição (1080 x 1920) */
-    .templatePreview {
+    .previewInner {
       position: absolute;
       top: 0;
       left: 0;
       width: 1080px;
       height: 1920px;
+      transform: scale(0.37037);
       transform-origin: top left;
-      transform: scale(0.37037); /* Reduz proporcionalmente para caber nos 400px */
-      overflow: hidden;
-      background-color: #000000;
+      background: #000;
     }
-
-    .templatePreview .previewBg {
+    .previewInner .previewBg {
       position: absolute;
       top: 0;
       left: 0;
       width: 1080px;
       height: 1920px;
       z-index: 1;
-      pointer-events: none;
+      display: block;
     }
-
-    .templatePreview [data-bind] {
-      position: absolute;
-      z-index: 5;
+    .previewInner [data-bind] {
       font-family: 'Impact', 'Arial Black', sans-serif;
       text-transform: uppercase;
-      box-sizing: border-box;
+      z-index: 5;
     }
 
-    /* 1. CARREGAMENTO */
+    /* Posições */
     .previewColeta {
+      position: absolute;
       top: 920px;
       left: 0;
       width: 1080px;
       text-align: center;
+      z-index: 5;
     }
-    .previewColeta .previewValue {
-      position: static;
-      font-size: 56px;
+    .previewColeta .val {
+      font-size: 54px;
       font-weight: 900;
       color: #ffffff;
       text-shadow: 4px 4px 6px #000000;
       line-height: 1.1;
     }
-    .previewColeta .previewSmall {
-      position: static;
-      font-size: 38px;
+    .previewColeta .sub {
+      font-size: 36px;
       font-weight: bold;
       color: #111111;
       margin-top: 4px;
     }
 
-    /* 2. DESCARGA */
     .previewDescarga {
+      position: absolute;
       top: 1145px;
       left: 0;
       width: 1080px;
       text-align: center;
+      z-index: 5;
     }
-    .previewDescarga .previewValue {
-      position: static;
-      font-size: 56px;
+    .previewDescarga .val {
+      font-size: 54px;
       font-weight: 900;
       color: #ffffff;
       text-shadow: 4px 4px 6px #000000;
       line-height: 1.1;
     }
-    .previewDescarga .previewSmall {
-      position: static;
-      font-size: 38px;
+    .previewDescarga .sub {
+      font-size: 36px;
       font-weight: bold;
       color: #111111;
       margin-top: 4px;
     }
 
-    /* 3. PRODUTO (Encaixe no meio da palavra PRODUTO e R$) */
     .previewProduct {
+      position: absolute;
       top: 1315px;
       left: 0;
       width: 1080px;
       text-align: center;
-      font-size: 54px;
+      font-size: 52px;
       font-weight: 900;
       color: #ffffff;
       text-shadow: 4px 4px 8px #000000;
-      letter-spacing: 1px;
     }
 
-    /* 4. VALOR / PREÇO (Alinhado exatamente ao lado direito do R$) */
     .previewPrice {
+      position: absolute;
       top: 1435px;
       left: 520px;
       width: 500px;
       text-align: left;
-      font-size: 68px;
+      font-size: 64px;
       font-weight: 900;
       color: #111111;
       line-height: 1;
     }
 
-    /* 5. CONTATOS (No rodapé preto) */
     .previewContacts {
+      position: absolute;
       top: 1630px;
       left: 0;
       width: 1080px;
@@ -269,72 +201,77 @@
       flex-direction: column;
       gap: 6px;
       text-align: center;
+      z-index: 5;
     }
-    .previewContactLine {
-      position: static;
+    .previewContacts .line {
       font-size: 38px;
       font-weight: 900;
       color: #ffffff;
       text-shadow: 3px 3px 6px #000000;
-      line-height: 1.2;
     }
 
-    /* 6. OBSERVAÇÕES (Base do rodapé preto) */
     .previewNote {
+      position: absolute;
       bottom: 45px;
       left: 0;
       width: 1080px;
       text-align: center;
-      font-size: 38px;
+      font-size: 36px;
       font-weight: 900;
       color: #f59e0b;
-      letter-spacing: 1px;
       text-shadow: 2px 2px 4px #000000;
     }
+
+    .templateActions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .btnAction {
+      padding: 10px 22px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+    }
+    .btnAction.green { background: #10b981; color: #fff; }
+    .btnAction.ghost { background: transparent; border: 1px solid #cbd5e1; color: #475569; }
   </style>
 </head>
 <body>
+
   <div class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <a class="burger" href="./home.html" title="Voltar"><div></div></a>
-        <img src="../assets/img/logoT3L.png" alt="T3L" />
-      </div>
-      <div class="actions">
-        <div class="icon-btn" title="Sair" data-logout>↩️</div>
-      </div>
-    </div>
+    <h3 style="color:#f59e0b;">T3L TRANSPORTES</h3>
+    <a class="btnVoltar" href="./home.html">Voltar</a>
   </div>
 
-  <main class="container divulgacao-page">
-    <header class="page-header">
-      <div>
-        <h1>Divulgação</h1>
-        <p>Preencha os campos e salve a imagem em JPG.</p>
-      </div>
-      <a class="btnTiny ghost" href="./home.html">Voltar</a>
-    </header>
+  <main class="container">
+    <div class="page-header">
+      <h1>Divulgação</h1>
+      <p>Preencha os campos e salve a imagem em JPG.</p>
+    </div>
 
-    <!-- MODELO 1 -->
-    <section class="templateCard" data-template="1">
+    <div class="templateCard" data-template="1">
       <div class="templateHeader">
         <h2>Modelo 1 - Coleta x Descarga</h2>
-        <p>Layout direto para anúncios rápidos.</p>
       </div>
 
       <div class="templateBody">
         <div class="templateForm">
           <label>Local de coleta (Cidade-UF)</label>
-          <input data-template="1" data-field="coletaCidade" placeholder="Ex: INDIARA-GO" />
+          <input data-template="1" data-field="coletaCidade" placeholder="Ex: RIO VERDE/GO" />
 
           <label>Local de coleta (Detalhe)</label>
-          <input data-template="1" data-field="coletaLocal" placeholder="Ex: Faz Ouro Branco" />
+          <input data-template="1" data-field="coletaLocal" placeholder="Ex: TERMINAL RUMO" />
 
           <label>Local de descarga (Cidade-UF)</label>
-          <input data-template="1" data-field="descargaCidade" placeholder="Ex: RIO VERDE-GO" />
+          <input data-template="1" data-field="descargaCidade" placeholder="Ex: INDIARA/GO" />
 
           <label>Local de descarga (Detalhe)</label>
-          <input data-template="1" data-field="descargaLocal" placeholder="Ex: Terminal Rumo" />
+          <input data-template="1" data-field="descargaLocal" placeholder="Ex: COMIGO" />
 
           <label>Produto</label>
           <input data-template="1" data-field="produto" placeholder="Ex: SOJA EM GRAOS" />
@@ -364,41 +301,40 @@
           <input data-template="1" data-field="contato4" placeholder="Ex: (64) 9xxxx-xxxx" />
         </div>
 
-        <!-- Preview com escala travada -->
-        <div class="previewWrapper">
-          <div class="templatePreview" data-template-preview="1">
-            <img class="previewBg" src="../assets/img/postt3l.png" alt="Template T3L" />
+        <div class="previewContainer">
+          <div class="previewInner" data-template-preview="1">
+            <img class="previewBg" src="../assets/img/postt3l.png" alt="Template" />
 
-            <div class="previewColeta" data-bind-group="coleta">
-              <div class="previewValue" data-bind="coletaCidade" data-placeholder="-CIDADE-UF"></div>
-              <div class="previewSmall" data-bind="coletaLocal" data-placeholder="Local"></div>
+            <div class="previewColeta">
+              <div class="val" data-bind="coletaCidade">-CIDADE-UF</div>
+              <div class="sub" data-bind="coletaLocal">Local</div>
             </div>
 
-            <div class="previewDescarga" data-bind-group="descarga">
-              <div class="previewValue" data-bind="descargaCidade" data-placeholder="-CIDADE-UF"></div>
-              <div class="previewSmall" data-bind="descargaLocal" data-placeholder="Local"></div>
+            <div class="previewDescarga">
+              <div class="val" data-bind="descargaCidade">-CIDADE-UF</div>
+              <div class="sub" data-bind="descargaLocal">Local</div>
             </div>
 
-            <div class="previewProduct" data-bind="produto" data-placeholder="Produto"></div>
-            <div class="previewPrice" data-bind="valor" data-placeholder="Valor"></div>
+            <div class="previewProduct" data-bind="produto">PRODUTO</div>
+            <div class="previewPrice" data-bind="valor">R$ 00,00</div>
 
             <div class="previewContacts">
-              <div class="previewContactLine" data-bind="contato1" data-placeholder="Contato 1"></div>
-              <div class="previewContactLine" data-bind="contato2" data-placeholder="Contato 2"></div>
-              <div class="previewContactLine" data-bind="contato3" data-placeholder="Contato 3"></div>
-              <div class="previewContactLine" data-bind="contato4" data-placeholder="Contato 4"></div>
+              <div class="line" data-bind="contato1"></div>
+              <div class="line" data-bind="contato2"></div>
+              <div class="line" data-bind="contato3"></div>
+              <div class="line" data-bind="contato4"></div>
             </div>
 
-            <div class="previewNote" data-bind="obs" data-placeholder="Observações"></div>
+            <div class="previewNote" data-bind="obs">OBSERVAÇÃO</div>
           </div>
         </div>
       </div>
 
       <div class="templateActions">
-        <button class="btnTiny green" data-action="save" data-template="1">Salvar JPG</button>
-        <button class="btnTiny ghost" data-action="reset" data-template="1">Resetar</button>
+        <button class="btnAction green" data-action="save" data-template="1">Salvar JPG</button>
+        <button class="btnAction ghost" data-action="reset" data-template="1">Resetar</button>
       </div>
-    </section>
+    </div>
   </main>
 
   <script src="../assets/js/auth.js"></script>
