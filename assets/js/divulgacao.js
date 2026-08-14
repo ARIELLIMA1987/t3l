@@ -2,16 +2,35 @@
 (function () {
   "use strict";
 
-  const PRODUCT_BG_MAP = {"../assets/img/postt3l.png",
-   };
+  const DEFAULT_IMAGE_PATH = "../assets/img/postt3l.png";
+
+  const PRODUCT_BG_MAP = {
+    DEFAULT: DEFAULT_IMAGE_PATH,
+    SOJA: DEFAULT_IMAGE_PATH,
+    MILHO: DEFAULT_IMAGE_PATH,
+    ACUCAR: DEFAULT_IMAGE_PATH,
+    CALCARIO: DEFAULT_IMAGE_PATH,
+    FARELODESOJA: DEFAULT_IMAGE_PATH,
+    SORGO: DEFAULT_IMAGE_PATH,
+    FERTILIZANTE: DEFAULT_IMAGE_PATH,
+    CONCRETO: DEFAULT_IMAGE_PATH,
+    EMBALAGENS: DEFAULT_IMAGE_PATH,
+    DERIVADODEMILHO: DEFAULT_IMAGE_PATH,
+    FUBA: DEFAULT_IMAGE_PATH,
+    MILHODEPIPOCA: DEFAULT_IMAGE_PATH,
+    POSTEDECONCRETO: DEFAULT_IMAGE_PATH
+  };
 
   const FILIAIS_CONTATOS = {
     RIOVERDE: [
-      
-      "ARIEL (64) 99227-7537",};
-          
+      "ARIEL (64) 99227-7537",
+      "",
+      "",
+      ""
+    ]
+  };
 
-  const DEFAULT_BG = PRODUCT_BG_MAP.SOJA;
+  const DEFAULT_BG = PRODUCT_BG_MAP.DEFAULT || DEFAULT_IMAGE_PATH;
 
   const PRODUCT_ALIAS = {
     SOJA: "SOJA",
@@ -44,16 +63,18 @@
     ADUBO: "FERTILIZANTE",
     FERTILIZANTE: "FERTILIZANTE",
     FERTILIZANTES: "FERTILIZANTE",
-    FERT: "FERTILIZANTE"
+    FERT: "FERTILIZANTE",
 
     FUBA: "FUBA",
-    BLOCO DE CONCRETO: "CONCRETO",
+    BLOCODECONCRETO: "CONCRETO",
+    CONCRETO: "CONCRETO",
     EMBALAGENS: "EMBALAGENS",
-    DERIVADO DE MILHO : "DERIVADO DE MILHO"
-    GERMEN DE MILHO: "FERTILIZANTE",
+    DERIVADODEMILHO: "DERIVADODEMILHO",
+    GERMENDEMILHO: "FERTILIZANTE",
     ALIMENTICIO: "FERTILIZANTE",
-    PIPOCA: "MILHO DE PIPOCA",
-    POSTE DE CONCRETO: "POSTE DE CONCRETO"
+    PIPOCA: "MILHODEPIPOCA",
+    MILHODEPIPOCA: "MILHODEPIPOCA",
+    POSTEDECONCRETO: "POSTEDECONCRETO"
   };
 
   function getPreview(templateId) {
@@ -129,7 +150,7 @@
   function inferProductFamily(normalized) {
     if (normalized.includes("FARELO") && normalized.includes("SOJA")) return "FARELODESOJA";
     if (normalized.includes("SOJA")) return "SOJA";
-    if (normalized.includes("MILHO")) return "MILHO";
+    if (normalized.includes("MILHO") && !normalized.includes("PIPOCA")) return "MILHO";
     if (normalized.includes("ACUCAR")) return "ACUCAR";
     if (normalized.includes("CALCARIO")) return "CALCARIO";
     if (normalized.includes("SORGO")) return "SORGO";
@@ -254,6 +275,11 @@
         bgImg.addEventListener("load", resolve, { once: true });
         bgImg.addEventListener("error", resolve, { once: true });
       });
+    }
+
+    if (typeof html2canvas === "undefined") {
+      console.error("Biblioteca html2canvas não foi carregada no HTML.");
+      return;
     }
 
     const canvas = await html2canvas(preview, {
