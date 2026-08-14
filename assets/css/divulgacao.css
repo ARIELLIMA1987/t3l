@@ -1,11 +1,12 @@
-/* C) PRODUTO (Encaixado no centro entre "PRODUTO" e "R$") */
-    .templatePreview .previewProduct {
+/* 3. PRODUTO (Desceu um pouco para dar respiro da palavra PRODUTO) */
+    .previewProduct {
       position: absolute !important;
-      top: 68% !important; /* Subiu para livrar totalmente o R$ */
+      top: 73.2% !important;
+      bottom: auto !important;
       left: 0 !important;
       width: 100% !important;
       text-align: center !important;
-      z-index: 5 !important;
+      z-index: 10 !important;
       font-size: 1.25rem !important;
       font-weight: 900 !important;
       color: #ffffff !important;
@@ -13,15 +14,16 @@
       letter-spacing: 0.5px !important;
     }
 
-    /* D) VALOR / PREÇO (Cravado na mesma linha horizontal do R$) */
-    .templatePreview .previewPrice {
+    /* 4. VALOR / PREÇO (Desceu um pouquinho para cravar na linha do R$) */
+    .previewPrice {
       position: absolute !important;
-      top: 74.8% !important; /* Subiu para alinhar perfeitamente com o R$ */
-      left: 45% !important;   /* Encaixa colado à direita do R$ */
-      width: 50% !important;
+      top: 77.3% !important;
+      bottom: auto !important;
+      left: 48% !important;
+      width: 48% !important;
       text-align: left !important;
-      z-index: 5 !important;
-      font-size: 1.45rem !important;
+      z-index: 10 !important;
+      font-size: 1.4rem !important;
       font-weight: 900 !important;
       color: #111111 !important;
       text-shadow: none !important;
