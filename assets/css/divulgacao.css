@@ -1,138 +1,4 @@
-/* =========================================
-   ESTRUTURA GERAL DA PÁGINA (Layout 2 Colunas)
-========================================= */
-.divulgacao-page {
-  padding: 24px 16px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.templateCard {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  margin-bottom: 32px;
-}
-
-.templateHeader {
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 12px;
-}
-
-.templateHeader h2 {
-  font-size: 1.4rem;
-  color: #111;
-  margin: 0 0 4px 0;
-}
-
-.templateHeader p {
-  color: #666;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-/* Coloca o Formulário na Esquerda e o Preview na Direita */
-.templateBody {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 32px;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .templateBody {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =========================================
-   FORMULÁRIO (Coluna da Esquerda)
-========================================= */
-.templateForm {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.templateForm label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: -6px;
-}
-
-.templateForm input,
-.templateForm select {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #dcdfe6;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  background-color: #fff;
-  color: #333;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-}
-
-.templateForm input:focus,
-.templateForm select:focus {
-  outline: none;
-  border-color: #f59e0b;
-}
-
-/* Botões de Ação */
-.templateActions {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #eee;
-}
-
-.btnTiny {
-  padding: 10px 20px;
-  font-size: 0.95rem;
-  font-weight: bold;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btnTiny.green {
-  background-color: #10b981;
-  color: #fff;
-}
-
-.btnTiny.green:hover {
-  background-color: #059669;
-}
-
-.btnTiny.ghost {
-  background-color: transparent;
-  border: 1px solid #ccc;
-  color: #444;
-}
-
-.btnTiny.ghost:hover {
-  background-color: #f3f4f6;
-}
-
-/* =========================================
-   CARD DE PREVIEW (Coluna da Direita)
-========================================= */
+/* Container Principal do Card de Preview */
 .templatePreview {
   position: relative;
   width: 100%;
@@ -156,7 +22,7 @@
   z-index: 1;
 }
 
-/* Tipografia Geral dos Textos */
+/* Tipografia Geral */
 .templatePreview [data-bind] {
   position: relative;
   z-index: 2;
@@ -165,10 +31,12 @@
   box-sizing: border-box;
 }
 
-/* 1. CARREGAMENTO / COLETA */
+/* =========================================
+   1. CARREGAMENTO (Abaixo de CARREGAMENTO)
+========================================= */
 .previewColeta {
   position: absolute;
-  top: 45.5%;
+  top: 51.5%;
   left: 0;
   width: 100%;
   text-align: center;
@@ -177,7 +45,7 @@
 }
 
 .previewColeta .previewValue {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 900;
   color: #ffffff;
   text-shadow: 2px 2px 3px #000000;
@@ -185,16 +53,18 @@
 }
 
 .previewColeta .previewSmall {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: bold;
   color: #111111;
   margin-top: 1px;
 }
 
-/* 2. DESCARGA */
+/* =========================================
+   2. DESCARGA (Abaixo de DESCARGA)
+========================================= */
 .previewDescarga {
   position: absolute;
-  top: 60%;
+  top: 64.5%;
   left: 0;
   width: 100%;
   text-align: center;
@@ -203,7 +73,7 @@
 }
 
 .previewDescarga .previewValue {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 900;
   color: #ffffff;
   text-shadow: 2px 2px 3px #000000;
@@ -211,72 +81,82 @@
 }
 
 .previewDescarga .previewSmall {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: bold;
   color: #111111;
   margin-top: 1px;
 }
 
-/* 3. CONTATOS (Esquerda) */
-.previewContacts {
-  position: absolute;
-  top: 67%;
-  left: 5%;
-  width: 42%;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.previewContactLine {
-  font-size: 0.7rem;
-  font-weight: 900;
-  color: #ffffff;
-  text-shadow: 1.5px 1.5px 3px #000000;
-  white-space: nowrap;
-  line-height: 1.2;
-}
-
-/* 4. PRODUTO (Direita - Abaixo do título 'PRODUTO') */
+/* =========================================
+   3. PRODUTO (Abaixo da palavra PRODUTO)
+========================================= */
 .previewProduct {
   position: absolute;
-  top: 71.5%;
-  left: 48%;
-  width: 48%;
+  top: 73.5%;
+  left: 45%;
+  width: 50%;
   text-align: center;
   z-index: 2;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 900;
   color: #ffffff;
   text-shadow: 2px 2px 3px #000000;
 }
 
-/* 5. PREÇO / VALOR (Abaixo do 'R$') */
+/* =========================================
+   4. VALOR / PREÇO (Alinhado direto com o R$)
+========================================= */
 .previewPrice {
   position: absolute;
-  top: 80.5%;
-  left: 0;
-  width: 100%;
-  text-align: center;
+  top: 76.5%; /* Mesma altura da linha do R$ */
+  left: 54%;
+  width: 44%;
+  text-align: left;
   z-index: 2;
-  font-size: 1.55rem;
+  font-size: 1.45rem;
   font-weight: 900;
-  color: #ffffff;
-  text-shadow: 2px 2px 4px #000000;
+  color: #000000; /* Preto forte ao lado do R$ */
+  text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.8);
+  line-height: 1;
 }
 
-/* 6. OBSERVAÇÕES (Rodapé Preto) */
+/* =========================================
+   5. CONTATOS (No campo preto inferior - Esquerda)
+========================================= */
+.previewContacts {
+  position: absolute;
+  top: 85%;
+  left: 6%;
+  width: 88%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.previewContactLine {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px #000000;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+/* =========================================
+   6. OBSERVAÇÕES (No campo preto inferior - Direita/Base)
+========================================= */
 .previewNote {
   position: absolute;
   bottom: 2.5%;
-  left: 0;
-  width: 100%;
+  left: 5%;
+  width: 90%;
   text-align: center;
   z-index: 2;
   font-size: 0.85rem;
   font-weight: 900;
-  color: #ffffff;
-  letter-spacing: 0.5px;
-  padding: 0 10px;
+  color: #f59e0b; /* Destaque em amarelo sobre o fundo preto */
+  letter-spacing: 0.6px;
+  text-shadow: 1px 1px 2px #000000;
 }
