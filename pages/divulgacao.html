@@ -1,19 +1,304 @@
-<!-- divulgacao.html -->
 <!doctype html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Divulgação | T3L / ROCA</title>
+  <title>Divulgação | T3L</title>
   <link rel="stylesheet" href="../assets/css/app.css" />
-  <link rel="stylesheet" href="../assets/css/divulgacao.css" />
+
+  <style>
+    body {
+      background-color: #0b1020;
+      color: #e9eefc;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .divulgacao-page {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 24px 18px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+      margin: 0 0 4px 0;
+      font-size: 1.6rem;
+      color: #ffffff;
+    }
+
+    .page-header p {
+      margin: 0;
+      color: rgba(233, 238, 252, 0.7);
+      font-size: 0.9rem;
+    }
+
+    .templateCard {
+      background: #ffffff;
+      color: #1e293b;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+      margin-bottom: 32px;
+    }
+
+    .templateHeader {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 12px;
+    }
+
+    .templateHeader h2 {
+      font-size: 1.3rem;
+      margin: 0 0 4px 0;
+      color: #0f172a;
+    }
+
+    .templateHeader p {
+      color: #64748b;
+      margin: 0;
+      font-size: 0.85rem;
+    }
+
+    .templateBody {
+      display: grid;
+      grid-template-columns: 1fr 430px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .templateBody {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Formulário */
+    .templateForm {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .templateForm label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: -6px;
+    }
+
+    .templateForm input,
+    .templateForm select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background-color: #fff;
+      color: #1e293b;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    .templateForm input:focus,
+    .templateForm select:focus {
+      border-color: #f59e0b;
+    }
+
+    .templateActions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .btnTiny {
+      padding: 10px 22px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btnTiny.green {
+      background-color: #10b981;
+      color: #ffffff;
+    }
+
+    .btnTiny.ghost {
+      background-color: transparent;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+    }
+
+    /* ===================================================
+       CONTAINER COM ESCALA TRAVADA EM 1080x1920
+    =================================================== */
+    .previewWrapper {
+      width: 400px;
+      height: 711px; /* Proporção exata 9:16 para 400px de largura */
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      background-color: #000;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      margin: 0 auto;
+    }
+
+    /* Canvas nativo com resolução de alta definição (1080 x 1920) */
+    .templatePreview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1080px;
+      height: 1920px;
+      transform-origin: top left;
+      transform: scale(0.37037); /* Reduz proporcionalmente para caber nos 400px */
+      overflow: hidden;
+      background-color: #000000;
+    }
+
+    .templatePreview .previewBg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1080px;
+      height: 1920px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .templatePreview [data-bind] {
+      position: absolute;
+      z-index: 5;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      text-transform: uppercase;
+      box-sizing: border-box;
+    }
+
+    /* 1. CARREGAMENTO */
+    .previewColeta {
+      top: 920px;
+      left: 0;
+      width: 1080px;
+      text-align: center;
+    }
+    .previewColeta .previewValue {
+      position: static;
+      font-size: 56px;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 4px 4px 6px #000000;
+      line-height: 1.1;
+    }
+    .previewColeta .previewSmall {
+      position: static;
+      font-size: 38px;
+      font-weight: bold;
+      color: #111111;
+      margin-top: 4px;
+    }
+
+    /* 2. DESCARGA */
+    .previewDescarga {
+      top: 1145px;
+      left: 0;
+      width: 1080px;
+      text-align: center;
+    }
+    .previewDescarga .previewValue {
+      position: static;
+      font-size: 56px;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 4px 4px 6px #000000;
+      line-height: 1.1;
+    }
+    .previewDescarga .previewSmall {
+      position: static;
+      font-size: 38px;
+      font-weight: bold;
+      color: #111111;
+      margin-top: 4px;
+    }
+
+    /* 3. PRODUTO (Encaixe no meio da palavra PRODUTO e R$) */
+    .previewProduct {
+      top: 1315px;
+      left: 0;
+      width: 1080px;
+      text-align: center;
+      font-size: 54px;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 4px 4px 8px #000000;
+      letter-spacing: 1px;
+    }
+
+    /* 4. VALOR / PREÇO (Alinhado exatamente ao lado direito do R$) */
+    .previewPrice {
+      top: 1435px;
+      left: 520px;
+      width: 500px;
+      text-align: left;
+      font-size: 68px;
+      font-weight: 900;
+      color: #111111;
+      line-height: 1;
+    }
+
+    /* 5. CONTATOS (No rodapé preto) */
+    .previewContacts {
+      top: 1630px;
+      left: 0;
+      width: 1080px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: center;
+    }
+    .previewContactLine {
+      position: static;
+      font-size: 38px;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 3px 3px 6px #000000;
+      line-height: 1.2;
+    }
+
+    /* 6. OBSERVAÇÕES (Base do rodapé preto) */
+    .previewNote {
+      bottom: 45px;
+      left: 0;
+      width: 1080px;
+      text-align: center;
+      font-size: 38px;
+      font-weight: 900;
+      color: #f59e0b;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 4px #000000;
+    }
+  </style>
 </head>
 <body>
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <a class="burger" href="./home.html" title="Voltar">🏠</a>
-        <img src="../assets/img/logoT3L.png" alt="ROCA LOG" />
+        <a class="burger" href="./home.html" title="Voltar"><div></div></a>
+        <img src="../assets/img/logoT3L.png" alt="T3L" />
       </div>
       <div class="actions">
         <div class="icon-btn" title="Sair" data-logout>↩️</div>
@@ -52,13 +337,13 @@
           <input data-template="1" data-field="descargaLocal" placeholder="Ex: Terminal Rumo" />
 
           <label>Produto</label>
-          <input data-template="1" data-field="produto" placeholder="Ex: Soja / Milho / Açúcar / Calcário/ Farelo de Soja/ Sorgo/ Fertilizante" />
+          <input data-template="1" data-field="produto" placeholder="Ex: SOJA EM GRAOS" />
 
           <label>Valor por tonelada</label>
-          <input data-template="1" data-field="valor" placeholder="Ex: R$ 43,00 / A COMBINAR" />
+          <input data-template="1" data-field="valor" placeholder="Ex: R$ 80,00" />
 
           <label>Observações</label>
-          <input data-template="1" data-field="obs" placeholder="Ex: Pagamento PIX ou cheque" />
+          <input data-template="1" data-field="obs" placeholder="Ex: PAGAMENTO NO PIX" />
 
           <label>Filial</label>
           <select data-template="1" data-field="filial">
@@ -79,28 +364,32 @@
           <input data-template="1" data-field="contato4" placeholder="Ex: (64) 9xxxx-xxxx" />
         </div>
 
-        <div class="templatePreview" data-template-preview="1">
-          <img class="previewBg" src="../assets/img/postt3l.png" alt="Template T3L" />
+        <!-- Preview com escala travada -->
+        <div class="previewWrapper">
+          <div class="templatePreview" data-template-preview="1">
+            <img class="previewBg" src="../assets/img/postt3l.png" alt="Template T3L" />
 
-          <div class="previewColeta">
-            <div class="previewValue" data-bind="coletaCidade" data-placeholder="-CIDADE-UF"></div>
-            <div class="previewSmall" data-bind="coletaLocal" data-placeholder="Local"></div>
-          </div>
+            <div class="previewColeta" data-bind-group="coleta">
+              <div class="previewValue" data-bind="coletaCidade" data-placeholder="-CIDADE-UF"></div>
+              <div class="previewSmall" data-bind="coletaLocal" data-placeholder="Local"></div>
+            </div>
 
-          <div class="previewDescarga">
-            <div class="previewValue" data-bind="descargaCidade" data-placeholder="-CIDADE-UF"></div>
-            <div class="previewSmall" data-bind="descargaLocal" data-placeholder="Local"></div>
-          </div>
+            <div class="previewDescarga" data-bind-group="descarga">
+              <div class="previewValue" data-bind="descargaCidade" data-placeholder="-CIDADE-UF"></div>
+              <div class="previewSmall" data-bind="descargaLocal" data-placeholder="Local"></div>
+            </div>
 
-          <div class="previewProduct" data-bind="produto" data-placeholder="Produto"></div>
-          <div class="previewPrice" data-bind="valor" data-placeholder="Valor por tonelada"></div>
-          <div class="previewNote" data-bind="obs" data-placeholder="Observações"></div>
+            <div class="previewProduct" data-bind="produto" data-placeholder="Produto"></div>
+            <div class="previewPrice" data-bind="valor" data-placeholder="Valor"></div>
 
-          <div class="previewContacts">
-            <div class="previewContactLine" data-bind="contato1" data-placeholder="Contato 1"></div>
-            <div class="previewContactLine" data-bind="contato2" data-placeholder="Contato 2"></div>
-            <div class="previewContactLine" data-bind="contato3" data-placeholder="Contato 3"></div>
-            <div class="previewContactLine" data-bind="contato4" data-placeholder="Contato 4"></div>
+            <div class="previewContacts">
+              <div class="previewContactLine" data-bind="contato1" data-placeholder="Contato 1"></div>
+              <div class="previewContactLine" data-bind="contato2" data-placeholder="Contato 2"></div>
+              <div class="previewContactLine" data-bind="contato3" data-placeholder="Contato 3"></div>
+              <div class="previewContactLine" data-bind="contato4" data-placeholder="Contato 4"></div>
+            </div>
+
+            <div class="previewNote" data-bind="obs" data-placeholder="Observações"></div>
           </div>
         </div>
       </div>
@@ -115,9 +404,5 @@
   <script src="../assets/js/auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="../assets/js/divulgacao.js"></script>
-  <script>
-    if (typeof requireHomeAuth === "function") requireHomeAuth();
-    if (typeof bindLogoutButton === "function") bindLogoutButton();
-  </script>
 </body>
 </html>
