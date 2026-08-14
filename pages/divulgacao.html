@@ -25,7 +25,7 @@
     <header class="page-header">
       <div>
         <h1>Divulgação</h1>
-        <p>preencha os campos e salve a imagem em JPG.</p>
+        <p>Preencha os campos e salve a imagem em JPG.</p>
       </div>
       <a class="btnTiny ghost" href="./home.html">Voltar</a>
     </header>
@@ -61,11 +61,10 @@
           <input data-template="1" data-field="obs" placeholder="Ex: Pagamento PIX ou cheque" />
 
           <label>Filial</label>
-<select data-template="1" data-field="filial">
-  <option value="">Selecione...</option>
-
-  <option value="RIOVERDE">RIO VERDE</option>
-</select>
+          <select data-template="1" data-field="filial">
+            <option value="">Selecione...</option>
+            <option value="RIOVERDE">RIO VERDE</option>
+          </select>
 
           <label>Contatos (linha 1)</label>
           <input data-template="1" data-field="contato1" placeholder="Ex: (64) 9xxxx-xxxx" />
@@ -81,7 +80,7 @@
         </div>
 
         <div class="templatePreview" data-template-preview="1">
-          <img class="previewBg" src="../assets/img/T3L.png" alt="" />
+          <img class="previewBg" src="../assets/img/postt3l.png" alt="Template T3L" />
 
           <div class="previewColeta">
             <div class="previewValue" data-bind="coletaCidade" data-placeholder="-CIDADE-UF"></div>
@@ -117,8 +116,8 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="../assets/js/divulgacao.js"></script>
   <script>
-    requireHomeAuth();
-    bindLogoutButton();
+    if (typeof requireHomeAuth === "function") requireHomeAuth();
+    if (typeof bindLogoutButton === "function") bindLogoutButton();
   </script>
 </body>
 </html>
