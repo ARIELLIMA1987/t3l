@@ -1,5 +1,5 @@
 /* ===================================================
-   1. RESET E ESTRUTURA DA PÁGINA
+   1. ESTRUTURA GERAL DA PÁGINA (Layout em 2 Colunas)
 =================================================== */
 .divulgacao-page {
   padding: 24px 16px;
@@ -27,7 +27,7 @@
   font-size: 0.95rem;
 }
 
-/* Card Branco que segura o formulário e o preview */
+/* Card Branco Container */
 .templateCard {
   background: #ffffff !important;
   color: #1e293b !important;
@@ -55,7 +55,7 @@
   font-size: 0.85rem;
 }
 
-/* Grid de 2 Colunas */
+/* Duas Colunas: Formulário na Esquerda (flexível) e Card na Direita (420px) */
 .templateBody {
   display: grid !important;
   grid-template-columns: 1fr 420px !important;
@@ -171,8 +171,7 @@
 }
 
 /* -------------------------------------------
-   A) COLETA / CARREGAMENTO
-   Posicionado logo abaixo de "CARREGAMENTO"
+   A) CARREGAMENTO / COLETA
 ------------------------------------------- */
 .templatePreview .previewColeta {
   position: absolute !important;
@@ -203,11 +202,10 @@
 
 /* -------------------------------------------
    B) DESCARGA
-   Posicionado logo abaixo de "DESCARGA"
 ------------------------------------------- */
 .templatePreview .previewDescarga {
   position: absolute !important;
-  top: 56.5% !important;
+  top: 55.5% !important;
   bottom: auto !important;
   left: 0 !important;
   width: 100% !important;
@@ -234,11 +232,10 @@
 
 /* -------------------------------------------
    C) PRODUTO
-   Centralizado logo abaixo do título "PRODUTO"
 ------------------------------------------- */
 .templatePreview .previewProduct {
   position: absolute !important;
-  top: 67% !important;
+  top: 65% !important;
   bottom: auto !important;
   left: 0 !important;
   width: 100% !important;
@@ -252,12 +249,11 @@
 }
 
 /* -------------------------------------------
-   D) VALOR / PREÇO
-   Encaixado diretamente ao lado direito do "R$"
+   D) VALOR / PREÇO (Na mesma linha do R$)
 ------------------------------------------- */
 .templatePreview .previewPrice {
   position: absolute !important;
-  top: 72.8% !important;
+  top: 70.2% !important;
   bottom: auto !important;
   left: 54% !important;
   width: 42% !important;
@@ -272,12 +268,11 @@
 }
 
 /* -------------------------------------------
-   E) CONTATOS
-   Centralizados na faixa preta inferior
+   E) CONTATOS (No bloco preto inferior)
 ------------------------------------------- */
 .templatePreview .previewContacts {
   position: absolute !important;
-  top: 85% !important;
+  top: 83% !important;
   bottom: auto !important;
   left: 5% !important;
   width: 90% !important;
@@ -298,20 +293,19 @@
 }
 
 /* -------------------------------------------
-   F) OBSERVAÇÕES
-   Fixado na base final do rodapé preto
+   F) OBSERVAÇÕES (Base do bloco preto inferior)
 ------------------------------------------- */
 .templatePreview .previewNote {
   position: absolute !important;
   top: auto !important;
-  bottom: 2.2% !important;
+  bottom: 2.5% !important;
   left: 0 !important;
   width: 100% !important;
   text-align: center !important;
   z-index: 10 !important;
   font-size: 0.82rem !important;
   font-weight: 900 !important;
-  color: #f59e0b !important; /* Destaque em amarelo sobre o fundo preto */
+  color: #f59e0b !important;
   letter-spacing: 0.6px !important;
   padding: 0 10px !important;
   text-shadow: 1px 1px 2px #000000 !important;
