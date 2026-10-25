@@ -2,17 +2,17 @@
 (function () {
   "use strict";
 
-  const DEFAULT_IMAGE_PATH = "../assets/img/postt3l.png";
+  const DEFAULT_IMAGE_PATH = "../assets/img/frete.jpg";
 
   const PRODUCT_BG_MAP = {
-    DEFAULT: "../assets/img/postt3l.png",
-    SOJA: "../assets/img/postt3l.png",
-    FARELODESOJA: "../assets/img/postt3l.png",
-    MILHO: "../assets/img/postt3l.png",
-    ACUCAR: "../assets/img/postt3l.png",
-    CALCARIO: "../assets/img/postt3l.png",
-    SORGO: "../assets/img/postt3l.png",
-    FERTILIZANTE: "../assets/img/postt3l.png"
+    DEFAULT: "../assets/img/frete.jpg",
+    SOJA: "../assets/img/frete.jpg",
+    FARELODESOJA: "../assets/img/frete.jpg",
+    MILHO: "../assets/img/frete.jpg",
+    ACUCAR: "../assets/img/frete.jpg",
+    CALCARIO: "../assets/img/frete.jpg",
+    SORGO: "../assets/img/frete.jpg",
+    FERTILIZANTE: "../assets/img/frete.jpg"
   };
 
   const PRODUCT_ALIAS = {
